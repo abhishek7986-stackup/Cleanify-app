@@ -32,6 +32,11 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# the template has placeholders only, and tells a new setup what to fill in
+!.env.example
+
+# self-signed dev certificate for phone testing (npm run dev:https)
+/certificates/
 
 # vercel
 .vercel

@@ -1,0 +1,33 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "cleanify-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
+      "port": 3000
+    },
+    {
+      "name": "cleanify-dev-https",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev:https"
+      ],
+      "port": 3000,
+      "url": "https://localhost:3000"
+    },
+    {
+      "name": "cleanify-mac",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev:mac"
+      ],
+      "port": 3001
+    }
+  ]
+}
