@@ -272,6 +272,8 @@ team's trust; the sales rep's review queue is the real control.
 ```
 supabase/migrations/     ordered migrations — schema, RLS, RPCs, scheduler, seed
 docs/PHASE-1.md          how the whole Phase 1 day works, rules, what is left
+docs/DEPLOY-AWS.md       deploying to AWS, push alerts, go-live checklist
+src/app/api/dispatch     sends due notifications; called every minute by pg_cron
 src/proxy.ts             session refresh + optimistic role routing (Next 16 renamed
                          Middleware to Proxy)
 src/lib/supabase/        browser, server and service-role clients
@@ -290,5 +292,6 @@ npm run dev      # Turbopack dev server
 npm run dev:https # same, over https so phones can use the camera (Wi-Fi testing)
 npm run dev:mac  # http://localhost:3001 into the https server, for this Mac
 npm run build    # production build + typecheck
+docker build ... # production image for AWS, see docs/DEPLOY-AWS.md
 npm run lint
 ```

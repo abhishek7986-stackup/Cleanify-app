@@ -51,9 +51,13 @@ export function LoginForm() {
     setError(null);
 
     const supabase = createClient();
-    const email = username.includes("@")
-      ? username.trim()
-      : `${username.trim().toLowerCase()}@${EMAIL_DOMAIN}`;
+    // Self-registered staff sign in with their mobile number, typed any way
+    // ("98765 43210", "+91 98765 43210"); everyone else with a username.
+    const raw = username.trim();
+    const asPhone = /^[+\d\s-]+$/.test(raw) ? raw.replace(/\D/g, "").replace(/^91(?=\d{10}$)/, "") : null;
+    const email = raw.includes("@")
+      ? raw
+      : `${asPhone ?? raw.toLowerCase()}@${EMAIL_DOMAIN}`;
 
     const { error: err } = await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
@@ -170,7 +174,7 @@ export function LoginForm() {
   return (
     <form onSubmit={signInWithPassword} className="space-y-4">
       <label className="block">
-        <span className="mb-1.5 block text-sm font-medium text-slate-700">Username</span>
+        <span className="mb-1.5 block text-sm font-medium text-slate-700">Username or mobile number</span>
         <input
           className={field}
           type="text"

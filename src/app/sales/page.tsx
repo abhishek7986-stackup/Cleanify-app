@@ -3,6 +3,9 @@ import { requireRole } from "@/lib/data/session";
 import { getDayJobs } from "@/lib/data/jobs";
 import { AppShell } from "@/components/AppShell";
 import { DayPicker } from "@/components/DayPicker";
+import { InstallGate } from "@/components/InstallGate";
+import { ApprovalsWaiting } from "@/components/ApprovalsWaiting";
+import { getPendingApprovalCount } from "@/lib/data/approvals";
 import { istDate, formatIstTime } from "@/lib/domain/checkin-policy";
 
 export const metadata = { title: "Day timetable" };
@@ -15,12 +18,15 @@ const SALES_NAV = [
 ];
 
 export default async function SalesToday(props: PageProps<"/sales">) {
-  const profile = await requireRole("sales_rep");
   const sp = await props.searchParams;
   const date = typeof sp.date === "string" ? sp.date : istDate();
   const tab = sp.tab === "done" ? "done" : "assigned";
 
-  const jobs = await getDayJobs(date);
+  const [profile, jobs, waiting] = await Promise.all([
+    requireRole("sales_rep"),
+    getDayJobs(date),
+    getPendingApprovalCount(),
+  ]);
   const done = jobs.filter((j) => j.status === "COMPLETED");
   const open = jobs.filter((j) => j.status !== "COMPLETED" && j.status !== "CANCELLED");
   const late = jobs.filter((j) => j.is_late && !j.late_blameless);
@@ -29,6 +35,8 @@ export default async function SalesToday(props: PageProps<"/sales">) {
   return (
     <AppShell profile={profile} title="Day timetable" nav={SALES_NAV}>
       <div className="space-y-4">
+        <InstallGate audience="approver" />
+        <ApprovalsWaiting count={waiting} />
         <DayPicker date={date} basePath="/sales" />
 
         <div className="grid grid-cols-3 gap-3">

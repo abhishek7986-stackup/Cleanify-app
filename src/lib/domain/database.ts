@@ -103,6 +103,35 @@ export type Profile = {
   is_active: boolean;
   locale: string;
   base_address: string | null;
+  /** Depot point (hex EWKB). Admin-only by RLS; see parseEwkbPoint(). */
+  base_location?: string | null;
+};
+
+export type StaffDocKind = "AADHAAR_FRONT" | "AADHAAR_BACK" | "DRIVING_LICENCE";
+
+/** A new worker's self sign-up, waiting for (or decided by) an admin. */
+export type StaffApplication = {
+  id: string;
+  user_id: string;
+  full_name: string;
+  phone: string;
+  address: string;
+  has_licence: boolean;
+  status: ApprovalStatus;
+  submitted_at: string;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  rejection_reason: string | null;
+};
+
+export type StaffDocument = {
+  id: string;
+  application_id: string;
+  kind: StaffDocKind;
+  storage_path: string;
+  mime_type: string;
+  bytes: number;
+  uploaded_at: string;
 };
 
 export type Client = {
@@ -296,6 +325,8 @@ export type PushSubscriptionRow = {
   is_standalone: boolean | null;
   last_seen_at: string;
   last_ack_at: string | null;
+  last_success_at?: string | null;
+  failure_count?: number;
   disabled_at: string | null;
 };
 
@@ -311,9 +342,13 @@ export type NotificationRow = {
   payload: Record<string, unknown>;
   due_at: string;
   state: string;
+  stale_after_min: number;
   sent_at: string | null;
   read_at: string | null;
   created_at: string;
+  failed_at?: string | null;
+  last_error?: string | null;
+  lease_expires_at?: string | null;
 };
 
 export type Payment = {
@@ -360,6 +395,8 @@ export type Database = {
     Tables: {
       app_settings: Tbl<AppSetting>;
       profiles: Tbl<Profile>;
+      staff_applications: Tbl<StaffApplication>;
+      staff_documents: Tbl<StaffDocument>;
       services: Tbl<Service>;
       service_field_schemas: Tbl<ServiceFieldSchema>;
       service_fields: Tbl<ServiceField>;
@@ -446,6 +483,42 @@ export type Database = {
           p_odometer_km?: number | null;
         };
         Returns: DayRoster;
+      };
+      claim_notifications: {
+        Args: { p_worker: string; p_limit?: number };
+        Returns: NotificationRow[];
+      };
+      mark_notification_sent: {
+        Args: { p_id: string; p_provider_msg_id?: string | null };
+        Returns: undefined;
+      };
+      mark_notification_failed: {
+        Args: { p_id: string; p_error: string };
+        Returns: undefined;
+      };
+      admin_upsert_staff: {
+        Args: {
+          p_user_id: string;
+          p_full_name: string;
+          p_role: UserRole;
+          p_phone?: string | null;
+          p_base_lat?: number | null;
+          p_base_lng?: number | null;
+          p_base_address?: string | null;
+          p_is_active?: boolean;
+        };
+        Returns: Profile;
+      };
+      admin_review_staff_application: {
+        Args: {
+          p_application_id: string;
+          p_approve: boolean;
+          p_reason?: string | null;
+          p_depot_lat?: number | null;
+          p_depot_lng?: number | null;
+          p_depot_address?: string | null;
+        };
+        Returns: StaffApplication;
       };
       submit_checkout: {
         Args: {

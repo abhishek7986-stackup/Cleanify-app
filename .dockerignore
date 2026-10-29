@@ -1,0 +1,14 @@
+# Never send secrets or local build output into the image.
+.env*
+!.env.example
+certificates/
+*.pem
+node_modules/
+.next/
+.git/
+.claude/
+scripts/
+docs/
+supabase/
+*.log
+.DS_Store

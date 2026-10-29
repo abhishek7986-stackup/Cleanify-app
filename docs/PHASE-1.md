@@ -226,3 +226,21 @@ Known gaps, in rough priority order:
 5. **Admin self-service.** Adding staff and editing service questions from
    the app (today: script / database).
 6. **Reports.** Km per supervisor per month, jobs per day, approval times.
+
+---
+
+## 10. Added after v1.0 (29 October 2026)
+
+| Feature | Where |
+|---|---|
+| **New staff sign up themselves**: name, mobile (their username), address, password, Aadhaar + driving licence (or Aadhaar back). Account stays switched off until an admin checks the documents and approves with a depot. Documents are kept permanently, admin-only. | Login → *New staff? Create your account*; Admin → Users → Join requests |
+| **Approval alerts**: every approver gets a phone notification the moment a check-in, before photos, after photos or a new staff sign-up needs them, with reminders at 10 and 30 minutes until someone decides. Supervisors are told when their photos are approved or rejected. | *Enable alerts* banner on Sales Today, Approvals and the Admin dashboard |
+| **"N waiting for your approval"** banner that keeps itself up to date | Sales Today, Admin dashboard |
+| Deactivating a member of staff now removes their access immediately (before, the database kept honouring their old role) | everywhere |
+| Phone layout checked on every screen at 375 px width | all |
+| Production hardening: patched Next.js 16.4.1, security headers, standalone server build, Dockerfile | see [DEPLOY-AWS.md](DEPLOY-AWS.md) |
+
+| Migration | What it does |
+|---|---|
+| `20261029000100` | Staff sign-up tables, private document storage, admin approval; inactive accounts lose all access |
+| `20261029000200` | Approval notifications and reminders; the app (not a Supabase function) sends them |

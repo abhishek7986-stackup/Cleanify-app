@@ -1,5 +1,8 @@
 import { requireRole } from "@/lib/data/session";
 import { AppShell } from "@/components/AppShell";
+import { InstallGate } from "@/components/InstallGate";
+import { ApprovalsWaiting } from "@/components/ApprovalsWaiting";
+import { getPendingApprovalCount } from "@/lib/data/approvals";
 import { createClient } from "@/lib/supabase/server";
 import { formatIstTime, istDate } from "@/lib/domain/checkin-policy";
 
@@ -24,6 +27,11 @@ export default async function AdminDashboard() {
       .eq("roster_date", today),
     getSchedulerHealth(supabase),
   ]);
+  const waiting = await getPendingApprovalCount();
+  const { count: joinRequests } = await supabase
+    .from("staff_applications")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "PENDING");
   const { data: staff } = await supabase.from("staff_directory").select("id, full_name");
   const nameOf = (id: string) => (staff ?? []).find((s) => s.id === id)?.full_name ?? "Supervisor";
 
@@ -43,6 +51,8 @@ export default async function AdminDashboard() {
       ]}
     >
       <div className="space-y-4">
+        <InstallGate audience="approver" />
+        <ApprovalsWaiting count={waiting} />
         {schedulerStale ? (
           <div className="rounded-2xl border border-danger-100 bg-danger-50 p-4">
             <p className="font-semibold text-danger-700">Scheduler is not running</p>
@@ -53,6 +63,21 @@ export default async function AdminDashboard() {
               No reminders or late alerts are being sent. Check pg_cron.
             </p>
           </div>
+        ) : null}
+
+        {joinRequests ? (
+          <a
+            href="/admin/users"
+            className="flex items-center justify-between gap-3 rounded-2xl border-2 border-warn-100 bg-warn-50 p-4"
+          >
+            <span>
+              <span className="block font-semibold text-warn-700">
+                {joinRequests} new staff waiting for approval
+              </span>
+              <span className="block text-sm text-warn-700">Check their documents in Users</span>
+            </span>
+            <span aria-hidden className="text-xl text-warn-700">→</span>
+          </a>
         ) : null}
 
         <div className="grid grid-cols-2 gap-3">

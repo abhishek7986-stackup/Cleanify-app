@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSignedPhotoUrls } from "@/lib/data/photos";
 import { AppShell } from "@/components/AppShell";
 import { AutoRefresh } from "@/components/AutoRefresh";
+import { InstallGate } from "@/components/InstallGate";
 import { renderValue } from "@/components/JobDetailView";
 import { ApprovalCard } from "./ApprovalCard";
 import { SiteReviewCard } from "./SiteReviewCard";
@@ -127,6 +128,7 @@ export default async function ApprovalsPage() {
     <AppShell profile={profile} title="Approvals" nav={nav}>
       <AutoRefresh seconds={15} />
       <div className="space-y-4">
+        <InstallGate audience="approver" />
         <p className="text-sm text-slate-600">
           Supervisors wait on these: their jobs unlock when the depot photos are approved, and cleaning
           starts when the before photos are approved. Approving the after photos closes the job.

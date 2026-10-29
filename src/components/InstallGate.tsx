@@ -24,7 +24,47 @@ import { useIsStandalone, usePlatform } from "@/lib/pwa-store";
  * work. The countdown runs against a server-synced clock whether or not push
  * ever arrives. Push is a nudge.
  */
-export function InstallGate() {
+const COPY = {
+  supervisor: {
+    install: "On iPhone, reminders only work from the installed app.",
+    deniedTitle: "Reminders are blocked",
+    deniedBody: "You will not get the 15-minute check-in reminder.",
+    onTitle: "Turn on check-in reminders",
+    onBody: "You will get a nudge 15 minutes before each check-in is due, and when your photos are approved.",
+  },
+  approver: {
+    install: "On iPhone, approval alerts only work from the installed app.",
+    deniedTitle: "Approval alerts are blocked",
+    deniedBody: "You will not hear when a supervisor is waiting for you.",
+    onTitle: "Get an alert when someone needs approval",
+    onBody: "Supervisors wait for you before they can start. You will get an alert straight away, and a reminder at 10 and 30 minutes.",
+  },
+} as const;
+
+/** Links this device's alerts to whoever is signed in now. */
+async function saveSubscription(sub: PushSubscription) {
+  const json = sub.toJSON() as { keys?: { p256dh?: string; auth?: string } };
+  const supabase = createClient();
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) return;
+  await supabase.from("push_subscriptions").upsert(
+    {
+      user_id: auth.user.id,
+      endpoint: sub.endpoint,
+      p256dh: json.keys?.p256dh ?? "",
+      auth: json.keys?.auth ?? "",
+      user_agent: navigator.userAgent,
+      platform: detectPlatform(),
+      is_standalone: isStandalone(),
+      last_seen_at: new Date().toISOString(),
+      disabled_at: null,
+    },
+    { onConflict: "endpoint" },
+  );
+}
+
+export function InstallGate({ audience = "supervisor" }: { audience?: "supervisor" | "approver" }) {
+  const copy = COPY[audience];
   const platform = usePlatform();
   const standalone = useIsStandalone();
   // Assume deliverable until proven otherwise, so nothing flashes before
@@ -36,7 +76,18 @@ export function InstallGate() {
   useEffect(() => {
     // Deferred past the synchronous effect phase: a setState called straight
     // out of an effect body triggers a cascading render.
-    const id = requestAnimationFrame(() => setState(pushDeliverable()));
+    const id = requestAnimationFrame(() => {
+      const s = pushDeliverable();
+      setState(s);
+      // Alerts already on: make sure they go to the person signed in NOW
+      // (a shared phone, or a sign-out and sign-in as someone else).
+      if (s.ok) {
+        void navigator.serviceWorker?.ready
+          .then((reg) => reg.pushManager.getSubscription())
+          .then((sub) => (sub ? saveSubscription(sub) : undefined))
+          .catch(() => {});
+      }
+    });
     return () => cancelAnimationFrame(id);
   }, []);
 
@@ -52,26 +103,7 @@ export function InstallGate() {
       }
 
       const sub = await subscribeToPush();
-      if (sub) {
-        const json = sub.toJSON() as { keys?: { p256dh?: string; auth?: string } };
-        const supabase = createClient();
-        const { data: auth } = await supabase.auth.getUser();
-        if (auth.user) {
-          await supabase.from("push_subscriptions").upsert(
-            {
-              user_id: auth.user.id,
-              endpoint: sub.endpoint,
-              p256dh: json.keys?.p256dh ?? "",
-              auth: json.keys?.auth ?? "",
-              user_agent: navigator.userAgent,
-              platform: detectPlatform(),
-              is_standalone: isStandalone(),
-              last_seen_at: new Date().toISOString(),
-            },
-            { onConflict: "endpoint" },
-          );
-        }
-      }
+      if (sub) await saveSubscription(sub);
       setState(pushDeliverable());
     } finally {
       setBusy(false);
@@ -87,7 +119,7 @@ export function InstallGate() {
       <Banner tone="warn">
         <p className="font-semibold">Add Cleanify to your Home Screen</p>
         <p className="mt-1 text-sm">
-          On iPhone, reminders only work from the installed app. Tap the Share
+          {copy.install} Tap the Share
           button at the bottom of Safari, then choose{" "}
           <span className="font-medium">Add to Home Screen</span>. Open Cleanify
           from the new icon and sign in once more.
@@ -99,10 +131,10 @@ export function InstallGate() {
   if (state.reason === "denied") {
     return (
       <Banner tone="danger" onDismiss={() => setDismissed(true)}>
-        <p className="font-semibold">Reminders are blocked</p>
+        <p className="font-semibold">{copy.deniedTitle}</p>
         <p className="mt-1 text-sm">
-          You will not get the 15-minute check-in reminder. Allow notifications
-          for this site in your browser settings to turn them back on.
+          {copy.deniedBody} Allow notifications for Cleanify in your phone&apos;s
+          settings to turn them back on.
         </p>
       </Banner>
     );
@@ -110,10 +142,8 @@ export function InstallGate() {
 
   return (
     <Banner tone="brand" onDismiss={() => setDismissed(true)}>
-      <p className="font-semibold">Turn on check-in reminders</p>
-      <p className="mt-1 text-sm">
-        You will get a nudge 15 minutes before each check-in is due.
-      </p>
+      <p className="font-semibold">{copy.onTitle}</p>
+      <p className="mt-1 text-sm">{copy.onBody}</p>
       <button
         type="button"
         onClick={() => void enableAlerts()}

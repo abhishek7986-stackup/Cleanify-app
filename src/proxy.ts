@@ -32,7 +32,10 @@ const ROLE_PREFIX: Record<UserRole, string[]> = {
   supervisor: ["/s"],
 };
 
-const PUBLIC_PATHS = ["/login", "/auth", "/offline", "/api/time"];
+// /join is the new-staff sign-up (and /join/status where an applicant waits).
+// /api/dispatch has no session: it is called by the database scheduler and
+// checks its own shared secret.
+const PUBLIC_PATHS = ["/login", "/auth", "/offline", "/api/time", "/join", "/api/join", "/api/dispatch"];
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -70,6 +73,16 @@ export async function proxy(request: NextRequest) {
   const role = claims?.app_metadata?.role;
   const signedIn = Boolean(claims?.sub);
 
+  // A new applicant (or deactivated staff) is signed in but inactive: the only
+  // screen for them is their status page. The database refuses them too.
+  const inactive = signedIn && claims?.app_metadata?.is_active === false;
+  if (inactive && path !== "/join/status" && (!isPublic || path === "/login" || path === "/join")) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/join/status";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+
   if (!signedIn && !isPublic) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
@@ -77,7 +90,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (signedIn && (path === "/" || path === "/login")) {
+  if (signedIn && (path === "/" || path === "/login" || path === "/join")) {
     const url = request.nextUrl.clone();
     url.pathname = role ? ROLE_HOME[role] : "/login";
     url.search = "";
