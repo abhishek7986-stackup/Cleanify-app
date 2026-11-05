@@ -35,6 +35,7 @@ export default async function CheckinPage() {
         { href: "/s", label: "Today" },
         { href: "/s/roadmap", label: "Roadmap" },
         { href: "/s/history", label: "History" },
+        { href: "/s/payments", label: "Payments" },
       ]}
     >
       {!r ? (

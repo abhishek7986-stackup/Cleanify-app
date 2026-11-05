@@ -33,7 +33,7 @@ export const getSessionProfile = cache(async (): Promise<Profile | null> => {
   const supabase = await createClient();
   const { data } = await supabase
     .from("profiles")
-    .select("id, full_name, phone, role, is_active, locale, base_address")
+    .select("id, full_name, phone, role, is_active, locale, base_address, is_super_admin")
     .eq("id", userId)
     .maybeSingle();
 

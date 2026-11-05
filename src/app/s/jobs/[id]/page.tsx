@@ -7,7 +7,9 @@ import { JobDetailView } from "@/components/JobDetailView";
 import { createClient } from "@/lib/supabase/server";
 import { parseEwkbPoint } from "@/lib/location-link";
 import type { ApprovalStatus } from "@/lib/domain/database";
+import { PAYMENTS_START_AT, rupees } from "@/lib/domain/payments";
 import { JobFlow, type FlowUnit } from "./JobFlow";
+import { CollectPayment } from "./CollectPayment";
 
 export const dynamic = "force-dynamic";
 
@@ -49,6 +51,23 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
   // The location is the reward for an approved depot check-in.
   const unlocked = depot === "APPROVED";
 
+  // The customer pays when the work is finished, not when the office approves
+  // the photos, so this opens as soon as the after photos are sent.
+  const canCollect =
+    (job.status === "COMPLETED" && Boolean(job.completed_at) && new Date(job.completed_at!) >= new Date(PAYMENTS_START_AT)) ||
+    (job.status === "IN_PROGRESS" && job.after_review !== null);
+  const [{ data: paid }, { data: workers }, { data: upiSetting }] = canCollect
+    ? await Promise.all([
+        supabase
+          .from("payments")
+          .select("id, amount, mode, verified_at, note")
+          .eq("job_id", job.id)
+          .is("voided_at", null),
+        supabase.rpc("list_workers"),
+        supabase.from("app_settings").select("value").eq("key", "payments.upi").maybeSingle(),
+      ])
+    : [{ data: null }, { data: null }, { data: null }];
+
   return (
     <AppShell
       profile={profile}
@@ -57,6 +76,7 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
         { href: "/s", label: "Today" },
         { href: "/s/roadmap", label: "Roadmap" },
         { href: "/s/history", label: "History" },
+        { href: "/s/payments", label: "Payments" },
       ]}
     >
       <div className="space-y-4">
@@ -77,6 +97,29 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
           after={{ status: job.after_review, reason: job.after_rejection_reason }}
           completedAt={job.completed_at}
         />
+        {canCollect && paid?.length ? (
+          <section className="rounded-2xl border border-ok-100 bg-ok-50 p-4">
+            <h2 className="font-semibold text-ok-700">Payment marked</h2>
+            <ul className="mt-1 text-sm text-ok-700">
+              {paid.map((p) => (
+                <li key={p.id}>
+                  {p.mode === "upi" ? "UPI" : "Cash"} {rupees(p.amount)}
+                  {p.mode === "upi" ? (p.verified_at ? " · checked by office" : " · office to check") : " · with you"}
+                </li>
+              ))}
+            </ul>
+            {paid[0].note ? <p className="mt-1 text-sm text-ok-700">Note: {paid[0].note}</p> : null}
+            <p className="mt-2 text-xs text-ok-700">Wrong? Call the office. They can cancel it so you can mark it again.</p>
+          </section>
+        ) : canCollect ? (
+          <CollectPayment
+            jobId={job.id}
+            jobNumber={job.job_number}
+            quoted={job.quoted_amount != null ? Number(job.quoted_amount) : null}
+            upi={(upiSetting?.value as { id: string; name: string } | undefined) ?? null}
+            workers={workers ?? []}
+          />
+        ) : null}
         <JobDetailView detail={detail} />
         <Link
           href="/s"

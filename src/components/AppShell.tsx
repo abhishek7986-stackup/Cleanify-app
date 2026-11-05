@@ -26,7 +26,7 @@ export function AppShell({
           <div className="min-w-0">
             <h1 className="truncate text-lg font-semibold text-slate-900">{title}</h1>
             <p className="truncate text-xs text-slate-500">
-              Signed in as {profile.full_name} · {roleLabel(profile.role)}
+              Signed in as {profile.full_name} · {roleLabel(profile)}
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-1">
@@ -58,6 +58,7 @@ export function AppShell({
   );
 }
 
-function roleLabel(role: Profile["role"]): string {
+function roleLabel({ role, is_super_admin }: Profile): string {
+  if (is_super_admin) return "Super admin";
   return role === "admin" ? "Admin" : role === "sales_rep" ? "Sales" : "Supervisor";
 }

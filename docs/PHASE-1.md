@@ -244,3 +244,42 @@ Known gaps, in rough priority order:
 |---|---|
 | `20261029000100` | Staff sign-up tables, private document storage, admin approval; inactive accounts lose all access |
 | `20261029000200` | Approval notifications and reminders; the app (not a Supabase function) sends them |
+
+---
+
+## 11. Payments and the Monday payout (5 November 2026)
+
+| Who | Does | Where |
+|---|---|---|
+| **Supervisor** | After sending the after photos: shows the customer a UPI QR with the amount, or takes cash, or both. Marks it and ticks who worked with them. | Job page → *Collect payment* |
+| **Supervisor** | Sees their own earnings, cash held and Monday figure. Nobody else's. | *Payments* |
+| **Calling staff** | Add workers and set joining date and percentages. See all payments and payouts. | *Payments → Team %* |
+| **Admin** | Everything above, plus: ticks UPI as found in the bank, cancels a wrong payment with a reason, marks Monday payouts as paid or returned. | *Payments*, *Monday payout* |
+| **Super admin** | Everything an admin does, plus: sets the company UPI ID, reverses a payout. | Same pages |
+
+### The rules
+
+- **Earnings:** each person earns their own percentage of the amount collected on the job. The percentage is frozen on the job, so later changes never alter old figures.
+- **Percentage:** the start percentage (14) rises 1 point per full month from the joining date, up to 17. *Fixed %* overrides it.
+- **Cash** stays with the supervisor who collected it and comes off their payout. **UPI** goes to the company.
+- **Week:** Monday to Sunday by the date the money came in, in IST. A week can be settled from the following Monday.
+- **Monday figure:** carried over from earlier weeks + earned − cash held. Above zero the company pays; below zero the person returns it.
+- **Short payments:** paying or returning less than the full figure is allowed, and the rest moves to the next week. So does a Monday that is skipped.
+- **Different amount:** a total different from the quote needs a note.
+- **UPI is not automatic:** a plain UPI QR cannot tell the app the money arrived, so the supervisor marks it and an admin checks it against the bank. Unchecked amounts stay visible on the Payments page.
+- **Nothing is deleted:** a cancelled payment or reversed payout stays on record with who, when and why. A payment cannot be cancelled once that week is paid out; reverse the payout first.
+
+### Setting up
+
+Create the super admin login (its password is `SEED_SUPER_ADMIN_PASSWORD` in `.env.local`). This touches only that account:
+
+```bash
+npm run seed:users -- --only=superadmin
+```
+
+Then sign in as `superadmin` and add the company UPI ID under *Payments*. Until that is done, supervisors have no QR to show.
+
+| Migration | What it does |
+|---|---|
+| `20261105000100` | Super admin, staff percentages, UPI and cash payments, earnings, payouts |
+| `20261105000200` | *Not collected yet* lists only jobs completed since payments went live |

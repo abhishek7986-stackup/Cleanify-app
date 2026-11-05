@@ -34,6 +34,7 @@ export default async function SalesJobPage(props: PageProps<"/sales/jobs/[id]">)
         { href: "/sales", label: "Today" },
         { href: "/sales/new", label: "New job" },
         { href: "/sales/approvals", label: "Approvals" },
+        { href: "/sales/payments", label: "Payments" },
       ]}
     >
       <div className="space-y-4">

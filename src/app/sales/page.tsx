@@ -15,6 +15,7 @@ const SALES_NAV = [
   { href: "/sales", label: "Today" },
   { href: "/sales/new", label: "New job" },
   { href: "/sales/approvals", label: "Approvals" },
+  { href: "/sales/payments", label: "Payments" },
 ];
 
 export default async function SalesToday(props: PageProps<"/sales">) {

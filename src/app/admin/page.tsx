@@ -46,6 +46,7 @@ export default async function AdminDashboard() {
       nav={[
         { href: "/admin", label: "Today" },
         { href: "/sales/approvals", label: "Approvals" },
+        { href: "/sales/payments", label: "Payments" },
         { href: "/admin/users", label: "Users" },
         { href: "/admin/services", label: "Services" },
       ]}

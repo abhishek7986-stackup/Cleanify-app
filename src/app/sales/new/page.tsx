@@ -21,6 +21,7 @@ export default async function NewJobPage() {
         { href: "/sales", label: "Today" },
         { href: "/sales/new", label: "New job" },
         { href: "/sales/approvals", label: "Approvals" },
+        { href: "/sales/payments", label: "Payments" },
       ]}
     >
       <NewJobWizard services={services} supervisors={supervisors} />

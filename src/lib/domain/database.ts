@@ -103,6 +103,8 @@ export type Profile = {
   is_active: boolean;
   locale: string;
   base_address: string | null;
+  /** An admin who can also change UPI details and reverse payouts. */
+  is_super_admin?: boolean;
   /** Depot point (hex EWKB). Admin-only by RLS; see parseEwkbPoint(). */
   base_location?: string | null;
 };
@@ -359,6 +361,94 @@ export type Payment = {
   reference: string | null;
   collected_at: string | null;
   recorded_by: string;
+  note: string | null;
+  week_start: string | null;
+  held_by_staff_id: string | null;
+  verified_at: string | null;
+  verified_by: string | null;
+  voided_at: string | null;
+  voided_by: string | null;
+  void_reason: string | null;
+};
+
+export type PayStaff = {
+  id: string;
+  profile_id: string | null;
+  kind: "supervisor" | "worker";
+  full_name: string;
+  phone: string | null;
+  joined_on: string;
+  start_percent: number;
+  max_percent: number;
+  fixed_percent: number | null;
+  is_active: boolean;
+};
+
+export type JobEarning = {
+  id: string;
+  job_id: string;
+  staff_id: string;
+  percent: number;
+  base_amount: number;
+  amount: number;
+  week_start: string;
+  voided_at: string | null;
+  created_at: string;
+};
+
+export type Payout = {
+  id: string;
+  staff_id: string;
+  week_start: string;
+  brought_forward: number;
+  earned: number;
+  cash_held: number;
+  net_due: number;
+  settled_amount: number;
+  carry_forward: number;
+  method: "cash" | "upi" | "bank" | "none";
+  note: string | null;
+  settled_by: string;
+  settled_at: string;
+  reversed_at: string | null;
+};
+
+/** One person's week. net_due above zero: pay them. Below zero: they return it. */
+export type PayoutStatementRow = {
+  staff_id: string;
+  full_name: string;
+  kind: "supervisor" | "worker";
+  percent_now: number;
+  job_count: number;
+  earned: number;
+  cash_held: number;
+  brought_forward: number;
+  net_due: number;
+  payout_id: string | null;
+  settled_amount: number | null;
+  carry_forward: number | null;
+  method: Payout["method"] | null;
+  note: string | null;
+  settled_at: string | null;
+};
+
+export type PaymentTotalRow = {
+  supervisor_id: string | null;
+  supervisor_name: string | null;
+  job_count: number;
+  upi_total: number;
+  cash_total: number;
+  upi_unchecked: number;
+};
+
+export type JobAwaitingPayment = {
+  job_id: string;
+  job_number: string;
+  client_name: string | null;
+  supervisor_name: string | null;
+  quoted_amount: number | null;
+  service_date: string;
+  status: JobStatus;
 };
 
 export type JobEvent = {
@@ -407,6 +497,9 @@ export type Database = {
       photos: Tbl<Photo>;
       capture_tokens: Tbl<CaptureToken>;
       payments: Tbl<Payment>;
+      pay_staff: Tbl<PayStaff>;
+      job_earnings: Tbl<JobEarning>;
+      payouts: Tbl<Payout>;
       job_events: Tbl<JobEvent>;
       reasons: Tbl<Reason>;
       checkin_policies: Tbl<CheckinPolicy>;
@@ -549,15 +642,46 @@ export type Database = {
         Returns: Job;
       };
       recompute_for_job: { Args: { p_job_id: string }; Returns: unknown };
-      record_payment: {
+      record_job_payment: {
         Args: {
           p_job_id: string;
-          p_amount: number;
-          p_mode: PaymentMode;
-          p_reference?: string | null;
+          p_upi_amount: number;
+          p_cash_amount: number;
+          p_worker_ids?: string[];
+          p_note?: string | null;
         };
-        Returns: Payment;
+        Returns: number;
       };
+      verify_upi_payment: { Args: { p_payment_id: string }; Returns: undefined };
+      void_job_payment: { Args: { p_job_id: string; p_reason: string }; Returns: undefined };
+      payment_totals: { Args: { p_from: string; p_to: string }; Returns: PaymentTotalRow[] };
+      jobs_awaiting_payment: { Args: Record<string, never>; Returns: JobAwaitingPayment[] };
+      payout_statement: { Args: { p_week: string }; Returns: PayoutStatementRow[] };
+      settle_payout: {
+        Args: {
+          p_staff_id: string;
+          p_week: string;
+          p_amount: number;
+          p_method: Payout["method"];
+          p_note?: string | null;
+        };
+        Returns: Payout;
+      };
+      reverse_payout: { Args: { p_payout_id: string; p_reason: string }; Returns: undefined };
+      upsert_pay_staff: {
+        Args: {
+          p_id: string | null;
+          p_full_name: string | null;
+          p_phone: string | null;
+          p_joined_on: string;
+          p_start_percent: number;
+          p_fixed_percent: number | null;
+          p_is_active?: boolean;
+        };
+        Returns: PayStaff;
+      };
+      list_workers: { Args: Record<string, never>; Returns: { id: string; full_name: string }[] };
+      set_upi_details: { Args: { p_upi_id: string; p_payee_name: string }; Returns: undefined };
     };
     Enums: {
       user_role: UserRole;

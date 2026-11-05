@@ -116,12 +116,14 @@ export default async function ApprovalsPage() {
       ? [
           { href: "/admin", label: "Today" },
           { href: "/sales/approvals", label: "Approvals" },
+          { href: "/sales/payments", label: "Payments" },
           { href: "/admin/users", label: "Users" },
         ]
       : [
           { href: "/sales", label: "Today" },
           { href: "/sales/new", label: "New job" },
           { href: "/sales/approvals", label: "Approvals" },
+          { href: "/sales/payments", label: "Payments" },
         ];
 
   return (

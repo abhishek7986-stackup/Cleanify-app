@@ -27,6 +27,7 @@ screen works, the rules enforced, and what is left.
 | **M3 — Travel + deadlines** | Engine is done and running. Needs a Maps provider; currently falls back to straight-line distance and marks it `deadline_state = 'failed'` rather than inventing an ETA. |
 | **M4 — Notifications** | Outbox, sweeps and cron are live. Needs VAPID keys and WhatsApp templates. |
 | **M5 — Admin self-service** | Services and Users are read-only views. The field builder is not built — but the model behind it is, so a new service can be added by inserting rows today. |
+| **Payments** | Done. UPI QR and cash collection, payment reports, staff percentages and the Monday payout; see section 11 of [docs/PHASE-1.md](docs/PHASE-1.md). |
 
 ---|---|
 | **M0 — Foundations** | Done. Auth, roles, RLS, proxy routing, PWA shell, install gate. |
