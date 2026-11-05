@@ -2,9 +2,9 @@ import { expect, type Browser, type Page } from "@playwright/test";
 import pg from "pg";
 
 export const USERS = {
-  admin: { username: "admin", password: process.env.SEED_ADMIN_PASSWORD ?? "CleanifyAdmin#2026", home: "/admin" },
-  priya: { username: "priya", password: process.env.SEED_SALES_PASSWORD ?? "CleanifySales#2026", home: "/sales" },
-  ravi: { username: "ravi", password: process.env.SEED_SUPERVISOR_PASSWORD ?? "CleanifySuper#2026", home: "/s" },
+  admin: { username: "admin", password: process.env.SEED_ADMIN_PASSWORD!, home: "/admin" },
+  priya: { username: "priya", password: process.env.SEED_SALES_PASSWORD!, home: "/sales" },
+  ravi: { username: "ravi", password: process.env.SEED_SUPERVISOR_PASSWORD!, home: "/s" },
 } as const;
 
 export type Who = keyof typeof USERS;

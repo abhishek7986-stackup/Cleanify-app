@@ -110,18 +110,17 @@ This creates three staff accounts through the Admin API (raw SQL cannot be used
 — Supabase needs the password hashed and an `auth.identities` row written, or
 sign-in silently fails). Re-running it updates the accounts rather than erroring.
 
-| Role | Username | Password |
+| Role | Username | Password in `.env.local` |
 |---|---|---|
-| Admin | `admin` | `CleanifyAdmin#2026` |
-| Sales rep | `priya` | `CleanifySales#2026` |
-| Supervisor | `ravi` | `CleanifySuper#2026` |
+| Admin | `admin` | `SEED_ADMIN_PASSWORD` |
+| Sales rep | `priya` | `SEED_SALES_PASSWORD` |
+| Supervisor | `ravi` | `SEED_SUPERVISOR_PASSWORD` |
 
 Sign in with the **username only** — the login form appends
-`@cleanify.internal`. Override any password with `SEED_ADMIN_PASSWORD`,
-`SEED_SALES_PASSWORD` or `SEED_SUPERVISOR_PASSWORD`.
+`@cleanify.internal`. The script stops if any of the three is not set.
 
-> **Development credentials.** Change every one of them before this reaches
-> anyone outside your team.
+> **Never put a password in this repository.** Anything committed stays in its
+> history, even after it is deleted from the file.
 
 **Set the depot before you test timings.** The supervisor's check-in deadline is
 derived entirely from the travel time between the depot and their first job, so

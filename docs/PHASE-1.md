@@ -18,8 +18,8 @@ been tested against the live Supabase project.
 | **Admin** | `admin` | Dashboard | Sees everything, can approve anything |
 
 Sign-in is **username + password**; the app adds `@cleanify.internal` itself.
-Test passwords are in the README (section 6). Change them before real staff use
-the app.
+Test passwords are the `SEED_*_PASSWORD` values in `.env.local`, never in the
+repository.
 
 ---
 

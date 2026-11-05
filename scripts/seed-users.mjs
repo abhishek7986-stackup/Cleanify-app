@@ -37,6 +37,14 @@ if (!SERVICE_KEY) {
   );
   process.exit(1);
 }
+const { SEED_ADMIN_PASSWORD, SEED_SALES_PASSWORD, SEED_SUPERVISOR_PASSWORD } = process.env;
+if (!SEED_ADMIN_PASSWORD || !SEED_SALES_PASSWORD || !SEED_SUPERVISOR_PASSWORD) {
+  console.error(
+    "Set SEED_ADMIN_PASSWORD, SEED_SALES_PASSWORD and SEED_SUPERVISOR_PASSWORD in .env.local.\n" +
+      "Passwords are never kept in this repository.",
+  );
+  process.exit(1);
+}
 
 const STAFF = [
   {
@@ -44,21 +52,21 @@ const STAFF = [
     full_name: "Cleanify Admin",
     role: "admin",
     phone: "+919000000001",
-    password: process.env.SEED_ADMIN_PASSWORD ?? "CleanifyAdmin#2026",
+    password: SEED_ADMIN_PASSWORD,
   },
   {
     username: "priya",
     full_name: "Priya (Sales)",
     role: "sales_rep",
     phone: "+919000000002",
-    password: process.env.SEED_SALES_PASSWORD ?? "CleanifySales#2026",
+    password: SEED_SALES_PASSWORD,
   },
   {
     username: "ravi",
     full_name: "Ravi (Supervisor)",
     role: "supervisor",
     phone: "+919000000003",
-    password: process.env.SEED_SUPERVISOR_PASSWORD ?? "CleanifySuper#2026",
+    password: SEED_SUPERVISOR_PASSWORD,
     base_lat: DEPOT_LAT,
     base_lng: DEPOT_LNG,
     base_address: DEPOT_ADDRESS,
@@ -134,13 +142,8 @@ for (const person of STAFF) {
 if (results.length) {
   console.log("\n  Sign in at /login with the username only — the form appends");
   console.log(`  @${DOMAIN} for you.\n`);
-  console.table(
-    results.map((r) => ({ username: r.username, role: r.role, password: r.password })),
-  );
-  console.log(
-    "\n  These are DEVELOPMENT credentials. Change every password before this\n" +
-      "  reaches anyone outside your team.\n",
-  );
+  console.table(results.map((r) => ({ username: r.username, role: r.role })));
+  console.log("\n  Passwords are the SEED_*_PASSWORD values in .env.local.\n");
   console.log(
     "  If sign-in works but everything looks empty or forbidden, the Custom\n" +
       "  Access Token hook is not registered — role lives in the JWT, and every\n" +
