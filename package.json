@@ -11,7 +11,8 @@
     "lint": "eslint",
     "seed:users": "node --env-file=.env.local scripts/seed-users.mjs",
     "db:push": "node --env-file=.env.local scripts/migrate.mjs",
-    "db:status": "node --env-file=.env.local scripts/migrate.mjs --status"
+    "db:status": "node --env-file=.env.local scripts/migrate.mjs --status",
+    "test:e2e": "next build && playwright test"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
@@ -27,8 +28,10 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.56.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pg": "^8.15.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/web-push": "^3.6.4",

@@ -44,3 +44,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# playwright
+/e2e-report/
+/test-results/
+/playwright/.cache/
+.impeccable/hook.cache.json
+.impeccable/hook.pending.json
+
+# design tools installed for Claude; not part of the app
+/.claude/skills/
+/.claude/agents/
