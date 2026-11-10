@@ -78,7 +78,7 @@ export default async function PayoutsPage(props: PageProps<"/sales/payouts">) {
     r.payout_id ? Number(r.carry_forward ?? 0) : Number(r.net_due);
   const toPay = rows.reduce((n, r) => n + Math.max(0, r.payout_id ? 0 : Number(r.net_due)), 0);
   const toReturn = rows.reduce((n, r) => n + Math.max(0, r.payout_id ? 0 : -Number(r.net_due)), 0);
-  const isAdmin = profile.role === "admin";
+  const canManageMoney = profile.role === "admin" || profile.role === "sales_rep";
 
   return (
     <AppShell profile={profile} title="Monday payout" nav={officeNav(profile)}>
@@ -235,9 +235,9 @@ export default async function PayoutsPage(props: PageProps<"/sales/payouts">) {
                             </p>
                           ) : null}
                           {r.note ? <p className="mt-1 text-slate-500">Note: {r.note}</p> : null}
-                          {profile.is_super_admin ? <ReversePayoutButton payoutId={r.payout_id} /> : null}
+                          {canManageMoney ? <ReversePayoutButton payoutId={r.payout_id} /> : null}
                         </div>
-                      ) : isAdmin && finished ? (
+                      ) : canManageMoney && finished ? (
                         <SettleForm staffId={r.staff_id} week={week} net={net} />
                       ) : null}
                     </>

@@ -77,7 +77,8 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
   const byJob = new Map<string, Row[]>();
   for (const row of listRes.data ?? []) byJob.set(row.job_id, [...(byJob.get(row.job_id) ?? []), row]);
 
-  const isAdmin = profile.role === "admin";
+  // Calling staff look after all the money; there is no separate super admin.
+  const canManageMoney = profile.role === "admin" || profile.role === "sales_rep";
 
   return (
     <AppShell profile={profile} title="Payments" nav={officeNav(profile)}>
@@ -85,11 +86,11 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
       <div className="space-y-4">
         <OfficeTabs active="payments" />
 
-        {profile.is_super_admin ? (
+        {canManageMoney ? (
           <UpiSettings upi={upi} />
         ) : !upi ? (
           <p className="rounded-2xl border border-warn-100 bg-warn-50 p-3 text-sm text-warn-700">
-            The company UPI ID is not set up, so supervisors have no QR to show. A super admin can add it here.
+            The company UPI ID is not set up, so supervisors have no QR to show. Calling staff can add it here.
           </p>
         ) : null}
 
@@ -255,12 +256,12 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
                             </span>
                           ) : null}
                         </span>
-                        {isAdmin && r.mode === "upi" && !r.verified_at ? <VerifyUpiButton paymentId={r.id} /> : null}
+                        {canManageMoney && r.mode === "upi" && !r.verified_at ? <VerifyUpiButton paymentId={r.id} /> : null}
                       </li>
                     ))}
                   </ul>
                   {rows[0].note ? <p className="mt-2 text-sm text-slate-600">Note: {rows[0].note}</p> : null}
-                  {isAdmin ? <CancelPaymentButton jobId={jobId} /> : null}
+                  {canManageMoney ? <CancelPaymentButton jobId={jobId} /> : null}
                 </article>
               );
             })

@@ -253,9 +253,10 @@ Known gaps, in rough priority order:
 |---|---|---|
 | **Supervisor** | After sending the after photos: shows the customer a UPI QR with the amount, or takes cash, or both. Marks it and ticks who worked with them. | Job page → *Collect payment* |
 | **Supervisor** | Sees their own earnings, cash held and Monday figure. Nobody else's. | *Payments* |
-| **Calling staff** | Add workers and set joining date and percentages. See all payments and payouts. | *Payments → Team %* |
-| **Admin** | Everything above, plus: ticks UPI as found in the bank, cancels a wrong payment with a reason, marks Monday payouts as paid or returned. | *Payments*, *Monday payout* |
-| **Super admin** | Everything an admin does, plus: sets the company UPI ID, reverses a payout. | Same pages |
+| **Calling staff** | Look after all the money: set the company UPI ID, add workers and set joining date and percentages, tick UPI as found in the bank, cancel a wrong payment with a reason, mark Monday payouts as paid or returned, reverse a payout. | *Payments*, *Payments → Team %*, *Monday payout* |
+| **Admin** | Everything calling staff can do. | Same pages |
+
+There is no separate super admin: calling staff are responsible for the bank details and salaries (changed 10 November 2026).
 
 ### The rules
 
@@ -268,21 +269,16 @@ Known gaps, in rough priority order:
 - **Monday figure:** carried over from earlier weeks + salary − cash in hand. Above zero the company pays; below zero the person returns it.
 - **Short payments:** paying or returning less than the full figure is allowed, and the rest moves to the next week. So does a Monday that is skipped.
 - **Different amount:** a total different from the quote needs a note.
-- **UPI is not automatic:** a plain UPI QR cannot tell the app the money arrived, so the supervisor marks it and an admin checks it against the bank. Unchecked amounts stay visible on the Payments page.
+- **UPI is not automatic:** a plain UPI QR cannot tell the app the money arrived, so the supervisor marks it and calling staff check it against the bank. Unchecked amounts stay visible on the Payments page.
 - **Nothing is deleted:** a cancelled payment or reversed payout stays on record with who, when and why. A payment cannot be cancelled once that week is paid out; reverse the payout first.
 
 ### Setting up
 
-Create the super admin login (its password is `SEED_SUPER_ADMIN_PASSWORD` in `.env.local`). This touches only that account:
-
-```bash
-npm run seed:users -- --only=superadmin
-```
-
-Then sign in as `superadmin` and add the company UPI ID under *Payments*. Until that is done, supervisors have no QR to show.
+Sign in as calling staff (or admin) and add the company UPI ID under *Payments*. Until that is done, supervisors have no QR to show.
 
 | Migration | What it does |
 |---|---|
 | `20261105000100` | Super admin, staff percentages, UPI and cash payments, earnings, payouts |
 | `20261105000200` | *Not collected yet* lists only jobs completed since payments went live |
 | `20261110000100` | Workers need a valid mobile number, stored as +91XXXXXXXXXX |
+| `20261110000200` | Calling staff can set the UPI ID, check and cancel payments, and settle or reverse payouts |
