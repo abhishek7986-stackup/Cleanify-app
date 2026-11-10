@@ -72,8 +72,16 @@ export function StaffForm({ staff, today }: { staff?: PayStaff; today: string })
             <input value={name} onChange={(e) => setName(e.target.value)} className={input} />
           </label>
           <label className="block text-sm font-medium text-slate-700">
-            Mobile <span className="font-normal text-slate-400">(optional)</span>
-            <input type="tel" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className={input} />
+            Mobile (WhatsApp)
+            <input
+              type="tel"
+              inputMode="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="98765 43210"
+              className={input}
+            />
+            <span className="mt-1 block text-xs font-normal text-slate-500">Their weekly salary slip is sent here.</span>
           </label>
         </>
       ) : null}

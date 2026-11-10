@@ -259,11 +259,13 @@ Known gaps, in rough priority order:
 
 ### The rules
 
-- **Earnings:** each person earns their own percentage of the amount collected on the job. The percentage is frozen on the job, so later changes never alter old figures.
+- **Workers have no login.** Calling staff add them under *Team %* with a joining date and a mobile number (required). The supervisor ticks who worked with them on each job, and the hike happens by itself.
+- **Salary slip:** on *Monday payout*, *Send salary slip on WhatsApp* opens WhatsApp with that person's week filled in: salary, cash in hand, what is paid or to return, and when their next hike is. Someone in the office taps send; no WhatsApp Business setup is needed.
+- **Salary:** each person earns their own percentage of the amount collected on the job. The percentage is frozen on the job, so later changes never alter old figures.
 - **Percentage:** the start percentage (14) rises 1 point per full month from the joining date, up to 17. *Fixed %* overrides it.
 - **Cash** stays with the supervisor who collected it and comes off their payout. **UPI** goes to the company.
 - **Week:** Monday to Sunday by the date the money came in, in IST. A week can be settled from the following Monday.
-- **Monday figure:** carried over from earlier weeks + earned − cash held. Above zero the company pays; below zero the person returns it.
+- **Monday figure:** carried over from earlier weeks + salary − cash in hand. Above zero the company pays; below zero the person returns it.
 - **Short payments:** paying or returning less than the full figure is allowed, and the rest moves to the next week. So does a Monday that is skipped.
 - **Different amount:** a total different from the quote needs a note.
 - **UPI is not automatic:** a plain UPI QR cannot tell the app the money arrived, so the supervisor marks it and an admin checks it against the bank. Unchecked amounts stay visible on the Payments page.
@@ -283,3 +285,4 @@ Then sign in as `superadmin` and add the company UPI ID under *Payments*. Until 
 |---|---|
 | `20261105000100` | Super admin, staff percentages, UPI and cash payments, earnings, payouts |
 | `20261105000200` | *Not collected yet* lists only jobs completed since payments went live |
+| `20261110000100` | Workers need a valid mobile number, stored as +91XXXXXXXXXX |

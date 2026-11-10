@@ -49,6 +49,59 @@ export function upiLink(args: { id: string; name: string; amount: number; jobNum
 }
 
 /**
+ * The weekly slip a worker or supervisor gets on WhatsApp. They have no login,
+ * so this message is their record of what they were paid and when the next
+ * hike comes. Same figures as the Monday payout card.
+ */
+export function salarySlip(args: {
+  name: string;
+  week: string;
+  percentNow: number;
+  jobCount: number;
+  salary: number;
+  cashHeld: number;
+  broughtForward: number;
+  net: number;
+  settled: { amount: number; method: string | null; on: string | null; left: number } | null;
+  nextRise: string | null;
+}): string {
+  const lines = [
+    `Cleanify salary, ${weekLabel(args.week)}`,
+    `${args.name}, ${args.percentNow}% now`,
+    `${args.jobCount} ${args.jobCount === 1 ? "job" : "jobs"}, salary ${rupees(args.salary)}`,
+  ];
+  if (args.cashHeld > 0) lines.push(`Cash you collected: ${rupees(args.cashHeld)}`);
+  if (args.broughtForward > 0) lines.push(`Still owed to you from earlier weeks: ${rupees(args.broughtForward)}`);
+  if (args.broughtForward < 0) lines.push(`Still to return from earlier weeks: ${rupees(-args.broughtForward)}`);
+  lines.push(
+    args.net > 0
+      ? `Company pays you: ${rupees(args.net)}`
+      : args.net < 0
+        ? `You return to company: ${rupees(-args.net)}`
+        : "Nothing to hand over this week",
+  );
+  if (args.settled) {
+    const s = args.settled;
+    if (s.amount !== 0) {
+      const how = s.method && s.method !== "none" ? ` by ${s.method === "upi" ? "UPI" : s.method}` : "";
+      lines.push(`${s.amount > 0 ? "Paid" : "Returned"} ${rupees(Math.abs(s.amount))}${how}${s.on ? ` on ${s.on}` : ""}.`);
+    }
+    if (s.left > 0) lines.push(`${rupees(s.left)} still owed to you, added to next week.`);
+    if (s.left < 0) lines.push(`${rupees(-s.left)} still to return, added to next week.`);
+  }
+  if (args.nextRise) lines.push(`From ${shortDate(args.nextRise)} your percentage goes up to ${args.percentNow + 1}%.`);
+  return lines.join("\n");
+}
+
+/** wa.me wants the number as digits with the country code and no plus sign. */
+export function whatsappLink(phone: string, text: string): string | null {
+  const digits = phone.replace(/\D/g, "");
+  const number = digits.length === 10 ? `91${digits}` : digits;
+  if (!/^91[6-9]\d{9}$/.test(number)) return null;
+  return `https://wa.me/${number}?text=${encodeURIComponent(text)}`;
+}
+
+/**
  * For showing on the Team screen only; public.pay_percent() is what pays. The
  * next rise is the anniversary of the joining date, so a preview of a percentage
  * is only ever a label.

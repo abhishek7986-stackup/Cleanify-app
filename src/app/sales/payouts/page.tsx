@@ -5,7 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { OfficeTabs } from "@/components/OfficeTabs";
 import { officeNav } from "@/lib/nav";
 import { formatIstDate, istDate } from "@/lib/domain/checkin-policy";
-import { addDays, mondayOf, rupees, weekLabel } from "@/lib/domain/payments";
+import { addDays, mondayOf, previewPercent, rupees, salarySlip, weekLabel, whatsappLink } from "@/lib/domain/payments";
 import type { PayoutStatementRow } from "@/lib/domain/database";
 import { ReversePayoutButton, SettleForm } from "./PayoutActions";
 
@@ -31,7 +31,7 @@ export default async function PayoutsPage(props: PageProps<"/sales/payouts">) {
 
   const profile = await requireRole("sales_rep");
   const supabase = await createClient();
-  const [statementRes, earningsRes] = await Promise.all([
+  const [statementRes, earningsRes, staffRes] = await Promise.all([
     supabase.rpc("payout_statement", { p_week: week }),
     supabase
       .from("job_earnings")
@@ -40,9 +40,38 @@ export default async function PayoutsPage(props: PageProps<"/sales/payouts">) {
       .is("voided_at", null)
       .order("created_at")
       .overrideTypes<EarningRow[], { merge: false }>(),
+    supabase.from("pay_staff").select("id, phone, joined_on, start_percent, max_percent, fixed_percent"),
   ]);
 
   const rows = statementRes.data ?? [];
+  const staffById = new Map((staffRes.data ?? []).map((s) => [s.id, s]));
+  const today = istDate();
+  const slipLink = (r: PayoutStatementRow) => {
+    const s = staffById.get(r.staff_id);
+    if (!s?.phone) return null;
+    return whatsappLink(
+      s.phone,
+      salarySlip({
+        name: r.full_name,
+        week,
+        percentNow: Number(r.percent_now),
+        jobCount: Number(r.job_count),
+        salary: Number(r.earned),
+        cashHeld: Number(r.cash_held),
+        broughtForward: Number(r.brought_forward),
+        net: Number(r.net_due),
+        settled: r.payout_id
+          ? {
+              amount: Number(r.settled_amount ?? 0),
+              method: r.method,
+              on: r.settled_at ? formatIstDate(r.settled_at) : null,
+              left: Number(r.carry_forward ?? 0),
+            }
+          : null,
+        nextRise: previewPercent(s, today).nextRise,
+      }),
+    );
+  };
   const earnings = earningsRes.data ?? [];
   // What is still left to hand over, this week.
   const leftToSettle = (r: PayoutStatementRow) =>
@@ -91,8 +120,8 @@ export default async function PayoutsPage(props: PageProps<"/sales/payouts">) {
         </div>
 
         <p className="rounded-xl bg-slate-100 p-3 text-sm text-slate-600">
-          Each person: <b>earned</b> minus <b>cash they are holding</b>, plus anything left over from earlier weeks. Above
-          zero, the company pays them. Below zero, they return it.
+          Each person: <b>salary</b> minus <b>cash in hand</b> they collected from customers, plus anything left over from
+          earlier weeks. Above zero, the company pays them. Below zero, they return it.
         </p>
 
         {!finished ? (
@@ -133,8 +162,8 @@ export default async function PayoutsPage(props: PageProps<"/sales/payouts">) {
                   {quiet ? null : (
                     <>
                       <dl className="mt-3 space-y-1 text-sm tabular-nums">
-                        <Line label={`Earned from ${r.job_count} ${Number(r.job_count) === 1 ? "job" : "jobs"}`} value={rupees(r.earned)} />
-                        {Number(r.cash_held) > 0 ? <Line label="Cash they are holding" value={`− ${rupees(r.cash_held)}`} /> : null}
+                        <Line label={`Salary from ${r.job_count} ${Number(r.job_count) === 1 ? "job" : "jobs"}`} value={rupees(r.earned)} />
+                        {Number(r.cash_held) > 0 ? <Line label="Cash in hand (collected from customers)" value={`− ${rupees(r.cash_held)}`} /> : null}
                         {Number(r.brought_forward) !== 0 ? (
                           <Line
                             label={Number(r.brought_forward) > 0 ? "Still owed from earlier weeks" : "Still to return from earlier weeks"}
@@ -153,6 +182,24 @@ export default async function PayoutsPage(props: PageProps<"/sales/payouts">) {
                         </span>
                         {net !== 0 ? <span className="text-2xl tabular-nums">{rupees(Math.abs(net))}</span> : null}
                       </p>
+
+                      {(() => {
+                        const href = slipLink(r);
+                        return href ? (
+                          <a
+                            href={href}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="tap mt-3 flex items-center justify-center gap-2 rounded-xl border-2 border-ok-600 text-sm font-semibold text-ok-700"
+                          >
+                            Send salary slip on WhatsApp
+                          </a>
+                        ) : (
+                          <p className="mt-3 text-center text-xs text-slate-500">
+                            No mobile number, so no WhatsApp slip. Add it under Team %.
+                          </p>
+                        );
+                      })()}
 
                       {mine.length ? (
                         <details className="mt-2 text-sm">

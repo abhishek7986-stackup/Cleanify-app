@@ -85,7 +85,7 @@ export default async function MyPaymentsPage() {
 
         {earningsRes.data?.length ? (
           <section className="rounded-2xl border border-slate-200 bg-white p-4">
-            <h2 className="mb-1 font-semibold text-slate-900">What I earned per job</h2>
+            <h2 className="mb-1 font-semibold text-slate-900">My salary per job</h2>
             <ul className="divide-y divide-slate-100 text-sm">
               {earningsRes.data.map((e) => (
                 <li key={e.id}>
@@ -130,8 +130,8 @@ function Statement({
         {weekLabel(week)} · you are at {Number(row.percent_now)}%
       </p>
       <dl className="mt-3 space-y-1 text-sm tabular-nums">
-        <Line label={`Earned from ${row.job_count} ${Number(row.job_count) === 1 ? "job" : "jobs"}`} value={rupees(row.earned)} />
-        {Number(row.cash_held) > 0 ? <Line label="Cash you are holding" value={`− ${rupees(row.cash_held)}`} /> : null}
+        <Line label={`Salary from ${row.job_count} ${Number(row.job_count) === 1 ? "job" : "jobs"}`} value={rupees(row.earned)} />
+        {Number(row.cash_held) > 0 ? <Line label="Cash in hand (collected from customers)" value={`− ${rupees(row.cash_held)}`} /> : null}
         {bf !== 0 ? (
           <Line
             label={bf > 0 ? "Still owed to you from before" : "Still to return from before"}
