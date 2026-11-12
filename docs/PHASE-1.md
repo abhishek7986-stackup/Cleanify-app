@@ -263,7 +263,8 @@ Calling staff are responsible for the bank details and salaries day to day (10 N
 
 ### The rules
 
-- **Workers have no login.** Calling staff add them under *Team %* with a joining date and a mobile number (required). The supervisor ticks who worked with them on each job, and the hike happens by itself.
+- **Workers have no login.** Calling staff add them under *Team %* with a joining date, a mobile number and **the supervisor whose team they are on** (all required). The supervisor ticks who worked with them on each job, and the hike happens by itself.
+- **Teams:** a supervisor sees and can tick only their own team; the server refuses anyone else. Supervisors cannot add workers. To lend a worker to another supervisor, calling staff change the worker's team on *Team %* (the change is logged).
 - **Salary slip:** on *Monday payout*, *Send salary slip on WhatsApp* opens WhatsApp with that person's week filled in: salary, cash in hand, what is paid or to return, and when their next hike is. Someone in the office taps send; no WhatsApp Business setup is needed.
 - **Salary:** each person earns their own percentage of the amount collected on the job. The percentage is frozen on the job, so later changes never alter old figures.
 - **Percentage:** the start percentage (14) rises 1 point per full month from the joining date, up to 17. *Fixed %* overrides it.
@@ -286,6 +287,7 @@ Sign in as calling staff, admin or super admin and add the company UPI ID under 
 | `20261110000100` | Workers need a valid mobile number, stored as +91XXXXXXXXXX |
 | `20261110000200` | Calling staff can set the UPI ID, check and cancel payments, and settle or reverse payouts |
 | `20261113000100` | Calling staff or an admin correct a payment amount in one step |
+| `20261113000200` | Every worker is on one supervisor's team; supervisors tick only their own team |
 
 ### Demo week
 
