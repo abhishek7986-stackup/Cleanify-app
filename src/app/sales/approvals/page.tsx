@@ -2,6 +2,7 @@ import { requireRole } from "@/lib/data/session";
 import { createClient } from "@/lib/supabase/server";
 import { getSignedPhotoUrls } from "@/lib/data/photos";
 import { AppShell } from "@/components/AppShell";
+import { officeNav } from "@/lib/nav";
 import { AutoRefresh } from "@/components/AutoRefresh";
 import { InstallGate } from "@/components/InstallGate";
 import { renderValue } from "@/components/JobDetailView";
@@ -111,20 +112,7 @@ export default async function ApprovalsPage() {
     />
   );
 
-  const nav =
-    profile.role === "admin"
-      ? [
-          { href: "/admin", label: "Today" },
-          { href: "/sales/approvals", label: "Approvals" },
-          { href: "/sales/payments", label: "Payments" },
-          { href: "/admin/users", label: "Users" },
-        ]
-      : [
-          { href: "/sales", label: "Today" },
-          { href: "/sales/new", label: "New job" },
-          { href: "/sales/approvals", label: "Approvals" },
-          { href: "/sales/payments", label: "Payments" },
-        ];
+  const nav = officeNav(profile);
 
   return (
     <AppShell profile={profile} title="Approvals" nav={nav}>

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireRole } from "@/lib/data/session";
 import { createClient } from "@/lib/supabase/server";
 import { getSignedStaffDocUrls } from "@/lib/data/staff-docs";
@@ -5,19 +6,12 @@ import { parseEwkbPoint } from "@/lib/location-link";
 import { formatIstDate, formatIstTime } from "@/lib/domain/checkin-policy";
 import type { StaffApplication, StaffDocument } from "@/lib/domain/database";
 import { AppShell } from "@/components/AppShell";
+import { officeNav } from "@/lib/nav";
 import { AutoRefresh } from "@/components/AutoRefresh";
 import { JoinRequestCard, type DepotOption } from "./JoinRequestCard";
 
 export const metadata = { title: "Users" };
 export const dynamic = "force-dynamic";
-
-const NAV = [
-  { href: "/admin", label: "Today" },
-  { href: "/sales/approvals", label: "Approvals" },
-  { href: "/sales/payments", label: "Payments" },
-  { href: "/admin/users", label: "Users" },
-  { href: "/admin/services", label: "Services" },
-];
 
 const DOC_LABEL: Record<string, string> = {
   AADHAAR_FRONT: "Aadhaar card",
@@ -66,9 +60,12 @@ export default async function UsersPage() {
   }
 
   return (
-    <AppShell profile={profile} title="Staff" nav={NAV}>
+    <AppShell profile={profile} title="Staff" nav={officeNav(profile)}>
       <div className="space-y-4">
         {pending.length ? <AutoRefresh seconds={30} /> : null}
+        <Link href="/admin/services" className="tap flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700">
+          Services and their questions <span aria-hidden>→</span>
+        </Link>
 
         <section className="space-y-3">
           <h2 className="px-1 font-semibold text-slate-900">

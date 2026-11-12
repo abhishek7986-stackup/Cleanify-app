@@ -37,10 +37,10 @@ if (!SERVICE_KEY) {
   );
   process.exit(1);
 }
-const { SEED_ADMIN_PASSWORD, SEED_SALES_PASSWORD, SEED_SUPERVISOR_PASSWORD } = process.env;
-if (!SEED_ADMIN_PASSWORD || !SEED_SALES_PASSWORD || !SEED_SUPERVISOR_PASSWORD) {
+const { SEED_ADMIN_PASSWORD, SEED_SUPER_ADMIN_PASSWORD, SEED_SALES_PASSWORD, SEED_SUPERVISOR_PASSWORD } = process.env;
+if (!SEED_ADMIN_PASSWORD || !SEED_SUPER_ADMIN_PASSWORD || !SEED_SALES_PASSWORD || !SEED_SUPERVISOR_PASSWORD) {
   console.error(
-    "Set SEED_ADMIN_PASSWORD, SEED_SALES_PASSWORD and SEED_SUPERVISOR_PASSWORD in .env.local.\n" +
+    "Set SEED_ADMIN_PASSWORD, SEED_SUPER_ADMIN_PASSWORD, SEED_SALES_PASSWORD and SEED_SUPERVISOR_PASSWORD in .env.local.\n" +
       "Passwords are never kept in this repository.",
   );
   process.exit(1);
@@ -50,6 +50,15 @@ if (!SEED_ADMIN_PASSWORD || !SEED_SALES_PASSWORD || !SEED_SUPERVISOR_PASSWORD) {
 const ONLY = process.argv.find((a) => a.startsWith("--only="))?.slice("--only=".length);
 
 const STAFF = [
+  {
+    // Covers for anyone who is away: every admin, sales and money power.
+    username: "superadmin",
+    full_name: "Cleanify Super Admin",
+    role: "admin",
+    phone: "+919000000004",
+    password: SEED_SUPER_ADMIN_PASSWORD,
+    is_super_admin: true,
+  },
   {
     username: "admin",
     full_name: "Cleanify Admin",
@@ -127,6 +136,11 @@ async function upsertStaff(person) {
     p_is_active: true,
   });
   if (rpcError) throw new Error(`profile for ${email}: ${rpcError.message}`);
+
+  if (person.is_super_admin) {
+    const { error } = await supabase.from("profiles").update({ is_super_admin: true }).eq("id", user.id);
+    if (error) throw new Error(`super admin for ${email}: ${error.message}`);
+  }
 
   return { email, id: user.id, ...person };
 }

@@ -1,5 +1,6 @@
 import { requireRole } from "@/lib/data/session";
 import { AppShell } from "@/components/AppShell";
+import { officeNav } from "@/lib/nav";
 import { InstallGate } from "@/components/InstallGate";
 import { ApprovalsWaiting } from "@/components/ApprovalsWaiting";
 import { getPendingApprovalCount } from "@/lib/data/approvals";
@@ -43,13 +44,7 @@ export default async function AdminDashboard() {
     <AppShell
       profile={profile}
       title="Dashboard"
-      nav={[
-        { href: "/admin", label: "Today" },
-        { href: "/sales/approvals", label: "Approvals" },
-        { href: "/sales/payments", label: "Payments" },
-        { href: "/admin/users", label: "Users" },
-        { href: "/admin/services", label: "Services" },
-      ]}
+      nav={officeNav(profile)}
     >
       <div className="space-y-4">
         <InstallGate audience="approver" />

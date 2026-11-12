@@ -1,24 +1,17 @@
 import { requireRole } from "@/lib/data/session";
 import { getServicesWithSchemas } from "@/lib/data/services";
 import { AppShell } from "@/components/AppShell";
+import { officeNav } from "@/lib/nav";
 
 export const metadata = { title: "Services" };
 export const dynamic = "force-dynamic";
-
-const NAV = [
-  { href: "/admin", label: "Today" },
-  { href: "/sales/approvals", label: "Approvals" },
-  { href: "/sales/payments", label: "Payments" },
-  { href: "/admin/users", label: "Users" },
-  { href: "/admin/services", label: "Services" },
-];
 
 export default async function ServicesPage() {
   const profile = await requireRole("admin");
   const services = await getServicesWithSchemas();
 
   return (
-    <AppShell profile={profile} title="Services" nav={NAV}>
+    <AppShell profile={profile} title="Services" nav={officeNav(profile)}>
       <div className="space-y-3">
         <p className="rounded-2xl bg-slate-100 p-3 text-sm text-slate-600">
           The drag-and-drop field builder is <b>Milestone 5</b>. The data model

@@ -10,6 +10,7 @@
     "start": "next start",
     "lint": "eslint",
     "seed:users": "node --env-file=.env.local scripts/seed-users.mjs",
+    "demo:week": "node --env-file=.env.local scripts/demo-week.mjs",
     "db:push": "node --env-file=.env.local scripts/migrate.mjs",
     "db:status": "node --env-file=.env.local scripts/migrate.mjs --status",
     "test:e2e": "next build && playwright test"

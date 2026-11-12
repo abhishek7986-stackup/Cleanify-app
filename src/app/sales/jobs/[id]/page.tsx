@@ -3,6 +3,7 @@ import { requireRole } from "@/lib/data/session";
 import { getJobDetail } from "@/lib/data/jobs";
 import { getReasons, getSupervisors } from "@/lib/data/services";
 import { AppShell } from "@/components/AppShell";
+import { officeNav } from "@/lib/nav";
 import { JobDetailView } from "@/components/JobDetailView";
 import { JobActions } from "./JobActions";
 
@@ -30,12 +31,7 @@ export default async function SalesJobPage(props: PageProps<"/sales/jobs/[id]">)
     <AppShell
       profile={profile}
       title={detail.job.job_number}
-      nav={[
-        { href: "/sales", label: "Today" },
-        { href: "/sales/new", label: "New job" },
-        { href: "/sales/approvals", label: "Approvals" },
-        { href: "/sales/payments", label: "Payments" },
-      ]}
+      nav={officeNav(profile)}
     >
       <div className="space-y-4">
         <JobActions

@@ -1,6 +1,7 @@
 import { requireRole } from "@/lib/data/session";
 import { getServicesWithSchemas, getSupervisors } from "@/lib/data/services";
 import { AppShell } from "@/components/AppShell";
+import { officeNav } from "@/lib/nav";
 import { NewJobWizard } from "./NewJobWizard";
 
 export const metadata = { title: "New job" };
@@ -17,12 +18,7 @@ export default async function NewJobPage() {
     <AppShell
       profile={profile}
       title="New job"
-      nav={[
-        { href: "/sales", label: "Today" },
-        { href: "/sales/new", label: "New job" },
-        { href: "/sales/approvals", label: "Approvals" },
-        { href: "/sales/payments", label: "Payments" },
-      ]}
+      nav={officeNav(profile)}
     >
       <NewJobWizard services={services} supervisors={supervisors} />
     </AppShell>

@@ -88,6 +88,97 @@ export function CancelPaymentButton({ jobId }: { jobId: string }) {
   );
 }
 
+export function CorrectPaymentButton({ jobId, upi, cash }: { jobId: string; upi: number; cash: number }) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [upiAmount, setUpiAmount] = useState(upi ? String(upi) : "");
+  const [cashAmount, setCashAmount] = useState(cash ? String(cash) : "");
+  const [reason, setReason] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const total = (Number(upiAmount) || 0) + (Number(cashAmount) || 0);
+
+  async function save() {
+    setBusy(true);
+    setError(null);
+    const { error: err } = await createClient().rpc("correct_job_payment", {
+      p_job_id: jobId,
+      p_upi_amount: Number(upiAmount) || 0,
+      p_cash_amount: Number(cashAmount) || 0,
+      p_reason: reason,
+    });
+    setBusy(false);
+    if (err) return setError(err.message);
+    setOpen(false);
+    router.refresh();
+  }
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="tap mt-2 w-full rounded-xl border-2 border-brand-600 text-sm font-semibold text-brand-700"
+      >
+        Correct the amount
+      </button>
+    );
+  }
+  return (
+    <div className="mt-2 space-y-2 rounded-xl bg-slate-50 p-3">
+      <p className="text-sm font-semibold text-slate-800">The real amount received</p>
+      <div className="flex gap-2">
+        <label className="min-w-0 flex-1 text-xs font-medium text-slate-600">
+          UPI ₹
+          <input
+            inputMode="numeric"
+            value={upiAmount}
+            onChange={(e) => setUpiAmount(e.target.value.replace(/[^\d.]/g, ""))}
+            className="tap mt-1 block w-full rounded-xl border-2 border-slate-200 bg-white px-3 text-base tabular-nums outline-none focus:border-brand-600"
+          />
+        </label>
+        <label className="min-w-0 flex-1 text-xs font-medium text-slate-600">
+          Cash ₹
+          <input
+            inputMode="numeric"
+            value={cashAmount}
+            onChange={(e) => setCashAmount(e.target.value.replace(/[^\d.]/g, ""))}
+            className="tap mt-1 block w-full rounded-xl border-2 border-slate-200 bg-white px-3 text-base tabular-nums outline-none focus:border-brand-600"
+          />
+        </label>
+      </div>
+      <label className="block text-sm font-medium text-slate-700">
+        Why is it changing?
+        <input
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+          placeholder="e.g. Supervisor typed 1000, customer paid 2000"
+          className="tap mt-1 w-full rounded-xl border-2 border-slate-200 bg-white px-3 text-base font-normal outline-none focus:border-brand-600"
+        />
+      </label>
+      <p className="text-xs text-slate-500">
+        New total ₹{total.toLocaleString("en-IN")}. The old figure stays on record as corrected, and everyone&apos;s
+        salary for this job is worked out again on the new amount.
+      </p>
+      {error ? <p className="rounded-xl bg-danger-50 p-2 text-sm text-danger-700">{error}</p> : null}
+      <div className="flex gap-2">
+        <button type="button" onClick={() => setOpen(false)} className="tap flex-1 rounded-xl border-2 border-slate-200 text-sm font-semibold text-slate-600">
+          Keep it
+        </button>
+        <button
+          type="button"
+          disabled={busy || !reason.trim() || total <= 0}
+          onClick={() => void save()}
+          className="tap flex-1 rounded-xl bg-brand-700 text-sm font-semibold text-white disabled:opacity-40"
+        >
+          {busy ? "Saving…" : "Save correct amount"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function UpiSettings({ upi }: { upi: { id: string; name: string } | null }) {
   const router = useRouter();
   const [open, setOpen] = useState(!upi);

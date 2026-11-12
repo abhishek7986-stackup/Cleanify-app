@@ -7,7 +7,7 @@ import { OfficeTabs } from "@/components/OfficeTabs";
 import { officeNav } from "@/lib/nav";
 import { formatIstDate, formatIstTime, istDate } from "@/lib/domain/checkin-policy";
 import { mondayOf, rupees, shortDate } from "@/lib/domain/payments";
-import { CancelPaymentButton, UpiSettings, VerifyUpiButton } from "./PaymentActions";
+import { CancelPaymentButton, UpiSettings, VerifyUpiButton, CorrectPaymentButton } from "./PaymentActions";
 
 export const metadata = { title: "Payments" };
 export const dynamic = "force-dynamic";
@@ -261,7 +261,16 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
                     ))}
                   </ul>
                   {rows[0].note ? <p className="mt-2 text-sm text-slate-600">Note: {rows[0].note}</p> : null}
-                  {canManageMoney ? <CancelPaymentButton jobId={jobId} /> : null}
+                  {canManageMoney ? (
+                    <>
+                      <CorrectPaymentButton
+                        jobId={jobId}
+                        upi={rows.filter((r) => r.mode === "upi").reduce((n, r) => n + Number(r.amount), 0)}
+                        cash={rows.filter((r) => r.mode === "cash").reduce((n, r) => n + Number(r.amount), 0)}
+                      />
+                      <CancelPaymentButton jobId={jobId} />
+                    </>
+                  ) : null}
                 </article>
               );
             })

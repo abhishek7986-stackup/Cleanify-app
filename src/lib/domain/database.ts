@@ -654,6 +654,10 @@ export type Database = {
       };
       verify_upi_payment: { Args: { p_payment_id: string }; Returns: undefined };
       void_job_payment: { Args: { p_job_id: string; p_reason: string }; Returns: undefined };
+      correct_job_payment: {
+        Args: { p_job_id: string; p_upi_amount: number; p_cash_amount: number; p_reason: string };
+        Returns: number;
+      };
       payment_totals: { Args: { p_from: string; p_to: string }; Returns: PaymentTotalRow[] };
       jobs_awaiting_payment: { Args: Record<string, never>; Returns: JobAwaitingPayment[] };
       payout_statement: { Args: { p_week: string }; Returns: PayoutStatementRow[] };
