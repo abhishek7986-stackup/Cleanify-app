@@ -19,6 +19,7 @@
  * The only direct writes come last: the work really happened today, so its
  * times are moved back to the day it was booked for, and the payments into
  * the week they belong to. Without that every job would land in this week.
+ * The job history (job_events) is append-only and keeps the real run time.
  *
  * Demo records are marked: clients end in "(Demo)", jobs carry the internal
  * note "demo week", workers start with "Demo". --remove relies on those marks.
@@ -227,6 +228,7 @@ if (already) {
 
 const clientIds = {};
 const keptRosters = new Set();
+let lastKm = 12000;
 const summary = [];
 
 for (const [day, jobs] of Object.entries(WEEK)) {
@@ -252,11 +254,17 @@ for (const [day, jobs] of Object.entries(WEEK)) {
   }
 
   // 2. Supervisor checks in at the depot; sales rep approves.
+  // The day's roster is built by the every-minute scheduler. Run that step now
+  // rather than wait for it.
+  await db.query("select public.recompute_day($1, $2::date)", [sup.id, day]);
+
   // A day that already has a check-in from earlier testing keeps it.
-  const { data: roster, error: rErr } = await sup.sb.from("day_rosters").select("id, submitted_at, checked_out_at, approval_status")
+  const { data: roster, error: rErr } = await sup.sb.from("day_rosters").select("id, submitted_at, checked_out_at, approval_status, start_odometer_km")
     .eq("supervisor_id", sup.id).eq("roster_date", day).is("voided_at", null).single();
   if (rErr) throw new Error(`roster ${day}: ${rErr.message}`);
-  const startKm = 12000 + Object.keys(WEEK).indexOf(day) * 60;
+  // The scooter's km only goes up, carrying on from any real reading.
+  const startKm = roster.start_odometer_km ? Number(roster.start_odometer_km) : lastKm + 15;
+  lastKm = startKm + 38 + jobs.length * 6;
   if (!roster.submitted_at) {
     await shoot("PPE_SELFIE", { roster: roster.id }, depot);
     await shoot("ODOMETER", { roster: roster.id }, depot);
@@ -292,7 +300,9 @@ for (const [day, jobs] of Object.entries(WEEK)) {
       p_job_id: id, p_upi_amount: b.paid.upi ?? 0, p_cash_amount: b.paid.cash ?? 0,
       p_worker_ids: b.crew.map((i) => workers[i]), p_note: b.payNote ?? null,
     });
-    await rpc(sup, "advance_job_status", { p_job_id: id, p_to: "COMPLETED", p_meta: {} });
+    // Approving the after photos completes the job; only finish it by hand if not.
+    const { data: now } = await sup.sb.from("jobs").select("status").eq("id", id).single();
+    if (now.status !== "COMPLETED") await rpc(sup, "advance_job_status", { p_job_id: id, p_to: "COMPLETED", p_meta: {} });
     summary.push([day, b.time, b.job.job_number, b.name, b.service, b.quote, (b.paid.upi ?? 0) + (b.paid.cash ?? 0)]);
   }
 
@@ -304,7 +314,7 @@ for (const [day, jobs] of Object.entries(WEEK)) {
   await shoot("CHECKOUT_SELFIE", { roster: roster.id }, depot);
   await shoot("CHECKOUT_ODOMETER", { roster: roster.id }, depot);
   await rpc(sup, "submit_checkout", {
-    p_roster_date: day, p_odometer_km: startKm + 38 + booked.length * 6,
+    p_roster_date: day, p_odometer_km: lastKm,
     p_lat: depot.lat, p_lng: depot.lng, p_accuracy_m: 12, p_client_clock: new Date().toISOString(),
   });
   console.log(`  ok   ${day}  ${booked.length} jobs`);

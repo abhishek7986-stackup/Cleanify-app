@@ -253,10 +253,13 @@ Known gaps, in rough priority order:
 |---|---|---|
 | **Supervisor** | After sending the after photos: shows the customer a UPI QR with the amount, or takes cash, or both. Marks it and ticks who worked with them. | Job page → *Collect payment* |
 | **Supervisor** | Sees their own earnings, cash held and Monday figure. Nobody else's. | *Payments* |
-| **Calling staff** | Look after all the money: set the company UPI ID, add workers and set joining date and percentages, tick UPI as found in the bank, cancel a wrong payment with a reason, mark Monday payouts as paid or returned, reverse a payout. | *Payments*, *Payments → Team %*, *Monday payout* |
-| **Admin** | Everything calling staff can do. | Same pages |
+| **Calling staff** | Look after all the money: set the company UPI ID, add workers and set joining date and percentages, tick UPI as found in the bank, **correct a wrong amount**, cancel a wrong payment with a reason, mark Monday payouts as paid or returned, reverse a payout. | *Payments*, *Payments → Team %*, *Monday payout* |
+| **Admin** | Everything calling staff can do, plus the dashboard and staff approvals. | Same pages |
+| **Super admin** (`superadmin`) | Everything above. Covers for anyone who is away: books jobs, approves, handles money. A missing supervisor's jobs are moved to another supervisor with *Reschedule*; site photos still come from whoever is on site. | Every page |
 
-There is no separate super admin: calling staff are responsible for the bank details and salaries (changed 10 November 2026).
+Calling staff are responsible for the bank details and salaries day to day (10 November 2026); the super admin was brought back on 13 November 2026 to cover for anyone who is away.
+
+**Correcting an amount:** *Payments* → the job → *Correct the amount*. Enter the real UPI and cash and why. The wrong figure stays on record as corrected, the money stays in the week it came in, and everyone's salary for that job is worked out again on the new amount. Refused once that week is paid out: reverse the payout first.
 
 ### The rules
 
@@ -274,7 +277,7 @@ There is no separate super admin: calling staff are responsible for the bank det
 
 ### Setting up
 
-Sign in as calling staff (or admin) and add the company UPI ID under *Payments*. Until that is done, supervisors have no QR to show.
+Sign in as calling staff, admin or super admin and add the company UPI ID under *Payments*. The super admin login is created with `npm run seed:users -- --only=superadmin` (password `SEED_SUPER_ADMIN_PASSWORD` in `.env.local`). Until that is done, supervisors have no QR to show.
 
 | Migration | What it does |
 |---|---|
@@ -282,3 +285,14 @@ Sign in as calling staff (or admin) and add the company UPI ID under *Payments*.
 | `20261105000200` | *Not collected yet* lists only jobs completed since payments went live |
 | `20261110000100` | Workers need a valid mobile number, stored as +91XXXXXXXXXX |
 | `20261110000200` | Calling staff can set the UPI ID, check and cancel payments, and settle or reverse payouts |
+| `20261113000100` | Calling staff or an admin correct a payment amount in one step |
+
+### Demo week
+
+`npm run demo:week` books 6–12 November 2026 (24 jobs, 3–4 a day, ₹5,200–6,800 a day) and runs every job through the real steps as `priya` and `ravi`: booking, depot check-in, before photos, approval, after photos, approval, payment with workers, check-out. 12 November has a ₹1,000 payment on a ₹2,000 job, to practise *Correct the amount*. Clients end in "(Demo)" and jobs carry the internal note `demo week`.
+
+**Remove it before staff use the app** (the database is shared with the live site):
+
+```bash
+npm run demo:week -- --remove
+```
