@@ -382,6 +382,7 @@ export type PayStaff = {
   max_percent: number;
   fixed_percent: number | null;
   is_active: boolean;
+  team_supervisor_id: string | null;
 };
 
 export type JobEarning = {
@@ -681,6 +682,7 @@ export type Database = {
           p_start_percent: number;
           p_fixed_percent: number | null;
           p_is_active?: boolean;
+          p_team_supervisor_id?: string | null;
         };
         Returns: PayStaff;
       };

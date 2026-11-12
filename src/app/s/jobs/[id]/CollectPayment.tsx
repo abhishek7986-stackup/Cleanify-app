@@ -166,7 +166,7 @@ export function CollectPayment({
           <span className="font-medium text-slate-800">I worked alone</span>
         </label>
         {workers.length === 0 ? (
-          <p className="text-sm text-slate-500">No workers are on the list yet. Calling staff add them under Payments, Team.</p>
+          <p className="text-sm text-slate-500">No workers are on your team yet. Calling staff add them under Payments, Team %.</p>
         ) : null}
       </fieldset>
 

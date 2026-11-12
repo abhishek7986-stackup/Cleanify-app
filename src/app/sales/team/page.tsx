@@ -5,6 +5,7 @@ import { OfficeTabs } from "@/components/OfficeTabs";
 import { officeNav } from "@/lib/nav";
 import { istDate } from "@/lib/domain/checkin-policy";
 import { previewPercent, shortDate } from "@/lib/domain/payments";
+import { getSupervisors } from "@/lib/data/services";
 import { StaffForm } from "./StaffForm";
 
 export const metadata = { title: "Team percentages" };
@@ -20,6 +21,8 @@ export default async function TeamPage() {
     .order("kind")
     .order("full_name");
   const staff = data ?? [];
+  const supervisors = await getSupervisors();
+  const supervisorName = new Map(supervisors.map((s) => [s.id, s.full_name]));
   const today = istDate();
 
   return (
@@ -30,10 +33,10 @@ export default async function TeamPage() {
         <p className="rounded-xl bg-slate-100 p-3 text-sm text-slate-600">
           Everyone starts at their start percentage and goes up 1% each month from their joining date until 17%. A job keeps
           the percentage of the day it was done, so changing it here never changes old jobs. New supervisors appear here once
-          an admin approves them.
+          an admin approves them. Each worker is on one supervisor&apos;s team, and only that supervisor can tick them on a job.
         </p>
 
-        <StaffForm today={today} />
+        <StaffForm today={today} supervisors={supervisors} />
 
         <ul className="space-y-2">
           {staff.map((s) => {
@@ -47,6 +50,13 @@ export default async function TeamPage() {
                       {s.kind}
                       {s.is_active ? "" : " · not active"} · joined {shortDate(s.joined_on)}
                     </p>
+                    {s.kind === "worker" ? (
+                      <p className={`text-xs ${s.team_supervisor_id ? "text-slate-600" : "font-semibold text-warn-700"}`}>
+                        {s.team_supervisor_id
+                          ? `Team: ${supervisorName.get(s.team_supervisor_id) ?? "supervisor who has left"}`
+                          : "No team yet. No supervisor can tick them until you choose one."}
+                      </p>
+                    ) : null}
                   </div>
                   <p className="shrink-0 text-right">
                     <span className="text-2xl font-bold tabular-nums text-slate-900">{percent}%</span>
@@ -59,7 +69,7 @@ export default async function TeamPage() {
                     </span>
                   </p>
                 </div>
-                <StaffForm today={today} staff={s} />
+                <StaffForm today={today} staff={s} supervisors={supervisors} />
               </li>
             );
           })}

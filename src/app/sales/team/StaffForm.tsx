@@ -6,7 +6,15 @@ import { createClient } from "@/lib/supabase/client";
 import type { PayStaff } from "@/lib/domain/database";
 
 /** With `staff`, edits that person. Without it, adds a new worker. */
-export function StaffForm({ staff, today }: { staff?: PayStaff; today: string }) {
+export function StaffForm({
+  staff,
+  today,
+  supervisors,
+}: {
+  staff?: PayStaff;
+  today: string;
+  supervisors: { id: string; full_name: string }[];
+}) {
   const router = useRouter();
   const isWorker = !staff || staff.kind === "worker";
   const [open, setOpen] = useState(false);
@@ -16,6 +24,7 @@ export function StaffForm({ staff, today }: { staff?: PayStaff; today: string })
   const [start, setStart] = useState(String(staff?.start_percent != null ? Number(staff.start_percent) : 14));
   const [fixed, setFixed] = useState(staff?.fixed_percent != null ? String(Number(staff.fixed_percent)) : "");
   const [active, setActive] = useState(staff?.is_active ?? true);
+  const [team, setTeam] = useState(staff?.team_supervisor_id ?? (supervisors.length === 1 ? supervisors[0].id : ""));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,6 +39,7 @@ export function StaffForm({ staff, today }: { staff?: PayStaff; today: string })
       p_start_percent: Number(start),
       p_fixed_percent: fixed.trim() === "" ? null : Number(fixed),
       p_is_active: active,
+      p_team_supervisor_id: isWorker ? team || null : null,
     });
     setBusy(false);
     if (err) return setError(err.message);
@@ -40,6 +50,7 @@ export function StaffForm({ staff, today }: { staff?: PayStaff; today: string })
       setJoined(today);
       setStart("14");
       setFixed("");
+      setTeam(supervisors.length === 1 ? supervisors[0].id : "");
     }
     router.refresh();
   }
@@ -82,6 +93,20 @@ export function StaffForm({ staff, today }: { staff?: PayStaff; today: string })
               className={input}
             />
             <span className="mt-1 block text-xs font-normal text-slate-500">Their weekly salary slip is sent here.</span>
+          </label>
+          <label className="block text-sm font-medium text-slate-700">
+            Goes out with
+            <select value={team} onChange={(e) => setTeam(e.target.value)} className={input}>
+              <option value="">Choose a supervisor…</option>
+              {supervisors.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.full_name}
+                </option>
+              ))}
+            </select>
+            <span className="mt-1 block text-xs font-normal text-slate-500">
+              Only this supervisor can tick them on a job. Change it here if they move to another team.
+            </span>
           </label>
         </>
       ) : null}

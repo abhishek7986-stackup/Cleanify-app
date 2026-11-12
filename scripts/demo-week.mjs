@@ -147,7 +147,7 @@ async function ensureWorker(name, phone) {
   if (rows[0]) return rows[0].id;
   const w = await rpc(sales, "upsert_pay_staff", {
     p_id: null, p_full_name: name, p_phone: phone, p_joined_on: "2026-08-01",
-    p_start_percent: 14, p_fixed_percent: null, p_is_active: true,
+    p_start_percent: 14, p_fixed_percent: null, p_is_active: true, p_team_supervisor_id: sup.id,
   });
   return w.id;
 }
