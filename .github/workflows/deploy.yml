@@ -1,0 +1,82 @@
+name: Deploy Next.js App to EC2
+
+# Same pipeline as before: every push to main builds the app and restarts it on
+# the EC2 server. Only the settings changed, from MongoDB/S3 to Supabase.
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    # Only the repository that owns the EC2 server deploys. Copies of this code
+    # elsewhere (the working repo) skip it instead of failing every push.
+    if: github.repository == 'abhishekprakas-a/CLEANIFY'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '20' # Next.js 16 needs 20.9 or newer, here and on the server
+
+      - name: Create .env file for Build & Server
+        run: |
+          echo "NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" >> .env
+          echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" >> .env
+          echo "SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" >> .env
+          echo "NEXT_PUBLIC_AUTH_MODE=password" >> .env
+          echo "NEXT_PUBLIC_STAFF_EMAIL_DOMAIN=cleanify.internal" >> .env
+          echo "NEXT_PUBLIC_VAPID_PUBLIC_KEY=${{ secrets.NEXT_PUBLIC_VAPID_PUBLIC_KEY }}" >> .env
+          echo "VAPID_PRIVATE_KEY=${{ secrets.VAPID_PRIVATE_KEY }}" >> .env
+          echo "VAPID_SUBJECT=${{ secrets.VAPID_SUBJECT }}" >> .env
+          echo "DISPATCH_SECRET=${{ secrets.DISPATCH_SECRET }}" >> .env
+
+      - name: Stop if the Supabase settings are missing
+        run: |
+          if [ -z "${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" ] || [ -z "${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" ] || [ -z "${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" ]; then
+            echo "Add NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY and SUPABASE_SERVICE_ROLE_KEY under Settings > Secrets and variables > Actions. The live site was not touched."
+            exit 1
+          fi
+
+      - name: Install Dependencies
+        run: npm ci # Uses package-lock.json for a clean install
+
+      - name: Build Next.js Application
+        run: npm run build
+
+      - name: Copy Build Artifacts & .env to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.PROD_EC2_HOST }}
+          username: ${{ secrets.PROD_EC2_USER }}
+          key: ${{ secrets.PROD_EC2_KEY }}
+          source: ".next,.env"
+          target: "/sites/CLEANIFY"
+          # This copies the .next folder and .env file directly into /sites/CLEANIFY/
+
+      - name: Execute Server-side Commands
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PROD_EC2_HOST }}
+          username: ${{ secrets.PROD_EC2_USER }}
+          key: ${{ secrets.PROD_EC2_KEY }}
+          script: |
+            set -e
+            cd /sites/CLEANIFY
+
+            # Match GitHub exactly. A plain pull fails when main was replaced
+            # rather than added to; this works either way and leaves the
+            # copied .next and .env alone.
+            git fetch origin main
+            git reset --hard origin/main
+
+            # Install dependencies on the server
+            npm i
+
+            # Restart the application using PM2
+            pm2 restart cleanify
