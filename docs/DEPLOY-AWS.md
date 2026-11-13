@@ -119,19 +119,21 @@ open.
 ## Auto-deploy to the EC2 server (current setup)
 
 The live site runs on an EC2 server. `.github/workflows/deploy.yml` builds and
-restarts it on every push to `main` of `abhishekprakas-a/CLEANIFY` (it skips
-itself in any other repository). The server folder is `/sites/CLEANIFY`, run by
-PM2 as `cleanify`, and needs Node 20.9 or newer.
+restarts it on every push to `main` of `abhishek7986-stackup/Cleanify` or
+`abhishekprakas-a/CLEANIFY` (it skips itself in any other repository). The
+build is copied to the server, so the server never pulls from GitHub. The server
+folder is `/sites/CLEANIFY`, run by PM2 as `cleanify`, and needs Node 20.9 or
+newer.
 
-Secrets it reads (CLEANIFY → Settings → Secrets and variables → Actions):
+Secrets it reads (the repo → Settings → Secrets and variables → Actions):
 
 | Secret | Notes |
 |---|---|
 | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Project Settings → API |
 | `SUPABASE_SERVICE_ROLE_KEY` | same page. **Secret.** |
 | `DISPATCH_SECRET` | `openssl rand -hex 32` |
-| `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | already there from the earlier app |
-| `PROD_EC2_HOST`, `PROD_EC2_USER`, `PROD_EC2_KEY` | already there |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | copy from the earlier app's repo |
+| `PROD_EC2_HOST`, `PROD_EC2_USER`, `PROD_EC2_KEY` | server address, login user, and the .pem key file's contents |
 
 If the three Supabase secrets are missing the run stops before touching the
 server. The earlier MongoDB version of the app is kept on the

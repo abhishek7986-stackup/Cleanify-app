@@ -10,9 +10,9 @@ on:
 jobs:
   deploy:
     name: Build & Deploy
-    # Only the repository that owns the EC2 server deploys. Copies of this code
-    # elsewhere (the working repo) skip it instead of failing every push.
-    if: github.repository == 'abhishekprakas-a/CLEANIFY'
+    # Only repositories that hold the EC2 server keys deploy. The working repo
+    # (Cleanify-app) skips it instead of failing every push.
+    if: github.repository == 'abhishek7986-stackup/Cleanify' || github.repository == 'abhishekprakas-a/CLEANIFY'
     runs-on: ubuntu-latest
 
     steps:
@@ -55,9 +55,10 @@ jobs:
           host: ${{ secrets.PROD_EC2_HOST }}
           username: ${{ secrets.PROD_EC2_USER }}
           key: ${{ secrets.PROD_EC2_KEY }}
-          source: ".next,.env"
+          source: ".next,.env,public,package.json,package-lock.json,next.config.ts"
           target: "/sites/CLEANIFY"
-          # This copies the .next folder and .env file directly into /sites/CLEANIFY/
+          # Everything the server needs comes from this build, so the server
+          # never has to download code from GitHub (the repo can stay private).
 
       - name: Execute Server-side Commands
         uses: appleboy/ssh-action@v1.0.3
@@ -69,13 +70,7 @@ jobs:
             set -e
             cd /sites/CLEANIFY
 
-            # Match GitHub exactly. A plain pull fails when main was replaced
-            # rather than added to; this works either way and leaves the
-            # copied .next and .env alone.
-            git fetch origin main
-            git reset --hard origin/main
-
-            # Install dependencies on the server
+            # Install dependencies on the server (from the package files just copied)
             npm i
 
             # Restart the application using PM2
