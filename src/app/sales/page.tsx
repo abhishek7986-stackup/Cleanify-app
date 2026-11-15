@@ -7,6 +7,7 @@ import { InstallGate } from "@/components/InstallGate";
 import { ApprovalsWaiting } from "@/components/ApprovalsWaiting";
 import { getPendingApprovalCount } from "@/lib/data/approvals";
 import { istDate, formatIstTime } from "@/lib/domain/checkin-policy";
+import { TravelRefresh } from "@/components/TravelRefresh";
 
 export const metadata = { title: "Day timetable" };
 export const dynamic = "force-dynamic";
@@ -37,6 +38,12 @@ export default async function SalesToday(props: PageProps<"/sales">) {
     <AppShell profile={profile} title="Day timetable" nav={SALES_NAV}>
       <div className="space-y-4">
         <InstallGate audience="approver" />
+        <TravelRefresh
+          days={[...new Set(open.map((j) => j.assigned_supervisor_id).filter(Boolean))].map((id) => ({
+            supervisorId: id as string,
+            date,
+          }))}
+        />
         <ApprovalsWaiting count={waiting} />
         <DayPicker date={date} basePath="/sales" />
 

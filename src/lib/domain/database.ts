@@ -524,6 +524,34 @@ export type Database = {
     };
     Functions: {
       create_job: { Args: { p_payload: unknown }; Returns: Job };
+      travel_legs: {
+        Args: { p_supervisor: string; p_date: string };
+        Returns: {
+          job_id: string;
+          origin_lat: number;
+          origin_lng: number;
+          dest_lat: number;
+          dest_lng: number;
+          arrive_at: string;
+          seed_minutes: number;
+          cached: boolean;
+        }[];
+      };
+      recompute_day: { Args: { p_supervisor: string; p_date: string }; Returns: unknown };
+      store_travel_estimate: {
+        Args: {
+          p_origin_lat: number;
+          p_origin_lng: number;
+          p_dest_lat: number;
+          p_dest_lng: number;
+          p_arrive_at: string;
+          p_seed_minutes: number;
+          p_seconds: number;
+          p_meters: number;
+          p_raw: unknown;
+        };
+        Returns: undefined;
+      };
       reschedule_job: {
         Args: {
           p_job_id: string;

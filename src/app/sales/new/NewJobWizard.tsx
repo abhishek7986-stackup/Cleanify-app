@@ -274,6 +274,14 @@ export function NewJobWizard({
     // rep stares at "calculating" for up to a minute on the very screen where
     // the answer matters.
     await supabase.rpc("recompute_for_job", { p_job_id: job.id });
+    // Then real travel times from Google for that day (a few seconds at most;
+    // on failure the straight-line estimate simply stays).
+    await fetch("/api/travel", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ supervisorId, date: job.service_date }),
+      signal: AbortSignal.timeout(15_000),
+    }).catch(() => null);
 
     let checkinAt: string | null = null;
     for (let i = 0; i < 6; i++) {

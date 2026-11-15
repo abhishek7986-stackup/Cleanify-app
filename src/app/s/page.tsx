@@ -2,6 +2,7 @@ import { getSessionUserId, requireRole } from "@/lib/data/session";
 import { getSupervisorDay } from "@/lib/data/supervisor";
 import { AppShell } from "@/components/AppShell";
 import { InstallGate } from "@/components/InstallGate";
+import { TravelRefresh } from "@/components/TravelRefresh";
 import { CheckinCountdown } from "@/components/CheckinCountdown";
 import { AutoRefresh } from "@/components/AutoRefresh";
 import { formatIstDate, formatIstTime } from "@/lib/domain/checkin-policy";
@@ -30,6 +31,7 @@ export default async function SupervisorToday() {
     >
       <div className="space-y-4">
         <InstallGate />
+        {day.jobs.length ? <TravelRefresh days={[{ supervisorId: userId, date: day.date }]} /> : null}
         {day.jobs.some((j) => j.before_review === "PENDING" || j.after_review === "PENDING") ? (
           <AutoRefresh seconds={10} />
         ) : null}

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { Job } from "@/lib/domain/database";
 import { formatIstTime, istDate } from "@/lib/domain/checkin-policy";
+import { requestTravel } from "@/components/TravelRefresh";
 
 type Reason = { id: string; code: string; label: string; requires_note: boolean };
 type Supervisor = { id: string; full_name: string };
@@ -119,6 +120,7 @@ function RescheduleModal({
     });
     setBusy(false);
     if (err) { setError(err.message); return; }
+    requestTravel(supervisorId || job.assigned_supervisor_id, date);
     onClose();
     router.refresh();
   }
