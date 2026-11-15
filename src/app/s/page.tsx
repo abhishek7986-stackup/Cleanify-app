@@ -198,7 +198,7 @@ function ShiftStrip({
 /** The current stop: where, when, its one next step, and the two field tools. */
 function CurrentStop({ job, index, total, unlocked }: { job: DayJob; index: number; total: number; unlocked: boolean }) {
   const pin = parseEwkbPoint(job.site_location);
-  const step = nextStep(job, unlocked);
+  const step = nextStep(job);
   return (
     <section className="sheet border-t-0 px-4 pb-4 pt-5">
       <p className="text-sm font-medium tabular-nums text-slate-600">
@@ -370,11 +370,12 @@ function actionLabel(job: Job): { text: string; waiting?: boolean } {
 }
 
 /** The one thing to do next on the current job. */
-function nextStep(job: Job, unlocked: boolean): { text: string; tone: "go" | "wait" | "bad" } | null {
+function nextStep(job: Job): { text: string; tone: "go" | "wait" | "bad" } | null {
   switch (job.status) {
     case "ASSIGNED":
     case "CHECKED_IN":
-      return unlocked ? { text: "Tap Start trip when you leave. The map opens to the site.", tone: "go" } : null;
+      // The Start trip button says it all; no line above it.
+      return null;
     case "EN_ROUTE":
       return { text: "On the way. Tap I've reached the site when you arrive", tone: "go" };
     case "ON_SITE":

@@ -293,7 +293,6 @@ export function JobFlow({
           </>
         ) : (
           <>
-            <StepStatus tone="go">Tap Start trip when you leave. It opens the map to the site.</StepStatus>
             <BigButton
               busy={busy}
               onClick={() =>
