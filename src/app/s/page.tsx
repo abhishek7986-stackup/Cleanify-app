@@ -62,7 +62,13 @@ export default async function SupervisorToday() {
         { href: "/s/payments", label: "Payments" },
       ]}
       status={<ShiftStrip date={day.date} roster={roster} phase={phase} done={doneCount} total={jobs.length} />}
-      action={<ActionBar phase={phase} current={current} />}
+      action={
+        // No bar when there is nothing to tap: no jobs, day finished, or on
+        // the way (the stop's tiles hold the actions then).
+        phase === "none" || phase === "off" || (phase === "working" && current?.status === "EN_ROUTE") ? undefined : (
+          <ActionBar phase={phase} current={current} />
+        )
+      }
     >
       {jobs.length ? <TravelRefresh days={[{ supervisorId: userId, date: day.date }]} /> : null}
       {jobs.some((j) => j.before_review === "PENDING" || j.after_review === "PENDING") ? <AutoRefresh seconds={10} /> : null}
@@ -218,38 +224,33 @@ function CurrentStop({ job, index, total, unlocked }: { job: DayJob; index: numb
         </p>
       ) : null}
 
-      <div className={`mt-4 grid gap-2 ${job.status === "EN_ROUTE" && pin ? "grid-cols-2" : "grid-cols-1"}`}>
-        {/* Directions only once the trip has started: Start trip opens them. */}
-        {job.status !== "EN_ROUTE" || !pin ? null : unlocked ? (
-          <a
-            href={`https://www.google.com/maps/dir/?api=1&destination=${pin.lat},${pin.lng}&travelmode=two-wheeler`}
-            target="_blank"
-            rel="noreferrer"
-            className="flex h-12 items-center justify-center gap-2 rounded-lg border border-brand-950/15 text-[0.9375rem] font-semibold text-brand-950 active:bg-brand-50"
-          >
-            <Glyph d="m3 11 18-8-8 18-2-8-8-2Z" />
-            Navigate
-          </a>
-        ) : (
-          <span className="flex h-12 items-center justify-center gap-2 rounded-lg border border-brand-950/10 text-sm font-medium text-slate-500">
-            <Glyph small d="M7 11V8a5 5 0 0 1 10 0v3M5.5 11h13v9.5h-13z" />
-            Navigate
-          </span>
-        )}
-        {job.client?.phone ? (
-          <a
-            href={`tel:${job.client.phone}`}
-            className="flex h-12 items-center justify-center gap-2 rounded-lg border border-brand-950/15 text-[0.9375rem] font-semibold text-brand-950 active:bg-brand-50"
-          >
-            <Glyph d="M5 4h3.5l1.5 4.5-2 1.5a11 11 0 0 0 6 6l1.5-2 4.5 1.5V19a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" />
-            Call
-          </a>
-        ) : (
-          <span className="flex h-12 items-center justify-center rounded-lg border border-brand-950/10 text-sm font-medium text-slate-500">
-            No phone
-          </span>
-        )}
-      </div>
+      {job.status === "EN_ROUTE" && unlocked ? (
+        /* On the way: three equal tiles; I've reached is the filled one. */
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          {pin ? (
+            <a href={mapsUrlFor(pin)} target="_blank" rel="noreferrer" className={tileOutline}>
+              <Glyph d="m3 11 18-8-8 18-2-8-8-2Z" />
+              Navigate
+            </a>
+          ) : (
+            <span className={`${tileOutline} text-slate-500`}>No pin</span>
+          )}
+          <TripAction tile jobId={job.id} status={job.status} mapsUrl={null} className={tileFilled} />
+          {job.client?.phone ? (
+            <a href={`tel:${job.client.phone}`} className={tileOutline}>
+              <Glyph d="M5 4h3.5l1.5 4.5-2 1.5a11 11 0 0 0 6 6l1.5-2 4.5 1.5V19a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" />
+              Call
+            </a>
+          ) : (
+            <span className={`${tileOutline} text-slate-500`}>No phone</span>
+          )}
+        </div>
+      ) : job.client?.phone ? (
+        <a href={`tel:${job.client.phone}`} className={`mt-4 ${tileOutline} h-12 flex-row`}>
+          <Glyph d="M5 4h3.5l1.5 4.5-2 1.5a11 11 0 0 0 6 6l1.5-2 4.5 1.5V19a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" />
+          Call
+        </a>
+      ) : null}
     </section>
   );
 }
@@ -287,6 +288,14 @@ function JobRow({ job, index, waitingFor }: { job: DayJob; index: number; waitin
   );
 }
 
+const tileBase = "flex h-[4.5rem] w-full flex-col items-center justify-center gap-1 rounded-lg text-sm font-semibold";
+const tileOutline = `${tileBase} border border-brand-950/15 text-brand-950 active:bg-brand-50`;
+const tileFilled = `${tileBase} bg-brand-950 text-white active:bg-brand-900 disabled:opacity-60`;
+
+function mapsUrlFor(pin: { lat: number; lng: number }): string {
+  return `https://www.google.com/maps/dir/?api=1&destination=${pin.lat},${pin.lng}&travelmode=two-wheeler`;
+}
+
 /** The fixed bar above the tabs: one full-width button for the next step. */
 function ActionBar({ phase, current }: { phase: Phase; current: DayJob | null }) {
   const primary = "flex h-14 w-full items-center justify-center gap-2 rounded-lg bg-brand-950 text-base font-semibold text-white active:bg-brand-900";
@@ -309,7 +318,9 @@ function ActionBar({ phase, current }: { phase: Phase; current: DayJob | null })
       return <span className={quiet}>Waiting for approval</span>;
     case "working": {
       if (!current) return null;
-      if (["ASSIGNED", "CHECKED_IN", "EN_ROUTE"].includes(current.status)) {
+      // On the way: the stop's own tiles carry Navigate / I've reached / Call.
+      if (current.status === "EN_ROUTE") return null;
+      if (["ASSIGNED", "CHECKED_IN"].includes(current.status)) {
         const pin = parseEwkbPoint(current.site_location);
         return (
           <TripAction

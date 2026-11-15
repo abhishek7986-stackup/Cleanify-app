@@ -18,11 +18,14 @@ export function TripAction({
   status,
   mapsUrl,
   className,
+  tile = false,
 }: {
   jobId: string;
   status: JobStatus;
   mapsUrl: string | null;
   className: string;
+  /** Icon above a short label, for a row of equal buttons. */
+  tile?: boolean;
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState<string | null>(null);
@@ -66,8 +69,8 @@ export function TripAction({
   }
 
   return (
-    <div>
-      {error ? <p className="mb-2 rounded-lg bg-danger-50 p-3 text-sm text-danger-700">{error}</p> : null}
+    <div className={tile ? "contents" : undefined}>
+      {error ? <p className="col-span-full mb-2 rounded-lg bg-danger-50 p-3 text-sm text-danger-700">{error}</p> : null}
       <button type="button" disabled={busy !== null} onClick={() => void run()} className={className}>
         <svg viewBox="0 0 24 24" className="size-5 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <path
@@ -78,7 +81,7 @@ export function TripAction({
             }
           />
         </svg>
-        {busy ?? (onTheWay ? "I've reached the site" : "Start trip")}
+        {busy ? (tile ? "Wait…" : busy) : onTheWay ? (tile ? "I've reached" : "I've reached the site") : "Start trip"}
       </button>
     </div>
   );
