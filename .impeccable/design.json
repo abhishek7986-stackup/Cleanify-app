@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-16T00:00:00Z",
+  "title": "Design System: Cleanify Operations",
+  "extensions": {
+    "colorMeta": {
+      "shift-teal": { "role": "primary", "displayName": "Shift Teal", "canonical": "#0b3532", "tonalRamp": ["#0b3532", "#134e4a", "#115e59", "#0f766e", "#0d9488", "#14b8a6", "#99f6e4", "#ccfbf1"] },
+      "shift-teal-pressed": { "role": "primary", "displayName": "Shift Teal Pressed", "canonical": "#134e4a", "tonalRamp": ["#0b3532", "#134e4a", "#115e59", "#0f766e", "#0d9488", "#14b8a6", "#99f6e4", "#ccfbf1"] },
+      "teal-ink": { "role": "primary", "displayName": "Teal Ink", "canonical": "#0f766e", "tonalRamp": ["#0b3532", "#134e4a", "#115e59", "#0f766e", "#0d9488", "#14b8a6", "#99f6e4", "#ccfbf1"] },
+      "focus-teal": { "role": "primary", "displayName": "Focus Teal", "canonical": "#0d9488", "tonalRamp": ["#0b3532", "#134e4a", "#115e59", "#0f766e", "#0d9488", "#14b8a6", "#99f6e4", "#ccfbf1"] },
+      "mint-wash": { "role": "secondary", "displayName": "Mint Wash", "canonical": "#ccfbf1", "tonalRamp": ["#0b3532", "#134e4a", "#115e59", "#0f766e", "#0d9488", "#14b8a6", "#99f6e4", "#ccfbf1"] },
+      "mint-mist": { "role": "secondary", "displayName": "Mint Mist", "canonical": "#f0fdfa", "tonalRamp": ["#0b3532", "#134e4a", "#115e59", "#0f766e", "#0d9488", "#14b8a6", "#ccfbf1", "#f0fdfa"] },
+      "canvas": { "role": "neutral", "displayName": "Cool Canvas", "canonical": "#eef1f0", "tonalRamp": ["#1d2524", "#333d3b", "#4d5856", "#6a7573", "#8b9593", "#b1b9b7", "#d6dcda", "#eef1f0"] },
+      "surface": { "role": "neutral", "displayName": "Sheet White", "canonical": "#ffffff" },
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#0f172a", "tonalRamp": ["#020617", "#0f172a", "#334155", "#475569", "#64748b", "#94a3b8", "#e2e8f0", "#f1f5f9"] },
+      "ink-strong": { "role": "neutral", "displayName": "Ink Strong", "canonical": "#020617" },
+      "ink-muted": { "role": "neutral", "displayName": "Ink Muted", "canonical": "#475569" },
+      "ink-subtle": { "role": "neutral", "displayName": "Ink Subtle", "canonical": "#64748b" },
+      "label-grey": { "role": "neutral", "displayName": "Label Grey", "canonical": "#5b6b69" },
+      "quiet-fill": { "role": "neutral", "displayName": "Quiet Fill", "canonical": "#f1f5f9" },
+      "hairline": { "role": "neutral", "displayName": "Teal Hairline", "canonical": "rgb(11 53 50 / 0.08)" },
+      "divider": { "role": "neutral", "displayName": "Row Divider", "canonical": "rgb(11 53 50 / 0.07)" },
+      "outline": { "role": "neutral", "displayName": "Button Outline", "canonical": "rgb(11 53 50 / 0.15)" },
+      "ok": { "role": "status", "displayName": "Done Green", "canonical": "#16a34a", "tonalRamp": ["#15803d", "#16a34a", "#dcfce7", "#f0fdf4"] },
+      "ok-ink": { "role": "status", "displayName": "Done Green Ink", "canonical": "#15803d" },
+      "ok-wash": { "role": "status", "displayName": "Done Green Wash", "canonical": "#f0fdf4" },
+      "warn": { "role": "status", "displayName": "Waiting Amber", "canonical": "#f59e0b", "tonalRamp": ["#b45309", "#f59e0b", "#fef3c7", "#fffbeb"] },
+      "warn-ink": { "role": "status", "displayName": "Waiting Amber Ink", "canonical": "#b45309" },
+      "warn-wash": { "role": "status", "displayName": "Waiting Amber Wash", "canonical": "#fef3c7" },
+      "danger": { "role": "status", "displayName": "Rejected Red", "canonical": "#dc2626", "tonalRamp": ["#b91c1c", "#dc2626", "#ef4444", "#fee2e2", "#fef2f2"] },
+      "danger-ink": { "role": "status", "displayName": "Rejected Red Ink", "canonical": "#b91c1c" },
+      "danger-wash": { "role": "status", "displayName": "Rejected Red Wash", "canonical": "#fef2f2" }
+    },
+    "typographyMeta": {
+      "money": { "displayName": "Money", "purpose": "The payout figure on Payments; tabular; Danger Ink when negative." },
+      "headline": { "displayName": "Headline", "purpose": "The current stop's client name." },
+      "bar-title": { "displayName": "Bar Title", "purpose": "Screen title in the teal app bar, white." },
+      "title": { "displayName": "Title", "purpose": "The next-step line beside its dot; empty-state and panel titles." },
+      "body": { "displayName": "Body", "purpose": "Addresses, data rows, outline button labels." },
+      "body-sm": { "displayName": "Body Small", "purpose": "Secondary row lines and explanations." },
+      "label": { "displayName": "Section Label", "purpose": "Uppercase name of the list or band that follows; never above a headline." },
+      "strip-caption": { "displayName": "Strip Caption", "purpose": "Caption over each value in the app-bar shift-status strip, white at 60%." }
+    },
+    "shadows": [
+      { "name": "action-bar-lift", "value": "0 -4px 16px rgb(11 53 50 / 0.06)", "purpose": "The fixed bottom action bar only." },
+      { "name": "map-pin", "value": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)", "purpose": "Map markers, to separate from map tiles." }
+    ],
+    "motion": [
+      { "name": "pressed", "value": "background-color change on :active; optional scale(0.98)", "purpose": "Touch feedback in place of hover." },
+      { "name": "tab-pill", "value": "background-color 200ms", "purpose": "Active-tab pill colour change." },
+      { "name": "waiting-pulse", "value": "Tailwind animate-pulse", "purpose": "Amber waiting dots and live location dot." },
+      { "name": "reduced-motion", "value": "all animation and transition durations 0.01ms", "purpose": "Honours prefers-reduced-motion." }
+    ],
+    "breakpoints": [
+      { "name": "content-max", "value": "48rem" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Action Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one full-width teal button in the fixed action bar, naming the next step.",
+      "html": "<button class=\"ds-btn-primary\"><span class=\"ds-btn-stack\"><span class=\"ds-btn-cap\">Open job</span><span>Next: Start trip</span></span><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14M13 6l6 6-6 6\"/></svg></button>",
+      "css": ".ds-btn-primary { display: flex; width: 100%; height: 56px; align-items: center; justify-content: space-between; gap: 8px; padding: 0 20px; border: 0; border-radius: 8px; background: var(--color-brand-950, #0b3532); color: #fff; font: 600 1rem/1.25 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; cursor: pointer; } .ds-btn-stack { text-align: left; line-height: 1.25; } .ds-btn-stack > span { display: block; } .ds-btn-cap { font-size: 0.75rem; font-weight: 500; color: rgb(255 255 255 / 0.7); } .ds-btn-primary:hover, .ds-btn-primary:active { background: var(--color-brand-900, #134e4a); } .ds-btn-primary:focus-visible { outline: 2px solid #0d9488; outline-offset: 2px; }"
+    },
+    {
+      "name": "Waiting Action Button",
+      "kind": "button",
+      "refersTo": "button-waiting",
+      "description": "The action-bar slot while the office approves; not tappable.",
+      "html": "<span class=\"ds-btn-wait\">Waiting for approval</span>",
+      "css": ".ds-btn-wait { display: flex; width: 100%; height: 56px; align-items: center; justify-content: center; border-radius: 8px; background: #f1f5f9; color: #64748b; font: 600 0.9375rem/1.25 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }"
+    },
+    {
+      "name": "Outline Field Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Navigate and Call: compact secondary actions in a two-column pair.",
+      "html": "<a class=\"ds-btn-outline\" href=\"#\"><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m3 11 18-8-8 18-2-8-8-2Z\"/></svg>Navigate</a>",
+      "css": ".ds-btn-outline { display: inline-flex; height: 48px; min-width: 160px; align-items: center; justify-content: center; gap: 8px; border: 1px solid rgb(11 53 50 / 0.15); border-radius: 8px; background: #fff; color: #0b3532; text-decoration: none; font: 600 0.9375rem/1 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; } .ds-btn-outline:hover, .ds-btn-outline:active { background: #f0fdfa; } .ds-btn-outline:focus-visible { outline: 2px solid #0d9488; outline-offset: 2px; }"
+    },
+    {
+      "name": "App Bar with Shift Strip",
+      "kind": "nav",
+      "refersTo": "app-bar",
+      "description": "Deep-teal top bar: title, signed-in line, and the three-cell shift-status strip.",
+      "html": "<header class=\"ds-appbar\"><h1 class=\"ds-appbar-title\">Today</h1><p class=\"ds-appbar-sub\">Ravi · Supervisor</p><dl class=\"ds-strip\"><div><dt>Mon, 16 Nov</dt><dd><span class=\"ds-dot\"></span>Approved</dd></div><div><dt>Jobs done</dt><dd>0/2</dd></div><div><dt>Leave depot</dt><dd>09:30 am</dd></div></dl></header>",
+      "css": ".ds-appbar { background: #0b3532; color: #fff; padding: 8px 16px 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; } .ds-appbar-title { margin: 0; font-size: 1.25rem; font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; } .ds-appbar-sub { margin: 2px 0 12px; font-size: 0.8125rem; color: rgb(255 255 255 / 0.75); } .ds-strip { display: grid; grid-template-columns: repeat(3, 1fr); margin: 0; padding: 8px 0; border-radius: 8px; background: rgb(255 255 255 / 0.08); } .ds-strip > div { padding: 0 12px; } .ds-strip > div + div { border-left: 1px solid rgb(255 255 255 / 0.15); } .ds-strip dt { font-size: 0.6875rem; font-weight: 500; color: rgb(255 255 255 / 0.6); } .ds-strip dd { margin: 2px 0 0; display: flex; align-items: center; gap: 6px; font-size: 0.9375rem; font-weight: 600; font-variant-numeric: tabular-nums; } .ds-dot { width: 8px; height: 8px; border-radius: 9999px; background: #34d399; }"
+    },
+    {
+      "name": "Sheet with List Rows",
+      "kind": "card",
+      "refersTo": "sheet",
+      "description": "Section label over a full-bleed white band of numbered stop rows divided by hairlines.",
+      "html": "<section class=\"ds-sheet-wrap\"><p class=\"ds-label\">Rest of today</p><ol class=\"ds-sheet\"><li><a class=\"ds-row\" href=\"#\"><span class=\"ds-badge\">2</span><span class=\"ds-row-main\"><span class=\"ds-row-title\">Sunrise Towers</span><span class=\"ds-row-sub\">Opens after stop 1</span></span><span class=\"ds-row-time\">02:00 pm</span></a></li><li><a class=\"ds-row\" href=\"#\"><span class=\"ds-badge ds-badge-done\">&#10003;</span><span class=\"ds-row-main\"><span class=\"ds-row-title ds-muted\">Anand Residence</span><span class=\"ds-row-sub\">Done</span></span><span class=\"ds-row-time\">10:00 am</span></a></li></ol></section>",
+      "css": ".ds-sheet-wrap { background: #eef1f0; padding-top: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; } .ds-label { margin: 0; padding: 0 16px 8px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #5b6b69; } .ds-sheet { list-style: none; margin: 0; padding: 0; background: #fff; border-block: 1px solid rgb(11 53 50 / 0.08); } .ds-sheet li + li { border-top: 1px solid rgb(11 53 50 / 0.07); } .ds-row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; color: #0f172a; text-decoration: none; } .ds-row:active, .ds-row:hover { background: #f8fafc; } .ds-row:focus-visible { outline: 2px solid #0d9488; outline-offset: -2px; } .ds-badge { display: flex; width: 32px; height: 32px; flex-shrink: 0; align-items: center; justify-content: center; border-radius: 9999px; background: #f1f5f9; color: #334155; font-size: 0.875rem; font-weight: 600; } .ds-badge-done { background: #16a34a; color: #fff; } .ds-row-main { min-width: 0; flex: 1; } .ds-row-title { display: block; font-weight: 600; } .ds-muted { color: #64748b; } .ds-row-sub { display: block; font-size: 0.875rem; color: #64748b; } .ds-row-time { font-size: 0.875rem; font-weight: 600; font-variant-numeric: tabular-nums; color: #334155; }"
+    },
+    {
+      "name": "Bottom Tab Bar",
+      "kind": "nav",
+      "refersTo": "tab-active",
+      "description": "White tab bar; active icon in a mint pill with a teal semibold label.",
+      "html": "<nav class=\"ds-tabs\"><a class=\"ds-tab ds-tab-on\" href=\"#\"><span class=\"ds-tab-pill\"><svg viewBox=\"0 0 24 24\" width=\"22\" height=\"22\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 10.5 12 3l9 7.5\"/><path d=\"M5 9.5V20h14V9.5\"/><path d=\"M10 20v-5h4v5\"/></svg></span>Today</a><a class=\"ds-tab\" href=\"#\"><span class=\"ds-tab-pill\"><svg viewBox=\"0 0 24 24\" width=\"22\" height=\"22\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5 9 4Z\"/><path d=\"M9 4v13M15 6.5v13\"/></svg></span>Roadmap</a><a class=\"ds-tab\" href=\"#\"><span class=\"ds-tab-pill\"><svg viewBox=\"0 0 24 24\" width=\"22\" height=\"22\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3\" y=\"6\" width=\"18\" height=\"13\" rx=\"2.5\"/><path d=\"M3 10h18\"/><path d=\"M16 15h2\"/></svg></span>Payments</a></nav>",
+      "css": ".ds-tabs { display: flex; background: #fff; border-top: 1px solid rgb(11 53 50 / 0.1); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; } .ds-tab { flex: 1; display: flex; min-height: 64px; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 0.75rem; font-weight: 500; color: #64748b; text-decoration: none; } .ds-tab-pill { display: flex; width: 64px; height: 32px; align-items: center; justify-content: center; border-radius: 9999px; transition: background-color 200ms; } .ds-tab-on { font-weight: 600; color: #0b3532; } .ds-tab-on .ds-tab-pill { background: #ccfbf1; } .ds-tab:focus-visible { outline: 2px solid #0d9488; outline-offset: -2px; }"
+    },
+    {
+      "name": "Job Stepper",
+      "kind": "custom",
+      "refersTo": "button-primary",
+      "description": "Four numbered steps joined by a line; done steps teal with a tick, current ringed.",
+      "html": "<ol class=\"ds-stepper\"><li class=\"ds-step-done\"><span class=\"ds-step\">&#10003;</span><span class=\"ds-step-label\">Reached</span></li><li class=\"ds-step-now\"><span class=\"ds-step\">2</span><span class=\"ds-step-label\">Before OK</span></li><li><span class=\"ds-step\">3</span><span class=\"ds-step-label\">Cleaning</span></li><li><span class=\"ds-step\">4</span><span class=\"ds-step-label\">After OK</span></li></ol>",
+      "css": ".ds-stepper { display: flex; list-style: none; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; } .ds-stepper li { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; } .ds-stepper li + li::before { content: ''; position: absolute; right: 50%; top: 14px; width: 100%; height: 2px; transform: translateY(-50%); background: #e2e8f0; } .ds-stepper li.ds-step-now::before, .ds-stepper li.ds-step-done + li::before { background: #0b3532; } .ds-step { position: relative; z-index: 1; display: flex; width: 28px; height: 28px; align-items: center; justify-content: center; border-radius: 9999px; background: #f1f5f9; color: #475569; font-size: 0.75rem; font-weight: 600; } .ds-step-done .ds-step { background: #0b3532; color: #fff; } .ds-step-now .ds-step { background: #fff; color: #0f766e; box-shadow: 0 0 0 2px #0b3532; } .ds-step-label { margin-top: 6px; font-size: 11px; line-height: 1.25; color: #475569; } .ds-step-done .ds-step-label { font-weight: 600; color: #0b3532; } .ds-step-now .ds-step-label { font-weight: 600; color: #0f172a; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Slate-50 field with a 2px ring that turns teal on focus.",
+      "html": "<label class=\"ds-field\"><span>Notes <em>(optional)</em></span><textarea rows=\"2\" placeholder=\"Anything the office should know\"></textarea></label>",
+      "css": ".ds-field { display: block; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; } .ds-field > span { display: block; margin-bottom: 6px; font-size: 0.875rem; font-weight: 600; color: #1e293b; } .ds-field em { font-style: normal; font-weight: 400; color: #475569; } .ds-field textarea { width: 100%; padding: 12px 16px; border: 0; border-radius: 8px; background: #f8fafc; box-shadow: 0 0 0 2px #e2e8f0; font: 400 1rem/1.5 inherit; color: #0f172a; caret-color: #0b3532; outline: none; } .ds-field textarea:focus { box-shadow: 0 0 0 2px #0d9488; }"
+    },
+    {
+      "name": "Next Step Line",
+      "kind": "custom",
+      "refersTo": "sheet",
+      "description": "The one next step as a semibold line with a status dot.",
+      "html": "<p class=\"ds-next\"><span class=\"ds-next-dot ds-wait\"></span>Before photos sent, waiting for approval</p>",
+      "css": ".ds-next { display: flex; align-items: center; gap: 10px; margin: 0; font: 600 1.125rem/1.375 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #0f172a; } .ds-next-dot { width: 10px; height: 10px; flex-shrink: 0; border-radius: 9999px; background: #0b3532; } .ds-next-dot.ds-wait { background: #f59e0b; animation: ds-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; } @keyframes ds-pulse { 50% { opacity: 0.5; } } @media (prefers-reduced-motion: reduce) { .ds-next-dot.ds-wait { animation: none; } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Shift Bar",
+    "overview": "Cleanify's supervisor app is a delivery-partner shift app, the user-pinned direction (Swiggy, Zomato, Uber driver). The screen is built from three fixed layers: a deep-teal app bar on top carrying the title and live shift status in white, full-bleed white bands on a cool grey canvas in the middle, and a fixed white action bar at the bottom holding one full-width button that names the next step. Everything between those two bars is quiet: one current stop with its single next step, then a numbered list of what comes later.\n\nThe system is dense but calm. Hierarchy comes from type weight and size, not from containers: the client name at 22px semibold, the next step at 18px semibold beside a coloured dot, and everything else in 15px or 14px slate. Sections are square bands separated by hairlines and canvas gaps, not floating rounded boxes. The user rejected the previous build as childish (too rounded, too many boxes, weak hierarchy, off colours), and this system exists to answer that.\n\nIt is light-only on purpose. Supervisors read it outdoors in direct sun, one-handed, sometimes with wet or gloved hands, so contrast stays high, no automatic dark mode exists, and every control clears 48px.\n\nOffice screens (`src/app/sales`, `src/app/admin`) share these tokens, the app bar and the tab bar, but they have not yet been fully converted to the band-and-row language. They still use rounded `card` blocks in many places. That is known drift, recorded here and not a pattern to copy (see Do's and Don'ts).",
+    "keyCharacteristics": [
+      "Deep teal app bar with a translucent three-cell shift-status strip inside it.",
+      "Full-bleed white bands (sheets) on a cool grey canvas, divided by teal-tinted hairlines.",
+      "One fixed bottom action bar naming the one next step, in the same deep teal.",
+      "Status shown as a word plus a small dot, never colour alone.",
+      "Tabular figures for every time, km, count and rupee value.",
+      "Corners: 8px on controls, 12px at most, square sections, full circles only for dots, number badges and the active-tab pill."
+    ],
+    "rules": [
+      { "name": "The One Action Colour Rule", "body": "Shift Teal is the only filled button colour. A screen has one filled teal button, and it lives in the fixed action bar. Secondary actions are white with a teal outline.", "section": "colors" },
+      { "name": "The Dot Plus Word Rule", "body": "Status is always a word with a small dot (8–10px circle) beside it: green done, amber waiting, red rejected or late. Colour never carries the status alone; waiting dots pulse.", "section": "colors" },
+      { "name": "The Sunlight Rule", "body": "Light theme only. `color-scheme: light`, no `prefers-color-scheme` dark variant.", "section": "colors" },
+      { "name": "The Tabular Figures Rule", "body": "Every time, km, count, percentage and rupee amount sets in tabular numerals (`font-variant-numeric: tabular-nums`) so columns and live-updating values do not jitter.", "section": "typography" },
+      { "name": "The List Header Rule", "body": "The uppercase section label names a list or band that follows it (\"Rest of today\", \"Job details\", \"Earnings\"). It never sits above a headline as a decorative tag.", "section": "typography" },
+      { "name": "The Band Not Box Rule", "body": "Content sits in full-bleed square white bands divided by hairlines. Do not float rounded, shadowed cards on the canvas.", "section": "elevation" },
+      { "name": "The 12px Ceiling Rule", "body": "No control or panel rounds beyond 12px, and sheets do not round at all.", "section": "shapes" }
+    ],
+    "dos": [
+      "Do put the one next step in the fixed bottom action bar as a full-width 56px Shift Teal button whose label names the step (\"Start trip\", \"Take before photos\").",
+      "Do build screens from full-bleed white sheets on the canvas, divided by 1px teal-tinted hairlines, with a section label above each list.",
+      "Do show every status as a word with a small dot (green done, amber waiting and pulsing, red rejected or late).",
+      "Do set every time, km, count and rupee value in tabular numerals.",
+      "Do keep every control at least 48px and keep the light theme in direct sun.",
+      "Do keep control corners at 8px and never above 12px."
+    ],
+    "donts": [
+      "Don't float rounded, shadowed `card` blocks on the canvas for new supervisor screens. Office screens still use them; that is drift waiting for conversion, not a pattern.",
+      "Don't add a second filled teal button to a screen; secondary actions are outline buttons.",
+      "Don't use colour alone for a status.",
+      "Don't add a dark theme or `prefers-color-scheme` variant.",
+      "Don't put an uppercase section label above a headline as a decorative tag; it only names a list or band.",
+      "Don't add shadows to sheets; the action bar lift is the only shadow in the supervisor world."
+    ]
+  }
+}
