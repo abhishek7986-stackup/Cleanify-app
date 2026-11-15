@@ -524,6 +524,25 @@ export type Database = {
     };
     Functions: {
       create_job: { Args: { p_payload: unknown }; Returns: Job };
+      report_location: {
+        Args: { p_lat: number; p_lng: number; p_accuracy_m?: number | null };
+        Returns: boolean;
+      };
+      team_locations: {
+        Args: Record<string, never>;
+        Returns: {
+          supervisor_id: string;
+          full_name: string;
+          lat: number | null;
+          lng: number | null;
+          accuracy_m: number | null;
+          recorded_at: string | null;
+          checked_in_at: string | null;
+          checked_out_at: string | null;
+          jobs_total: number;
+          jobs_done: number;
+        }[];
+      };
       travel_legs: {
         Args: { p_supervisor: string; p_date: string };
         Returns: {

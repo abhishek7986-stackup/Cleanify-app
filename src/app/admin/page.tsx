@@ -6,6 +6,7 @@ import { ApprovalsWaiting } from "@/components/ApprovalsWaiting";
 import { getPendingApprovalCount } from "@/lib/data/approvals";
 import { createClient } from "@/lib/supabase/server";
 import { formatIstTime, istDate } from "@/lib/domain/checkin-policy";
+import { TeamNowLink } from "@/components/TeamNowLink";
 
 export const metadata = { title: "Dashboard" };
 export const dynamic = "force-dynamic";
@@ -49,6 +50,7 @@ export default async function AdminDashboard() {
       <div className="space-y-4">
         <InstallGate audience="approver" />
         <ApprovalsWaiting count={waiting} />
+        <TeamNowLink />
         {schedulerStale ? (
           <div className="rounded-2xl border border-danger-100 bg-danger-50 p-4">
             <p className="font-semibold text-danger-700">Scheduler is not running</p>

@@ -3,6 +3,7 @@ import type { Profile } from "@/lib/domain/database";
 import { SignOutButton } from "./SignOutButton";
 import { QueueChip } from "./QueueChip";
 import { BottomNav } from "./BottomNav";
+import { LocationSharer } from "./LocationSharer";
 
 /**
  * A visible "signed in as" chip is not decoration. Field staff share phones,
@@ -52,6 +53,8 @@ export function AppShell({
               <span className="truncate">
                 {profile.full_name} · {roleLabel(profile)}
               </span>
+              {/* Supervisors only: shares position with the office while on duty. */}
+              {profile.role === "supervisor" ? <LocationSharer /> : null}
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-1">

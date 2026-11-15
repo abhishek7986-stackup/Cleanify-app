@@ -8,6 +8,7 @@ import { ApprovalsWaiting } from "@/components/ApprovalsWaiting";
 import { getPendingApprovalCount } from "@/lib/data/approvals";
 import { istDate, formatIstTime } from "@/lib/domain/checkin-policy";
 import { TravelRefresh } from "@/components/TravelRefresh";
+import { TeamNowLink } from "@/components/TeamNowLink";
 
 export const metadata = { title: "Day timetable" };
 export const dynamic = "force-dynamic";
@@ -45,6 +46,7 @@ export default async function SalesToday(props: PageProps<"/sales">) {
           }))}
         />
         <ApprovalsWaiting count={waiting} />
+        <TeamNowLink />
         <DayPicker date={date} basePath="/sales" />
 
         <div className="grid grid-cols-3 gap-3">
