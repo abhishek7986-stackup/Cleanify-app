@@ -35,6 +35,7 @@ jobs:
           echo "VAPID_PRIVATE_KEY=${{ secrets.VAPID_PRIVATE_KEY }}" >> .env
           echo "VAPID_SUBJECT=${{ secrets.VAPID_SUBJECT }}" >> .env
           echo "DISPATCH_SECRET=${{ secrets.DISPATCH_SECRET }}" >> .env
+          echo "GOOGLE_VISION_API_KEY=${{ secrets.GOOGLE_VISION_API_KEY }}" >> .env
 
       - name: Stop if the Supabase settings are missing
         run: |
