@@ -65,7 +65,9 @@ export default async function SupervisorToday() {
       action={
         // No bar when there is nothing to tap: no jobs, day finished, or on
         // the way (the stop's tiles hold the actions then).
-        phase === "none" || phase === "off" || (phase === "working" && current?.status === "EN_ROUTE") ? undefined : (
+        phase === "none" ||
+        phase === "off" ||
+        (phase === "working" && current != null && ["ASSIGNED", "CHECKED_IN", "EN_ROUTE"].includes(current.status)) ? undefined : (
           <ActionBar phase={phase} current={current} />
         )
       }
@@ -245,11 +247,16 @@ function CurrentStop({ job, index, total, unlocked }: { job: DayJob; index: numb
             <span className={`${tileOutline} text-slate-500`}>No phone</span>
           )}
         </div>
-      ) : job.client?.phone ? (
-        <a href={`tel:${job.client.phone}`} className={`mt-4 ${tileOutline} h-12 flex-row`}>
-          <Glyph d="M5 4h3.5l1.5 4.5-2 1.5a11 11 0 0 0 6 6l1.5-2 4.5 1.5V19a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" />
-          Call
-        </a>
+      ) : ["ASSIGNED", "CHECKED_IN"].includes(job.status) && unlocked ? (
+        /* Before leaving: one button in the same place; it turns into the three tiles. */
+        <div className="mt-4">
+          <TripAction
+            jobId={job.id}
+            status={job.status}
+            mapsUrl={pin ? mapsUrlFor(pin) : null}
+            className="flex h-[4.5rem] w-full items-center justify-center gap-2 rounded-lg bg-brand-950 text-base font-semibold text-white active:bg-brand-900 disabled:opacity-60"
+          />
+        </div>
       ) : null}
     </section>
   );
@@ -318,19 +325,8 @@ function ActionBar({ phase, current }: { phase: Phase; current: DayJob | null })
       return <span className={quiet}>Waiting for approval</span>;
     case "working": {
       if (!current) return null;
-      // On the way: the stop's own tiles carry Navigate / I've reached / Call.
-      if (current.status === "EN_ROUTE") return null;
-      if (["ASSIGNED", "CHECKED_IN"].includes(current.status)) {
-        const pin = parseEwkbPoint(current.site_location);
-        return (
-          <TripAction
-            jobId={current.id}
-            status={current.status}
-            mapsUrl={pin ? `https://www.google.com/maps/dir/?api=1&destination=${pin.lat},${pin.lng}&travelmode=two-wheeler` : null}
-            className={`${primary} disabled:opacity-60`}
-          />
-        );
-      }
+      // The trip steps live in the stop's own space (Start trip, then the tiles).
+      if (["ASSIGNED", "CHECKED_IN", "EN_ROUTE"].includes(current.status)) return null;
       const label = actionLabel(current);
       return (
         <Link href={`/s/jobs/${current.id}`} className={label.waiting ? quiet : `${primary} justify-between px-5`}>
@@ -378,7 +374,7 @@ function nextStep(job: Job, unlocked: boolean): { text: string; tone: "go" | "wa
   switch (job.status) {
     case "ASSIGNED":
     case "CHECKED_IN":
-      return unlocked ? { text: "Tap Start trip when you leave. It opens the map to the site.", tone: "go" } : null;
+      return unlocked ? { text: "Tap Start trip when you leave. The map opens to the site.", tone: "go" } : null;
     case "EN_ROUTE":
       return { text: "On the way. Tap I've reached the site when you arrive", tone: "go" };
     case "ON_SITE":
