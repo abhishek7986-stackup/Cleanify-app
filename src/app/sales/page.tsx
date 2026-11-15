@@ -3,6 +3,7 @@ import { requireRole } from "@/lib/data/session";
 import { getDayJobs } from "@/lib/data/jobs";
 import { AppShell } from "@/components/AppShell";
 import { DayPicker } from "@/components/DayPicker";
+import { ShiftTimes } from "@/components/ShiftTimes";
 import { InstallGate } from "@/components/InstallGate";
 import { ApprovalsWaiting } from "@/components/ApprovalsWaiting";
 import { getPendingApprovalCount } from "@/lib/data/approvals";
@@ -88,6 +89,7 @@ export default async function SalesToday(props: PageProps<"/sales">) {
         ) : null}
         <TeamNowLink />
         <DayPicker date={date} basePath="/sales" />
+        <ShiftTimes date={date} />
 
         <div className="grid grid-cols-3 gap-3">
           <Stat label="Scheduled" value={open.length} />

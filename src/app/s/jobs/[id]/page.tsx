@@ -64,9 +64,14 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
   // Once this job is done, the completed screen hands over to whatever is
   // still open today (or to check-out), so the supervisor never has to go
   // back to Today to find the next Start trip.
-  // Only for today's jobs: an old job never offers today's check-out.
+  // Day by day: only today's jobs can be worked on. A past day is closed (the
+  // office fixes it) and a later day opens on its own day. The database
+  // refuses the same, so this screen only says it plainly.
+  const today = istDate();
+  const otherDay = job.service_date !== today ? (job.service_date < today ? "past" : "future") : null;
+
   let next: NextJob = null;
-  if (job.status === "COMPLETED" && job.service_date === istDate()) {
+  if (job.status === "COMPLETED" && !otherDay) {
     const { data: open } = await supabase
       .from("jobs")
       .select("id, job_number, status, site_address, site_location, client:clients(name)")
@@ -99,9 +104,12 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
   // The customer pays when the work is finished, not when the office approves
   // the photos, so this opens as soon as the after photos are sent.
   const canCollect =
-    (job.status === "COMPLETED" && Boolean(job.completed_at) && new Date(job.completed_at!) >= new Date(PAYMENTS_START_AT)) ||
-    (job.status === "IN_PROGRESS" && job.after_review !== null);
-  const [{ data: paid }, { data: workers }, { data: upiSetting }, { data: contact }] = canCollect
+    !otherDay &&
+    ((job.status === "COMPLETED" && Boolean(job.completed_at) && new Date(job.completed_at!) >= new Date(PAYMENTS_START_AT)) ||
+      (job.status === "IN_PROGRESS" && job.after_review !== null));
+  // A past day still shows what was marked, read-only.
+  const loadMoney = canCollect || otherDay === "past";
+  const [{ data: paid }, { data: workers }, { data: upiSetting }, { data: contact }] = loadMoney
     ? await Promise.all([
         supabase
           .from("payments")
@@ -152,6 +160,23 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
                     : "You are at the site"
           }
         />
+        {otherDay ? (
+          <section className="sheet -mx-4 px-4 py-4">
+            <p className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+              <svg viewBox="0 0 24 24" className="size-5 shrink-0 text-slate-500" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M7 11V8a5 5 0 0 1 10 0v3M5.5 11h13v9.5h-13z" />
+              </svg>
+              {otherDay === "past" ? `This job was on ${formatIstDate(job.scheduled_start)}` : `This job is on ${formatIstDate(job.scheduled_start)}`}
+            </p>
+            <p className="mt-1 text-sm text-slate-600">
+              {otherDay === "past"
+                ? job.status === "COMPLETED"
+                  ? "Finished. Past days are closed in the app."
+                  : "Past days are closed in the app. If something was left undone, call the office."
+                : "It opens on that day, after your depot check-in."}
+            </p>
+          </section>
+        ) : (
         <JobFlow
           // Remount when the server state moves (e.g. an approval arrives via
           // AutoRefresh) so local state never shows a stale step.
@@ -170,7 +195,8 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
           next={next}
           unpaid={canCollect && !paid?.length}
         />
-        {canCollect && paid?.length ? (
+        )}
+        {paid?.length ? (
           <section className="sheet -mx-4 px-4 py-4">
             <h2 className="text-lg font-semibold text-ok-700">Payment marked</h2>
             <ul className="mt-1 text-sm text-ok-700">
@@ -192,7 +218,7 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
               ))}
             </ul>
             {paid[0].note ? <p className="mt-1 text-sm text-ok-700">Note: {paid[0].note}</p> : null}
-            {callPending && office ? (
+            {callPending && office && !otherDay ? (
               <a
                 href={`tel:${office.phone.replace(/[^\d+]/g, "")}`}
                 className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-brand-950 font-semibold text-white active:bg-brand-900"
@@ -200,7 +226,9 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
                 Call {office.full_name} to confirm
               </a>
             ) : null}
-            <p className="mt-2 text-xs text-ok-700">Wrong? Call the office. They can cancel it so you can mark it again.</p>
+            {!otherDay ? (
+              <p className="mt-2 text-xs text-ok-700">Wrong? Call the office. They can cancel it so you can mark it again.</p>
+            ) : null}
           </section>
         ) : canCollect ? (
           <CollectPayment
@@ -219,7 +247,7 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
             </svg>
             The job size and amount show once {waitFor.client} is finished.
           </p>
-        ) : canCollect || job.status === "COMPLETED" ? null : (
+        ) : canCollect || job.status === "COMPLETED" || otherDay === "past" ? null : (
           // The job's size and fields matter while doing the work; once it is
           // done the screen is about the money, so they step aside.
           <JobDetailView detail={detail} hideSummary />

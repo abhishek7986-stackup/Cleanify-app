@@ -1,11 +1,12 @@
 import { requireRole } from "@/lib/data/session";
+import { ShiftTimes } from "@/components/ShiftTimes";
 import { AppShell } from "@/components/AppShell";
 import { officeNav } from "@/lib/nav";
 import { InstallGate } from "@/components/InstallGate";
 import { ApprovalsWaiting } from "@/components/ApprovalsWaiting";
 import { getPendingApprovalCount } from "@/lib/data/approvals";
 import { createClient } from "@/lib/supabase/server";
-import { formatIstTime, istDate } from "@/lib/domain/checkin-policy";
+import { istDate } from "@/lib/domain/checkin-policy";
 import { TeamNowLink } from "@/components/TeamNowLink";
 
 export const metadata = { title: "Dashboard" };
@@ -34,8 +35,6 @@ export default async function AdminDashboard() {
     .from("staff_applications")
     .select("id", { count: "exact", head: true })
     .eq("status", "PENDING");
-  const { data: staff } = await supabase.from("staff_directory").select("id, full_name");
-  const nameOf = (id: string) => (staff ?? []).find((s) => s.id === id)?.full_name ?? "Supervisor";
 
   const jobs = jobsRes.data ?? [];
   const rosters = rostersRes.data ?? [];
@@ -105,44 +104,7 @@ export default async function AdminDashboard() {
         </div>
 
         {/* Each supervisor's day: in, out, and the scooter km in between. */}
-        {rosters.length ? (
-          <section className="card p-4">
-            <h2 className="mb-2 font-semibold text-slate-900">Supervisors today</h2>
-            <ul className="divide-y divide-slate-100 text-sm">
-              {rosters.map((r) => {
-                const start = r.start_odometer_km != null ? Number(r.start_odometer_km) : null;
-                const end = r.end_odometer_km != null ? Number(r.end_odometer_km) : null;
-                return (
-                  <li key={r.id} className="flex items-center justify-between gap-3 py-2">
-                    <div className="min-w-0">
-                      <p className="font-medium text-slate-900">{nameOf(r.supervisor_id)}</p>
-                      <p className="text-slate-500">
-                        {r.submitted_at
-                          ? `In ${formatIstTime(r.submitted_at)}${r.checkin_status === "LATE" ? " (late)" : ""}`
-                          : "Not checked in"}
-                        {r.checked_out_at ? ` · Out ${formatIstTime(r.checked_out_at)}` : r.submitted_at ? " · still out" : ""}
-                      </p>
-                    </div>
-                    <p className="shrink-0 text-right tabular-nums">
-                      {start != null && end != null ? (
-                        <>
-                          <b className="text-slate-900">{end - start} km</b>
-                          <span className="block text-xs text-slate-400">
-                            {start} → {end}
-                          </span>
-                        </>
-                      ) : start != null ? (
-                        <span className="text-slate-500">from {start} km</span>
-                      ) : (
-                        <span className="text-slate-300">—</span>
-                      )}
-                    </p>
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
-        ) : null}
+        <ShiftTimes date={today} />
       </div>
     </AppShell>
   );
