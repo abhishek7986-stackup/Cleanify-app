@@ -454,9 +454,10 @@ function Glyph({ d, small }: { d: string; small?: boolean }) {
 
 /** The current job's size and money, for the (i) sheet. */
 async function currentJobInfo(jobId: string): Promise<JobInfo | null> {
-  const [detail, sumRes] = await Promise.all([
+  const [detail, sumRes, teamRes] = await Promise.all([
     getJobDetail(jobId),
     createClient().then((sb) => sb.rpc("my_pay_summary")),
+    createClient().then((sb) => sb.rpc("my_team_rates")),
   ]);
   if (!detail) return null;
   const { job, service, lineItems, lineItemFields, jobFields } = detail;
@@ -474,5 +475,10 @@ async function currentJobInfo(jobId: string): Promise<JobInfo | null> {
     facts: jobFields
       .map((f) => ({ label: f.label, value: renderValue(f, job.service_details?.[f.key]) }))
       .filter((f) => f.value !== "—"),
+    team: (teamRes.data ?? []).map((w) => ({
+      name: w.full_name.replace(/\s*\(.*?\)\s*/g, ""),
+      percent: Number(w.percent),
+      training: w.in_training,
+    })),
   };
 }

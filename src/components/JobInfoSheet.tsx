@@ -9,6 +9,8 @@ export type JobInfo = {
   unitsLabel: string;
   units: { label: string; facts: string[] }[];
   facts: { label: string; value: string }[];
+  /** Workers on the supervisor's team and their current rate. */
+  team: { name: string; percent: number; training: boolean }[];
 };
 
 const inr = (n: number) => `₹${new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(n)}`;
@@ -78,6 +80,25 @@ export function JobInfoSheet({ info, title }: { info: JobInfo; title: string }) 
               </div>
             </dl>
 
+            {info.team.length ? (
+              <>
+                <p className="section-label pb-1 pt-4">Workers&apos; share, if they work this job</p>
+                <ul className="divide-y divide-brand-950/[0.07]">
+                  {info.team.map((w) => (
+                    <li key={w.name} className="flex items-center justify-between gap-3 py-2.5">
+                      <span className="min-w-0">
+                        <span className="block truncate font-semibold text-slate-900">{w.name}</span>
+                        <span className="block text-sm text-slate-600">{w.training ? "In training · 0%" : `${w.percent}%`}</span>
+                      </span>
+                      <span className="shrink-0 font-semibold tabular-nums text-slate-900">
+                        {info.total != null ? inr(Math.round((info.total * w.percent) / 100)) : "—"}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : null}
+
             {info.units.length ? (
               <>
                 <p className="section-label pb-1 pt-4">
@@ -104,7 +125,9 @@ export function JobInfoSheet({ info, title }: { info: JobInfo; title: string }) 
                 ))}
               </dl>
             ) : null}
-            <p className="mt-3 text-xs text-slate-500">Your share is worked out on the amount actually collected.</p>
+            <p className="mt-3 text-xs text-slate-500">
+              Shares are worked out on the amount actually collected, for the people ticked on the job at payment.
+            </p>
           </div>
         </div>
       ) : null}
