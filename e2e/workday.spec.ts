@@ -200,6 +200,8 @@ test("a full working day, booking to check-out", async ({ browser }) => {
 
     await ravi.reload();
     await expect(ravi.getByText("Job completed")).toBeVisible();
+    // The only job today, so the completed screen hands over to check-out.
+    await expect(ravi.getByRole("button", { name: "Go to check-out" })).toBeVisible();
     const [row] = await db<{ status: string }>(`select status from jobs where id = $1`, [jobId]);
     expect(row.status).toBe("COMPLETED");
   });
