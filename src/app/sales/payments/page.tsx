@@ -8,6 +8,8 @@ import { officeNav } from "@/lib/nav";
 import { formatIstDate, formatIstTime, istDate } from "@/lib/domain/checkin-policy";
 import { mondayOf, rupees, shortDate } from "@/lib/domain/payments";
 import { CancelPaymentButton, UpiSettings, VerifyUpiButton, CorrectPaymentButton } from "./PaymentActions";
+import { OfficeHandovers, type HandoverRow } from "@/components/CashHandover";
+import type { CashHandover } from "@/lib/domain/database";
 
 export const metadata = { title: "Payments" };
 export const dynamic = "force-dynamic";
@@ -40,7 +42,7 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
 
   const profile = await requireRole("sales_rep");
   const supabase = await createClient();
-  const [totalsRes, listRes, dueRes, directoryRes, upiRes] = await Promise.all([
+  const [totalsRes, listRes, dueRes, directoryRes, upiRes, handRes, staffRes] = await Promise.all([
     supabase.rpc("payment_totals", { p_from: from, p_to: to }),
     supabase
       .from("payments")
@@ -57,7 +59,17 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
     supabase.rpc("jobs_awaiting_payment"),
     supabase.from("staff_directory").select("id, full_name"),
     supabase.from("app_settings").select("value").eq("key", "payments.upi").maybeSingle(),
+    supabase
+      .from("cash_handovers")
+      .select("*, staff:pay_staff(full_name)")
+      .order("declared_at", { ascending: false })
+      .limit(30)
+      .overrideTypes<(CashHandover & { staff: { full_name: string } | null })[], { merge: false }>(),
+    supabase.from("pay_staff").select("id, full_name").eq("is_active", true).order("kind").order("full_name"),
   ]);
+  const handovers: HandoverRow[] = (handRes.data ?? []).map((h) => ({ ...h, staff_name: h.staff?.full_name ?? "Staff" }));
+  const pendingHandovers = handovers.filter((h) => h.status === "PENDING" && !h.voided_at);
+  const recentHandovers = handovers.filter((h) => h.status !== "PENDING" || h.voided_at).slice(0, 10);
 
   const totals = totalsRes.data ?? [];
   const due = dueRes.data ?? [];
@@ -85,6 +97,10 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
       <AutoRefresh seconds={30} />
       <div className="space-y-4">
         <OfficeTabs active="payments" />
+
+        {canManageMoney ? (
+          <OfficeHandovers pending={pendingHandovers} recent={recentHandovers} staff={staffRes.data ?? []} />
+        ) : null}
 
         {canManageMoney ? (
           <UpiSettings upi={upi} />

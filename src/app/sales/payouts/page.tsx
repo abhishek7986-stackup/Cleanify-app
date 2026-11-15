@@ -164,6 +164,7 @@ export default async function PayoutsPage(props: PageProps<"/sales/payouts">) {
                       <dl className="mt-3 space-y-1 text-sm tabular-nums">
                         <Line label={`Salary from ${r.job_count} ${Number(r.job_count) === 1 ? "job" : "jobs"}`} value={rupees(r.earned)} />
                         {Number(r.cash_held) > 0 ? <Line label="Cash in hand (collected from customers)" value={`− ${rupees(r.cash_held)}`} /> : null}
+                        {Number(r.handed_back) > 0 ? <Line label="Cash handed back during the week" value={`+ ${rupees(r.handed_back)}`} /> : null}
                         {Number(r.brought_forward) !== 0 ? (
                           <Line
                             label={Number(r.brought_forward) > 0 ? "Still owed from earlier weeks" : "Still to return from earlier weeks"}

@@ -432,6 +432,27 @@ export type PayoutStatementRow = {
   method: Payout["method"] | null;
   note: string | null;
   settled_at: string | null;
+  /** Confirmed cash handed back to the office during this week. */
+  handed_back: number;
+};
+
+/** Cash a person handed back to the office between Mondays. */
+export type CashHandover = {
+  id: string;
+  staff_id: string;
+  amount: number;
+  method: "cash" | "upi" | "bank";
+  note: string | null;
+  week_start: string;
+  status: "PENDING" | "CONFIRMED" | "REJECTED";
+  declared_by: string | null;
+  declared_at: string;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  reject_reason: string | null;
+  voided_at: string | null;
+  voided_by: string | null;
+  void_reason: string | null;
 };
 
 export type PaymentTotalRow = {
@@ -517,6 +538,7 @@ export type Database = {
       photos: Tbl<Photo>;
       odometer_readings: Tbl<OdometerReading>;
       pay_tiers: Tbl<PayTier>;
+      cash_handovers: Tbl<CashHandover>;
       capture_tokens: Tbl<CaptureToken>;
       payments: Tbl<Payment>;
       pay_staff: Tbl<PayStaff>;
@@ -564,7 +586,25 @@ export type Database = {
           cash_collected_month: number;
           cash_returned_total: number;
           paid_to_me_total: number;
+          week_handed_back: number;
+          handover_pending: number;
         }[];
+      };
+      declare_cash_handover: {
+        Args: { p_amount: number; p_method: "cash" | "upi" | "bank"; p_note?: string | null };
+        Returns: CashHandover;
+      };
+      review_cash_handover: {
+        Args: { p_id: string; p_confirm: boolean; p_reason?: string | null };
+        Returns: CashHandover;
+      };
+      record_cash_handover: {
+        Args: { p_staff_id: string; p_amount: number; p_method: "cash" | "upi" | "bank"; p_note?: string | null };
+        Returns: CashHandover;
+      };
+      void_cash_handover: {
+        Args: { p_id: string; p_reason: string };
+        Returns: undefined;
       };
       report_location: {
         Args: { p_lat: number; p_lng: number; p_accuracy_m?: number | null };

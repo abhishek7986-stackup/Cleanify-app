@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/AppShell";
 import { formatIstDate } from "@/lib/domain/checkin-policy";
 import { rupees, shortDate } from "@/lib/domain/payments";
+import { DeclareHandover } from "@/components/CashHandover";
 
 export const metadata = { title: "My payments" };
 export const dynamic = "force-dynamic";
@@ -35,7 +36,7 @@ export default async function MyPaymentsPage() {
   if (profile.role !== "supervisor") redirect("/sales/payouts");
 
   const supabase = await createClient();
-  const [sumRes, earningsRes, dueRes] = await Promise.all([
+  const [sumRes, earningsRes, dueRes, handRes] = await Promise.all([
     supabase.rpc("my_pay_summary"),
     supabase
       .from("job_earnings")
@@ -45,7 +46,15 @@ export default async function MyPaymentsPage() {
       .limit(20)
       .overrideTypes<EarningRow[], { merge: false }>(),
     supabase.rpc("jobs_awaiting_payment"),
+    supabase
+      .from("cash_handovers")
+      .select("*")
+      .is("voided_at", null)
+      .order("declared_at", { ascending: false })
+      .limit(5),
   ]);
+  const myHandovers = handRes.data ?? [];
+  const pendingHandover = myHandovers.find((h) => h.status === "PENDING") ?? null;
   const s = sumRes.data?.[0];
   const due = dueRes.data ?? [];
 
@@ -97,6 +106,7 @@ export default async function MyPaymentsPage() {
             {bf !== 0 ? <Row k={bf > 0 ? "Still owed to you from before" : "Still to hand back from before"} v={signed(bf)} /> : null}
             <Row k={`Your salary this week · ${s.week_jobs} ${Number(s.week_jobs) === 1 ? "job" : "jobs"}`} v={signed(Number(s.week_earned))} />
             <Row k="Cash you collected this week" v={signed(-Number(s.week_cash_collected))} />
+            {Number(s.week_handed_back) > 0 ? <Row k="Cash you handed back this week" v={signed(Number(s.week_handed_back))} /> : null}
             <Row k="Balance" v={signed(net)} strong />
           </dl>
         </section>
@@ -132,7 +142,28 @@ export default async function MyPaymentsPage() {
           <Row k="Handed back to the office (all time)" v={rupees(s.cash_returned_total)} />
           <Row k="Paid to you by the office (all time)" v={rupees(s.paid_to_me_total)} />
           <Row k="Still with you" v={rupees(withYou)} strong danger={withYou > 0} />
+          <DeclareHandover holding={withYou} pending={pendingHandover} />
         </dl>
+        {myHandovers.some((h) => h.status !== "PENDING") ? (
+          <ul className="sheet divide-y divide-brand-950/[0.07] border-t-0">
+            {myHandovers
+              .filter((h) => h.status !== "PENDING")
+              .map((h) => (
+                <li key={h.id} className="flex min-h-12 items-center justify-between gap-3 px-4 py-2 text-sm">
+                  <span className="flex min-w-0 items-center gap-2 text-slate-600">
+                    <span className={`size-2 shrink-0 rounded-full ${h.status === "CONFIRMED" ? "bg-ok-600" : "bg-danger-600"}`} aria-hidden />
+                    <span className="truncate">
+                      {h.status === "CONFIRMED" ? "Office confirmed" : `Office rejected: ${h.reject_reason}`} ·{" "}
+                      {formatIstDate(h.reviewed_at ?? h.declared_at)}
+                    </span>
+                  </span>
+                  <span className={`shrink-0 tabular-nums ${h.status === "CONFIRMED" ? "font-semibold text-slate-900" : "text-slate-500 line-through"}`}>
+                    {rupees(h.amount)}
+                  </span>
+                </li>
+              ))}
+          </ul>
+        ) : null}
 
         {/* ------------------------------------------------------ rate */}
         <p className="section-label px-4 pb-2 pt-5">Your rate</p>

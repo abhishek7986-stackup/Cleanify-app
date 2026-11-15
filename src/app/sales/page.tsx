@@ -9,6 +9,8 @@ import { getPendingApprovalCount } from "@/lib/data/approvals";
 import { istDate, formatIstTime } from "@/lib/domain/checkin-policy";
 import { TravelRefresh } from "@/components/TravelRefresh";
 import { TeamNowLink } from "@/components/TeamNowLink";
+import { createClient } from "@/lib/supabase/server";
+import { rupees } from "@/lib/domain/payments";
 
 export const metadata = { title: "Day timetable" };
 export const dynamic = "force-dynamic";
@@ -25,11 +27,19 @@ export default async function SalesToday(props: PageProps<"/sales">) {
   const date = typeof sp.date === "string" ? sp.date : istDate();
   const tab = sp.tab === "done" ? "done" : "assigned";
 
-  const [profile, jobs, waiting] = await Promise.all([
+  const supabase = await createClient();
+  const [profile, jobs, waiting, handRes] = await Promise.all([
     requireRole("sales_rep"),
     getDayJobs(date),
     getPendingApprovalCount(),
+    supabase
+      .from("cash_handovers")
+      .select("amount")
+      .eq("status", "PENDING")
+      .is("voided_at", null),
   ]);
+  const handoverCount = handRes.data?.length ?? 0;
+  const handoverTotal = (handRes.data ?? []).reduce((n, h) => n + Number(h.amount), 0);
   const done = jobs.filter((j) => j.status === "COMPLETED");
   const open = jobs.filter((j) => j.status !== "COMPLETED" && j.status !== "CANCELLED");
   const late = jobs.filter((j) => j.is_late && !j.late_blameless);
@@ -46,6 +56,17 @@ export default async function SalesToday(props: PageProps<"/sales">) {
           }))}
         />
         <ApprovalsWaiting count={waiting} />
+        {handoverCount ? (
+          <Link href="/sales/payments" className="sheet -mx-4 flex min-h-14 items-center justify-between gap-3 px-4 active:bg-slate-50">
+            <span className="flex items-center gap-2.5 font-semibold text-slate-900">
+              <span className="size-2.5 animate-pulse rounded-full bg-amber-500" aria-hidden />
+              Confirm cash handed back: {handoverCount} · {rupees(handoverTotal)}
+            </span>
+            <svg viewBox="0 0 24 24" className="size-5 shrink-0 text-slate-500" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="m9 5 7 7-7 7" />
+            </svg>
+          </Link>
+        ) : null}
         <TeamNowLink />
         <DayPicker date={date} basePath="/sales" />
 
