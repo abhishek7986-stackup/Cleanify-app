@@ -5,10 +5,10 @@ import { AppShell } from "@/components/AppShell";
 import { JobDetailView } from "@/components/JobDetailView";
 import { createClient } from "@/lib/supabase/server";
 import { parseEwkbPoint } from "@/lib/location-link";
-import type { ApprovalStatus } from "@/lib/domain/database";
+import type { ApprovalStatus, JobStatus } from "@/lib/domain/database";
 import { PAYMENTS_START_AT, rupees } from "@/lib/domain/payments";
 import { formatIstDate, formatIstTime } from "@/lib/domain/checkin-policy";
-import { JobFlow, type FlowUnit } from "./JobFlow";
+import { JobFlow, type FlowUnit, type NextJob } from "./JobFlow";
 import { CollectPayment } from "./CollectPayment";
 
 export const dynamic = "force-dynamic";
@@ -60,6 +60,26 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
     .limit(1);
   const first = earlier?.[0] as { job_number: string; client: { name: string } | null } | undefined;
   const waitFor = first ? { jobNumber: first.job_number, client: first.client?.name ?? "the earlier job" } : null;
+
+  // Once this job is done, the completed screen hands over to whatever is
+  // still open today (or to check-out), so the supervisor never has to go
+  // back to Today to find the next Start trip.
+  let next: NextJob = null;
+  if (job.status === "COMPLETED") {
+    const { data: open } = await supabase
+      .from("jobs")
+      .select("id, job_number, status, client:clients(name)")
+      .eq("assigned_supervisor_id", job.assigned_supervisor_id ?? "")
+      .eq("service_date", job.service_date)
+      .neq("id", job.id)
+      .not("status", "in", "(COMPLETED,CANCELLED,NO_SHOW,DRAFT)")
+      .order("scheduled_start")
+      .limit(1);
+    const n = open?.[0] as { id: string; job_number: string; status: JobStatus; client: { name: string } | null } | undefined;
+    next = n
+      ? { kind: "job", id: n.id, jobNumber: n.job_number, client: n.client?.name ?? n.job_number, status: n.status }
+      : { kind: "checkout" };
+  }
 
   const depot = roster?.submitted_at ? (roster.approval_status as ApprovalStatus) : "none";
   // The location is the reward for an approved depot check-in.
@@ -122,6 +142,8 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
           after={{ status: job.after_review, reason: job.after_rejection_reason }}
           completedAt={job.completed_at}
           waitFor={waitFor}
+          next={next}
+          unpaid={canCollect && !paid?.length}
         />
         {canCollect && paid?.length ? (
           <section className="sheet -mx-4 px-4 py-4">

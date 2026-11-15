@@ -46,6 +46,12 @@ export type FlowUnit = {
 
 type Review = { status: ApprovalStatus | null; reason: string | null };
 
+/** What comes after a completed job: the next open job today, or check-out. */
+export type NextJob =
+  | { kind: "job"; id: string; jobNumber: string; client: string; status: JobStatus }
+  | { kind: "checkout" }
+  | null;
+
 export function JobFlow({
   jobId,
   initialStatus,
@@ -57,6 +63,8 @@ export function JobFlow({
   after,
   completedAt,
   waitFor = null,
+  next = null,
+  unpaid = false,
 }: {
   jobId: string;
   initialStatus: JobStatus;
@@ -70,6 +78,10 @@ export function JobFlow({
   completedAt: string | null;
   /** An earlier job today that is still open; this one waits for it. */
   waitFor?: { jobNumber: string; client: string } | null;
+  /** Only for a completed job: where the supervisor goes next. */
+  next?: NextJob;
+  /** Payment is open on this job but not marked yet. */
+  unpaid?: boolean;
 }) {
   const router = useRouter();
   const [status, setStatus] = useState(initialStatus);
@@ -209,9 +221,12 @@ export function JobFlow({
   /* ---------------------------------------------------------------- views */
   if (status === "COMPLETED") {
     return (
-      <Panel tone="ok" title="Job completed">
-        {completedAt ? `Approved and closed at ${formatIstTime(completedAt)}.` : "Approved and closed."}
-      </Panel>
+      <div className="space-y-3">
+        <Panel tone="ok" title="Job completed">
+          {completedAt ? `Approved and closed at ${formatIstTime(completedAt)}.` : "Approved and closed."}
+        </Panel>
+        {next ? <AfterCompleted next={next} unpaid={unpaid} /> : null}
+      </div>
     );
   }
   if (status === "CANCELLED" || status === "NO_SHOW") {
@@ -503,6 +518,68 @@ function UnitPhotoRow({ unit, which, onShoot }: { unit: FlowUnit; which: "before
         <span className="shrink-0 rounded-full bg-brand-950 active:bg-brand-900 px-3 py-1.5 text-xs font-semibold text-white">Camera</span>
       ) : null}
     </button>
+  );
+}
+
+/**
+ * The hand-over from a finished job: Start trip for the next one, straight
+ * from here, or check-out after the last job of the day.
+ */
+function AfterCompleted({ next, unpaid }: { next: NonNullable<NextJob>; unpaid: boolean }) {
+  const router = useRouter();
+  const supabase = createClient();
+  const [busy, setBusy] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const hint = unpaid ? "Mark the payment above before you leave." : null;
+
+  if (next.kind === "checkout") {
+    return (
+      <>
+        <StepStatus tone="ok">That was your last job today.</StepStatus>
+        <BigButton busy={busy} hint={hint} onClick={() => router.push("/s/checkout")} icon="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9">
+          Go to check-out
+        </BigButton>
+      </>
+    );
+  }
+
+  // Already on the way (or further): just take them to it.
+  const notStarted = next.status === "ASSIGNED" || next.status === "CHECKED_IN";
+
+  async function startTrip() {
+    if (next.kind !== "job") return;
+    setError(null);
+    setBusy("Starting trip…");
+    const path: JobStatus[] = next.status === "ASSIGNED" ? ["CHECKED_IN", "EN_ROUTE"] : ["EN_ROUTE"];
+    for (const to of path) {
+      const { error: err } = await supabase.rpc("advance_job_status", { p_job_id: next.id, p_to: to, p_meta: {} });
+      if (err) {
+        setBusy(null);
+        setError(err.message);
+        return;
+      }
+    }
+    router.push(`/s/jobs/${next.id}`);
+  }
+
+  return (
+    <>
+      <div className="rounded-lg bg-slate-50 p-4">
+        <p className="section-label">Next job</p>
+        <p className="mt-1 font-semibold text-slate-900">{next.client}</p>
+        <p className="text-sm text-slate-500">{next.jobNumber}</p>
+      </div>
+      {error ? <p className="rounded-lg bg-danger-50 p-3 text-sm font-medium text-danger-700">{error}</p> : null}
+      {notStarted ? (
+        <BigButton busy={busy} hint={hint} onClick={() => void startTrip()} icon="m3 11 18-8-8 18-2-8-8-2Z">
+          Start trip
+        </BigButton>
+      ) : (
+        <BigButton busy={busy} onClick={() => router.push(`/s/jobs/${next.id}`)}>
+          Open next job
+        </BigButton>
+      )}
+    </>
   );
 }
 
