@@ -41,6 +41,11 @@ export default async function CheckoutPage() {
               : ""
           }.`}
         />
+      ) : openJobs > 0 ? (
+        <Notice
+          title="Check-out opens after your last job"
+          body={`${openJobs} job${openJobs === 1 ? " is" : "s are"} still waiting to be finished and approved. Once the last one is approved, come back here to check out.`}
+        />
       ) : (
         <DayPhotosFlow
           mode="checkout"

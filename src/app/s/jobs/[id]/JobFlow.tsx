@@ -56,6 +56,7 @@ export function JobFlow({
   before,
   after,
   completedAt,
+  waitFor = null,
 }: {
   jobId: string;
   initialStatus: JobStatus;
@@ -67,6 +68,8 @@ export function JobFlow({
   before: Review;
   after: Review;
   completedAt: string | null;
+  /** An earlier job today that is still open; this one waits for it. */
+  waitFor?: { jobNumber: string; client: string } | null;
 }) {
   const router = useRouter();
   const [status, setStatus] = useState(initialStatus);
@@ -246,7 +249,21 @@ export function JobFlow({
         )
       ) : null}
 
-      {preArrival && depot === "APPROVED" ? (
+      {preArrival && depot === "APPROVED" && waitFor ? (
+        <div className="flex items-start gap-3 rounded-2xl bg-slate-50 p-4">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 ring-1 ring-slate-900/10">
+            <Glyph d="M7 11V8a5 5 0 0 1 10 0v3M5.5 11h13v9.5h-13z" />
+          </span>
+          <div className="min-w-0">
+            <p className="font-bold text-slate-900">Finish {waitFor.client} first</p>
+            <p className="mt-0.5 text-sm text-slate-600">
+              This job opens once {waitFor.jobNumber} is done and its after photos are approved.
+            </p>
+          </div>
+        </div>
+      ) : null}
+
+      {preArrival && depot === "APPROVED" && !waitFor ? (
         <div className="space-y-2">
           <BigButton busy={busy} onClick={() => void reached()} icon="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11ZM12 12.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z">
             I&apos;ve reached the site

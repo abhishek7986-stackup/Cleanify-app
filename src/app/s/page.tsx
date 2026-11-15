@@ -136,11 +136,20 @@ export default async function SupervisorToday() {
             </p>
           ) : (
             <ol className="space-y-3">
-              {day.jobs.map((job, i) => (
-                <li key={job.id}>
-                  <JobCard job={job} index={i + 1} unlocked={day.roster?.approval_status === "APPROVED"} />
-                </li>
-              ))}
+              {day.jobs.map((job, i) => {
+                // One job at a time: only the first unfinished job is open.
+                const currentIndex = day.jobs.findIndex((j) => !FINISHED.includes(j.status));
+                return (
+                  <li key={job.id}>
+                    <JobCard
+                      job={job}
+                      index={i + 1}
+                      unlocked={day.roster?.approval_status === "APPROVED"}
+                      waitingFor={currentIndex >= 0 && i > currentIndex ? currentIndex + 1 : null}
+                    />
+                  </li>
+                );
+              })}
             </ol>
           )}
         </section>
@@ -151,9 +160,12 @@ export default async function SupervisorToday() {
   );
 }
 
+/** Jobs that no longer need the supervisor: approved, cancelled or no-show. */
+const FINISHED: Job["status"][] = ["COMPLETED", "CANCELLED", "NO_SHOW", "DRAFT"];
+
 /**
- * End of the day. Always available once checked in; it becomes the main
- * button when every job is finished, and stays a quieter one before that.
+ * End of the day. Check-out opens only once every job today is finished
+ * (approved, cancelled or no-show); the server refuses it before that.
  */
 function CheckoutCard({ roster, jobs }: { roster: DayRoster; jobs: Job[] }) {
   if (roster.checked_out_at) {
@@ -168,23 +180,28 @@ function CheckoutCard({ roster, jobs }: { roster: DayRoster; jobs: Job[] }) {
       </p>
     );
   }
-  const open = jobs.filter((j) => !["COMPLETED", "CANCELLED", "NO_SHOW", "DRAFT"].includes(j.status)).length;
+  const open = jobs.filter((j) => !FINISHED.includes(j.status)).length;
   return (
     <section className="space-y-2 card p-5">
       <p className="text-lg font-bold text-slate-900">End of the day</p>
       <p className="text-sm text-slate-600">
         {open === 0
           ? "All jobs done. Take a selfie and the scooter km reading to check out."
-          : `${open} job${open === 1 ? "" : "s"} still open. Check out after your last job if you can.`}
+          : `Check-out opens after your last job is approved. ${open} job${open === 1 ? "" : "s"} to go.`}
       </p>
-      <a
-        href="/s/checkout"
-        className={`tap-lg flex items-center justify-center rounded-2xl font-semibold ${
-          open === 0 ? "bg-brand-900 text-white" : "border-2 border-slate-300 text-slate-700"
-        }`}
-      >
-        Check out
-      </a>
+      {open === 0 ? (
+        <a
+          href="/s/checkout"
+          className="tap-lg flex items-center justify-center rounded-2xl bg-brand-900 font-bold text-white active:scale-[0.98]"
+        >
+          Check out
+        </a>
+      ) : (
+        <span className="tap-lg flex items-center justify-center gap-2 rounded-2xl bg-slate-100 font-semibold text-slate-400">
+          <Icon d="M7 11V8a5 5 0 0 1 10 0v3M5.5 11h13v9.5h-13z" small />
+          Check out
+        </span>
+      )}
     </section>
   );
 }
@@ -193,12 +210,15 @@ function JobCard({
   job,
   index,
   unlocked,
+  waitingFor = null,
 }: {
   job: Job & { client: { name: string; phone: string | null } | null };
   index: number;
   unlocked: boolean;
+  /** Set when an earlier job is still open: the job number to finish first. */
+  waitingFor?: number | null;
 }) {
-  const next = nextStep(job, unlocked);
+  const next = waitingFor ? null : nextStep(job, unlocked);
   const conflict = job.itinerary_flags?.includes("itinerary_conflict");
   const upstream = job.itinerary_flags?.includes("upstream_overrun");
 
@@ -265,10 +285,10 @@ function JobCard({
             <Icon d="m9 5 7 7-7 7" small />
           )}
         </p>
-      ) : !unlocked && !done ? (
+      ) : !done && (waitingFor || !unlocked) ? (
         <p className="flex items-center gap-1.5 border-t border-slate-100 px-4 py-2.5 text-xs font-medium text-slate-500">
           <Icon d="M7 11V8a5 5 0 0 1 10 0v3M5.5 11h13v9.5h-13z" small />
-          Unlocks after your check-in is approved
+          {waitingFor ? `Opens after Job ${waitingFor} is finished and approved` : "Unlocks after your check-in is approved"}
         </p>
       ) : null}
     </a>

@@ -47,6 +47,20 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
     after: has(li.id, "SITE_AFTER"),
   }));
 
+  // One job at a time: an earlier job today that is still open comes first.
+  const { data: earlier } = await supabase
+    .from("jobs")
+    .select("job_number, scheduled_start, client:clients(name)")
+    .eq("assigned_supervisor_id", job.assigned_supervisor_id ?? "")
+    .eq("service_date", job.service_date)
+    .neq("id", job.id)
+    .lt("scheduled_start", job.scheduled_start)
+    .not("status", "in", "(COMPLETED,CANCELLED,NO_SHOW,DRAFT)")
+    .order("scheduled_start")
+    .limit(1);
+  const first = earlier?.[0] as { job_number: string; client: { name: string } | null } | undefined;
+  const waitFor = first ? { jobNumber: first.job_number, client: first.client?.name ?? "the earlier job" } : null;
+
   const depot = roster?.submitted_at ? (roster.approval_status as ApprovalStatus) : "none";
   // The location is the reward for an approved depot check-in.
   const unlocked = depot === "APPROVED";
@@ -91,9 +105,9 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
           quoted={job.quoted_amount != null ? Number(job.quoted_amount) : null}
           // The location is the reward for an approved depot check-in.
           mapsHref={
-            unlocked && job.status !== "COMPLETED" ? mapsLink(job.site_address, parseEwkbPoint(job.site_location)) : null
+            unlocked && !waitFor && job.status !== "COMPLETED" ? mapsLink(job.site_address, parseEwkbPoint(job.site_location)) : null
           }
-          mapNote={job.status === "COMPLETED" ? "Job finished" : "Map opens after check-in"}
+          mapNote={job.status === "COMPLETED" ? "Job finished" : waitFor ? "Opens after the earlier job" : "Map opens after check-in"}
         />
         <JobFlow
           // Remount when the server state moves (e.g. an approval arrives via
@@ -108,6 +122,7 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
           before={{ status: job.before_review, reason: job.before_rejection_reason }}
           after={{ status: job.after_review, reason: job.after_rejection_reason }}
           completedAt={job.completed_at}
+          waitFor={waitFor}
         />
         {canCollect && paid?.length ? (
           <section className="rounded-3xl bg-ok-50 p-5 ring-1 ring-ok-100">
