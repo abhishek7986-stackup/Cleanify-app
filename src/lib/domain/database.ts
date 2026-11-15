@@ -579,6 +579,7 @@ export type Database = {
     };
     Functions: {
       create_job: { Args: { p_payload: unknown }; Returns: Job };
+      set_training_days: { Args: { p_days: number }; Returns: undefined };
       add_expense: {
         Args: { p_amount: number; p_category: string; p_paid_from: string; p_bill_path: string; p_note?: string | null; p_spent_on?: string | null };
         Returns: unknown;

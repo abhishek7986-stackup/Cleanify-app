@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/AppShell";
 import { officeNav } from "@/lib/nav";
 import { PayLadderForm } from "./PayLadderForm";
+import { TrainingDaysForm } from "./TrainingDaysForm";
 
 export const metadata = { title: "Pay rates" };
 export const dynamic = "force-dynamic";
@@ -15,7 +16,10 @@ export const dynamic = "force-dynamic";
 export default async function PayRatesPage() {
   const profile = await requireRole("admin");
   const supabase = await createClient();
-  const { data } = await supabase.from("pay_tiers").select("kind, from_earned, percent").order("from_earned");
+  const [{ data }, { data: training }] = await Promise.all([
+    supabase.from("pay_tiers").select("kind, from_earned, percent").order("from_earned"),
+    supabase.from("app_settings").select("value").eq("key", "pay.training_days").maybeSingle(),
+  ]);
   const tiers = data ?? [];
   const of = (kind: "worker" | "supervisor") =>
     tiers.filter((t) => t.kind === kind).map((t) => ({ from_earned: Number(t.from_earned), percent: Number(t.percent) }));
@@ -33,6 +37,7 @@ export default async function PayRatesPage() {
             this ladder for them.
           </p>
         </section>
+        <TrainingDaysForm initial={Number(training?.value ?? 2)} />
         <PayLadderForm kind="worker" title="Workers" initial={of("worker")} />
         <PayLadderForm kind="supervisor" title="Supervisors" initial={of("supervisor")} />
       </div>

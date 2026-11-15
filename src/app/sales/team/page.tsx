@@ -24,6 +24,10 @@ export default async function TeamPage() {
   const supervisors = await getSupervisors();
   const supervisorName = new Map(supervisors.map((s) => [s.id, s.full_name]));
   const today = istDate();
+  // The real current percentage from the server: fixed %, the admin's ladder,
+  // or training days for a new worker.
+  const { data: statement } = await supabase.rpc("payout_statement", { p_week: today });
+  const pctNow = new Map((statement ?? []).map((r) => [r.staff_id, Number(r.percent_now)]));
 
   return (
     <AppShell profile={profile} title="Team percentages" nav={officeNav(profile)}>
@@ -31,16 +35,18 @@ export default async function TeamPage() {
         <OfficeTabs active="team" />
 
         <p className="rounded-xl bg-slate-100 p-3 text-sm text-slate-600">
-          Everyone starts at their start percentage and goes up 1% each month from their joining date until 17%. A job keeps
-          the percentage of the day it was done, so changing it here never changes old jobs. New supervisors appear here once
-          an admin approves them. Each worker is on one supervisor&apos;s team, and only that supervisor can tick them on a job.
+          Each person&apos;s percentage comes from the admin&apos;s Pay rates (raises by earnings), or a fixed percentage set
+          here. A new worker&apos;s first working days are unpaid training. A job keeps the percentage of the day it was done, so
+          changing it here never changes old jobs. New supervisors appear here once an admin approves them. Each worker is on one supervisor&apos;s team, and only that supervisor can tick them on a job.
         </p>
 
         <StaffForm today={today} supervisors={supervisors} />
 
         <ul className="space-y-2">
           {staff.map((s) => {
-            const { percent, nextRise } = previewPercent(s, today);
+            const preview = previewPercent(s, today);
+            const percent = pctNow.get(s.id) ?? preview.percent;
+            const training = s.kind === "worker" && s.fixed_percent == null && percent === 0;
             return (
               <li key={s.id} className={`card p-4 ${s.is_active ? "" : "opacity-60"}`}>
                 <div className="flex items-start justify-between gap-3">
@@ -59,13 +65,9 @@ export default async function TeamPage() {
                     ) : null}
                   </div>
                   <p className="shrink-0 text-right">
-                    <span className="text-2xl font-bold tabular-nums text-slate-900">{percent}%</span>
+                    <span className="text-2xl font-semibold tabular-nums text-slate-900">{percent}%</span>
                     <span className="block text-xs text-slate-500">
-                      {s.fixed_percent != null
-                        ? "Fixed"
-                        : nextRise
-                          ? `${percent + 1}% from ${shortDate(nextRise)}`
-                          : "At the top"}
+                      {s.fixed_percent != null ? "Fixed" : training ? "In training" : "Current rate"}
                     </span>
                   </p>
                 </div>
