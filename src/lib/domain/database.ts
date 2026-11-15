@@ -436,6 +436,28 @@ export type PayoutStatementRow = {
   handed_back: number;
 };
 
+/** Money a person spent on the work, with a bill photo, for the office to approve. */
+export type ExpenseRecord = {
+  id: string;
+  staff_id: string;
+  spent_on: string;
+  week_start: string;
+  category: "fuel" | "chemicals" | "tools" | "food" | "travel" | "other";
+  amount: number;
+  paid_from: "customer_cash" | "own_money";
+  bill_path: string | null;
+  note: string | null;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  created_by: string | null;
+  created_at: string;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  reject_reason: string | null;
+  voided_at: string | null;
+  voided_by: string | null;
+  void_reason: string | null;
+};
+
 /** Cash a person handed back to the office between Mondays. */
 export type CashHandover = {
   id: string;
@@ -539,6 +561,7 @@ export type Database = {
       odometer_readings: Tbl<OdometerReading>;
       pay_tiers: Tbl<PayTier>;
       cash_handovers: Tbl<CashHandover>;
+      expenses: Tbl<ExpenseRecord>;
       capture_tokens: Tbl<CaptureToken>;
       payments: Tbl<Payment>;
       pay_staff: Tbl<PayStaff>;
@@ -556,6 +579,31 @@ export type Database = {
     };
     Functions: {
       create_job: { Args: { p_payload: unknown }; Returns: Job };
+      add_expense: {
+        Args: { p_amount: number; p_category: string; p_paid_from: string; p_bill_path: string; p_note?: string | null; p_spent_on?: string | null };
+        Returns: unknown;
+      };
+      review_expense: { Args: { p_id: string; p_approve: boolean; p_reason?: string | null }; Returns: unknown };
+      void_expense: { Args: { p_id: string; p_reason: string }; Returns: undefined };
+      business_profit: {
+        Args: { p_from: string; p_to: string };
+        Returns: { day: string; jobs: number; revenue: number; salaries: number; expenses: number; profit: number }[];
+      };
+      staff_breakdown: {
+        Args: { p_from: string; p_to: string };
+        Returns: {
+          staff_id: string;
+          full_name: string;
+          kind: "supervisor" | "worker";
+          jobs: number;
+          salary: number;
+          expenses: number;
+          expenses_pending: number;
+          cash_collected: number;
+          handed_back: number;
+          cash_in_hand: number;
+        }[];
+      };
       staff_pay_summary: {
         Args: { p_staff_id: string };
         Returns: Database["public"]["Functions"]["my_pay_summary"]["Returns"];

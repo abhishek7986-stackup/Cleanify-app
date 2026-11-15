@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { DeclareHandover } from "@/components/CashHandover";
+import { AddExpense, MyExpenses, type ExpenseRow } from "@/components/Expenses";
 import { addDays, rupees } from "@/lib/domain/payments";
 import { istDate } from "@/lib/domain/checkin-policy";
 
@@ -11,7 +12,7 @@ import { istDate } from "@/lib/domain/checkin-policy";
  */
 export async function MoneyView({ staffId, self }: { staffId: string; self: boolean }) {
   const supabase = await createClient();
-  const [sumRes, dailyRes, handRes] = await Promise.all([
+  const [sumRes, dailyRes, handRes, expRes] = await Promise.all([
     supabase.rpc("staff_pay_summary", { p_staff_id: staffId }),
     supabase.rpc("staff_daily", { p_staff_id: staffId, p_days: 7 }),
     supabase
@@ -21,7 +22,15 @@ export async function MoneyView({ staffId, self }: { staffId: string; self: bool
       .is("voided_at", null)
       .order("declared_at", { ascending: false })
       .limit(3),
+    supabase
+      .from("expenses")
+      .select("id, spent_on, category, amount, paid_from, note, status, reject_reason")
+      .eq("staff_id", staffId)
+      .is("voided_at", null)
+      .order("created_at", { ascending: false })
+      .limit(5),
   ]);
+  const expenses: ExpenseRow[] = (expRes.data ?? []).map((x) => ({ ...x, bill_url: null }));
   const s = sumRes.data?.[0];
   const days = dailyRes.data ?? [];
   if (!s) {
@@ -92,10 +101,40 @@ export async function MoneyView({ staffId, self }: { staffId: string; self: bool
             Says {rupees(pending.amount)} handed back, waiting for you to confirm on Payments.
           </p>
         ) : null}
-        {inHand > 0 || net > 0 ? (
-          <p className="mt-1 border-t border-brand-950/[0.07] pt-3 text-sm text-slate-600">
-            Settled with the office on <span className="font-medium text-slate-900">{payoutDay}</span>.
-          </p>
+      </section>
+
+      {/* -------------------------------------------- Monday's salary */}
+      <section className="sheet mt-3 px-4 pb-4 pt-5">
+        <p className="section-label">Monday payout · {payoutDay}</p>
+        <dl className="mt-2 divide-y divide-brand-950/[0.07] text-[0.9375rem]">
+          <Row k={`Salary this week · ${s.week_jobs} ${Number(s.week_jobs) === 1 ? "job" : "jobs"}`} v={`+ ${rupees(s.week_earned)}`} />
+          {Number(s.brought_forward) !== 0 ? (
+            <Row
+              k={Number(s.brought_forward) > 0 ? "Still owed from before" : "Still to give back from before"}
+              v={`${Number(s.brought_forward) > 0 ? "+" : "−"} ${rupees(Math.abs(Number(s.brought_forward)))}`}
+            />
+          ) : null}
+          <Row k="Customers' cash collected this week" v={`− ${rupees(s.week_cash_collected)}`} />
+          {Number(s.week_handed_back) > 0 ? <Row k="Given to the office or spent on work (approved)" v={`+ ${rupees(s.week_handed_back)}`} /> : null}
+        </dl>
+        <p className={`mt-3 flex items-baseline justify-between rounded-lg px-3 py-3 ${net < 0 ? "bg-danger-50" : "bg-ok-50"}`}>
+          <span className={`font-semibold ${net < 0 ? "text-danger-700" : "text-ok-700"}`}>
+            {net < 0 ? (self ? "You give the office" : "They give the office") : self ? "The office pays you" : "The office pays them"}
+          </span>
+          <span className={`text-xl font-semibold tabular-nums ${net < 0 ? "text-danger-700" : "text-ok-700"}`}>{rupees(Math.abs(net))}</span>
+        </p>
+      </section>
+
+      {/* ------------------------------------------------- expenses */}
+      <section className="sheet mt-3 px-4 pb-4 pt-5">
+        <p className="section-label pb-2">Expenses</p>
+        <MyExpenses rows={expenses} />
+        {self ? (
+          <div className={expenses.length ? "pt-3" : ""}>
+            <AddExpense />
+          </div>
+        ) : !expenses.length ? (
+          <p className="text-sm text-slate-600">No expenses recorded.</p>
         ) : null}
       </section>
 

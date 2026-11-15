@@ -74,7 +74,7 @@ export function DeclareHandover({ holding, pending }: { holding: number; pending
     return (
       <div className="py-3">
         <button type="button" onClick={() => setOpen(true)} className={`${secondary} w-full`}>
-          I handed back cash
+          I gave money to the office
         </button>
       </div>
     );
@@ -97,7 +97,7 @@ export function DeclareHandover({ holding, pending }: { holding: number; pending
   return (
     <div className="space-y-3 py-3">
       <label className="block">
-        <span className="mb-1.5 block text-sm font-medium text-slate-700">Amount handed back (₹)</span>
+        <span className="mb-1.5 block text-sm font-medium text-slate-700">Amount given to the office (₹)</span>
         <input
           inputMode="numeric"
           value={amount}

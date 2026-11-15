@@ -10,6 +10,8 @@ import { mondayOf, rupees, shortDate } from "@/lib/domain/payments";
 import { CancelPaymentButton, UpiSettings, VerifyUpiButton, CorrectPaymentButton } from "./PaymentActions";
 import { OfficeHandovers, type HandoverRow } from "@/components/CashHandover";
 import type { CashHandover } from "@/lib/domain/database";
+import { ReviewExpenses, type ExpenseRow } from "@/components/Expenses";
+import { getSignedBillUrls } from "@/lib/data/photos";
 
 export const metadata = { title: "Payments" };
 export const dynamic = "force-dynamic";
@@ -42,7 +44,7 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
 
   const profile = await requireRole("sales_rep");
   const supabase = await createClient();
-  const [totalsRes, listRes, dueRes, directoryRes, upiRes, handRes, staffRes] = await Promise.all([
+  const [totalsRes, listRes, dueRes, directoryRes, upiRes, handRes, staffRes, expRes] = await Promise.all([
     supabase.rpc("payment_totals", { p_from: from, p_to: to }),
     supabase
       .from("payments")
@@ -66,7 +68,23 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
       .limit(30)
       .overrideTypes<(CashHandover & { staff: { full_name: string } | null })[], { merge: false }>(),
     supabase.from("pay_staff").select("id, full_name, kind").eq("is_active", true).order("kind").order("full_name"),
+    supabase
+      .from("expenses")
+      .select("id, spent_on, category, amount, paid_from, note, status, reject_reason, bill_path, staff:pay_staff(full_name)")
+      .eq("status", "PENDING")
+      .is("voided_at", null)
+      .order("created_at")
+      .overrideTypes<
+        (Omit<ExpenseRow, "bill_url" | "staff_name"> & { bill_path: string | null; staff: { full_name: string } | null })[],
+        { merge: false }
+      >(),
   ]);
+  const billUrls = await getSignedBillUrls((expRes.data ?? []).map((x) => x.bill_path ?? ""));
+  const pendingExpenses: ExpenseRow[] = (expRes.data ?? []).map((x) => ({
+    ...x,
+    staff_name: x.staff?.full_name ?? "Staff",
+    bill_url: x.bill_path ? (billUrls[x.bill_path] ?? null) : null,
+  }));
   // Each supervisor's cash in hand and today's earnings, for the list below.
   const supervisors = (staffRes.data ?? []).filter((x) => x.kind === "supervisor");
   const summaries = await Promise.all(
@@ -106,6 +124,18 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
       <AutoRefresh seconds={30} />
       <div className="space-y-4">
         <OfficeTabs active="payments" />
+
+        <Link href="/sales/payments/breakdown" className="sheet -mx-4 flex min-h-14 items-center justify-between gap-3 px-4 active:bg-slate-50">
+          <span>
+            <span className="block font-semibold text-slate-900">Money breakdown and profit</span>
+            <span className="block text-sm text-slate-600">Every person&apos;s salary and expenses; revenue minus costs</span>
+          </span>
+          <svg viewBox="0 0 24 24" className="size-5 shrink-0 text-slate-500" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="m9 5 7 7-7 7" />
+          </svg>
+        </Link>
+
+        {canManageMoney ? <ReviewExpenses rows={pendingExpenses} /> : null}
 
         <section>
           <p className="section-label pb-2">Supervisors</p>
