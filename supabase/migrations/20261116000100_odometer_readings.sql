@@ -1,28 +1,35 @@
--- What the app read off each odometer photo, kept beside what the supervisor
--- typed. The photo's number pre-fills the km box; the supervisor confirms or
--- corrects it. When the two differ, the office sees both on the approval card.
+-- What the system read off each odometer photo, kept beside what the
+-- supervisor typed. The app fills the km box from the photo and the supervisor
+-- confirms or corrects it; when the two differ, the office sees both on the
+-- approval card.
 --
--- Written only by the server (service role) right after reading the photo, so
--- a supervisor cannot set "what the photo said". Never updated: a retake is a
--- new photo with its own row.
+-- One row per photo, written only by the server (service role) after it reads
+-- the image, never by the phone. A reading that failed is still recorded, with
+-- read_km null, so "the photo could not be read" is distinguishable from
+-- "nobody tried".
 
 create table if not exists public.odometer_readings (
   photo_id   uuid primary key references public.photos(id) on delete cascade,
-  read_km    numeric,            -- null when nothing on the photo looked like an odometer
-  raw_text   text,               -- what the reader saw, for checking a disputed number
-  engine     text not null,      -- 'google_vision' or 'tesseract'
+  read_km    numeric,
+  engine     text not null,             -- 'google_vision' or 'tesseract'
+  raw_text   text,
   created_at timestamptz not null default now()
 );
 
 alter table public.odometer_readings enable row level security;
 
--- The office sees every reading; a supervisor sees the readings of their own photos.
+-- The office sees every reading; a supervisor sees the readings of their own
+-- photos. Nobody writes through the API: the server uses the service role.
 drop policy if exists odometer_readings_read on public.odometer_readings;
 create policy odometer_readings_read on public.odometer_readings
   for select to authenticated
   using (
     public.is_admin() or public.is_sales_rep()
-    or exists (select 1 from public.photos p where p.id = photo_id and p.uploaded_by = auth.uid())
+    or exists (
+      select 1 from public.photos p
+       where p.id = odometer_readings.photo_id and p.uploaded_by = auth.uid()
+    )
   );
 
-revoke insert, update, delete on public.odometer_readings from authenticated, anon;
+revoke all on public.odometer_readings from anon;
+grant select on public.odometer_readings to authenticated;
