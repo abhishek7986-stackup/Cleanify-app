@@ -333,7 +333,7 @@ export function NewJobWizard({
   }
 
   const input =
-    "w-full tap rounded-xl border-2 border-slate-200 bg-white px-3 text-base outline-none focus:border-brand-600";
+    "w-full tap rounded-xl border border-slate-900/10 bg-white px-3 text-base outline-none focus:border-brand-600";
 
   return (
     <div className="space-y-4 pb-4">
@@ -372,7 +372,7 @@ export function NewJobWizard({
       {/* ------------------------------------------------------ 0. client */}
       {step === 0 ? (
         <section className="space-y-3">
-          <div className="flex gap-2">
+          <div className="flex gap-1 rounded-2xl bg-slate-900/[0.05] p-1">
             <TabButton active={clientMode === "search"} onClick={() => setClientMode("search")}>
               Existing client
             </TabButton>
@@ -395,7 +395,7 @@ export function NewJobWizard({
                 <button
                   type="button"
                   onClick={searchClients}
-                  className="tap shrink-0 rounded-xl bg-slate-800 px-5 font-semibold text-white"
+                  className="tap shrink-0 rounded-xl bg-brand-900 px-5 font-semibold text-white"
                 >
                   {searching ? "…" : "Search"}
                 </button>
@@ -450,7 +450,7 @@ export function NewJobWizard({
       {/* ---------------------------------------------------- 1. location */}
       {step === 1 ? (
         <section className="space-y-3">
-          <div className="rounded-2xl border-2 border-slate-200 bg-white p-3">
+          <div className="rounded-2xl border border-slate-900/10 bg-white p-3">
             <p className="text-sm font-medium text-slate-700">Location shared on WhatsApp?</p>
             <p className="mt-0.5 text-xs text-slate-500">
               Paste the Google Maps link or the coordinates and the pin moves there.
@@ -468,7 +468,7 @@ export function NewJobWizard({
                 <button
                   type="button"
                   onClick={pasteFromClipboard}
-                  className="tap shrink-0 rounded-xl bg-slate-800 px-4 text-sm font-semibold text-white"
+                  className="tap shrink-0 rounded-xl bg-brand-900 px-4 text-sm font-semibold text-white"
                 >
                   Paste
                 </button>
@@ -563,7 +563,7 @@ export function NewJobWizard({
               </div>
 
               {items.map((it, i) => (
-                <div key={it.key} className="rounded-2xl border-2 border-slate-200 bg-white p-4">
+                <div key={it.key} className="rounded-2xl border border-slate-900/10 bg-white p-4">
                   <div className="mb-3 flex items-center justify-between">
                     <p className="font-semibold text-slate-800">
                       {service.line_item_singular} {i + 1}
@@ -670,8 +670,8 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
     <button
       type="button"
       onClick={onClick}
-      className={`tap flex-1 rounded-xl border-2 text-sm font-semibold ${
-        active ? "border-brand-600 bg-brand-50 text-brand-800" : "border-slate-200 bg-white text-slate-600"
+      className={`min-h-11 flex-1 rounded-xl text-sm font-semibold ${
+        active ? "bg-white text-slate-900 shadow-[0_1px_2px_rgb(15_23_42/0.08),0_0_0_1px_rgb(15_23_42/0.06)]" : "text-slate-500"
       }`}
     >
       {children}

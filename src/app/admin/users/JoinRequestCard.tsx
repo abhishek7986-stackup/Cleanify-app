@@ -129,7 +129,7 @@ export function JoinRequestCard({
             rows={2}
             autoFocus
             placeholder="Why? The applicant sees this."
-            className="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-base outline-none focus:border-brand-600"
+            className="w-full rounded-xl border border-slate-900/10 px-3 py-2 text-base outline-none focus:border-brand-600"
             value={reason}
             onChange={(e) => setReason(e.target.value)}
           />
@@ -152,7 +152,7 @@ export function JoinRequestCard({
           <label className="block">
             <span className="mb-1.5 block text-sm font-medium text-slate-700">Starts the day from</span>
             <select
-              className="tap w-full rounded-xl border-2 border-slate-200 bg-white px-3 text-base"
+              className="tap w-full rounded-xl border border-slate-900/10 bg-white px-3 text-base"
               value={depot}
               onChange={(e) => setDepot(e.target.value)}
             >
@@ -167,13 +167,13 @@ export function JoinRequestCard({
           {depot === "new" ? (
             <div className="grid gap-2">
               <input
-                className="tap w-full rounded-xl border-2 border-slate-200 bg-white px-3 text-base"
+                className="tap w-full rounded-xl border border-slate-900/10 bg-white px-3 text-base"
                 placeholder="Google Maps link or 17.4401, 78.3489"
                 value={pasted}
                 onChange={(e) => setPasted(e.target.value)}
               />
               <input
-                className="tap w-full rounded-xl border-2 border-slate-200 bg-white px-3 text-base"
+                className="tap w-full rounded-xl border border-slate-900/10 bg-white px-3 text-base"
                 placeholder="Name, e.g. Kakkanad depot"
                 value={newDepotName}
                 onChange={(e) => setNewDepotName(e.target.value)}

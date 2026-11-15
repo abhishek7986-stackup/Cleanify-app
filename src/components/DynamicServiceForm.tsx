@@ -108,7 +108,7 @@ export function initialValues(fields: ServiceField[]): FieldValues {
 }
 
 const inputBase =
-  "w-full tap rounded-xl border-2 border-slate-200 bg-white px-3 text-base " +
+  "w-full tap rounded-xl border border-slate-900/10 bg-white px-3 text-base " +
   "outline-none focus:border-brand-600 disabled:bg-slate-50";
 
 export function DynamicServiceForm({
@@ -141,7 +141,7 @@ export function DynamicServiceForm({
             {f.field_type === "boolean" ? (
               <label
                 htmlFor={id}
-                className="flex tap items-center justify-between gap-3 rounded-xl border-2 border-slate-200 bg-white px-3"
+                className="flex tap items-center justify-between gap-3 rounded-xl border border-slate-900/10 bg-white px-3"
               >
                 <span className="text-base font-medium text-slate-800">{f.label}</span>
                 <input

@@ -64,7 +64,7 @@ export function CancelPaymentButton({ jobId }: { jobId: string }) {
         <input
           value={reason}
           onChange={(e) => setReason(e.target.value)}
-          className="tap mt-1 w-full rounded-xl border-2 border-slate-200 bg-white px-3 text-base font-normal outline-none focus:border-brand-600"
+          className="tap mt-1 w-full rounded-xl border border-slate-900/10 bg-white px-3 text-base font-normal outline-none focus:border-brand-600"
         />
       </label>
       <p className="text-xs text-slate-500">
@@ -72,7 +72,7 @@ export function CancelPaymentButton({ jobId }: { jobId: string }) {
       </p>
       {error ? <p className="rounded-xl bg-danger-50 p-2 text-sm text-danger-700">{error}</p> : null}
       <div className="flex gap-2">
-        <button type="button" onClick={() => setOpen(false)} className="tap flex-1 rounded-xl border-2 border-slate-200 text-sm font-semibold text-slate-600">
+        <button type="button" onClick={() => setOpen(false)} className="tap flex-1 rounded-xl border border-slate-900/10 text-sm font-semibold text-slate-600">
           Keep it
         </button>
         <button
@@ -135,7 +135,7 @@ export function CorrectPaymentButton({ jobId, upi, cash }: { jobId: string; upi:
             inputMode="numeric"
             value={upiAmount}
             onChange={(e) => setUpiAmount(e.target.value.replace(/[^\d.]/g, ""))}
-            className="tap mt-1 block w-full rounded-xl border-2 border-slate-200 bg-white px-3 text-base tabular-nums outline-none focus:border-brand-600"
+            className="tap mt-1 block w-full rounded-xl border border-slate-900/10 bg-white px-3 text-base tabular-nums outline-none focus:border-brand-600"
           />
         </label>
         <label className="min-w-0 flex-1 text-xs font-medium text-slate-600">
@@ -144,7 +144,7 @@ export function CorrectPaymentButton({ jobId, upi, cash }: { jobId: string; upi:
             inputMode="numeric"
             value={cashAmount}
             onChange={(e) => setCashAmount(e.target.value.replace(/[^\d.]/g, ""))}
-            className="tap mt-1 block w-full rounded-xl border-2 border-slate-200 bg-white px-3 text-base tabular-nums outline-none focus:border-brand-600"
+            className="tap mt-1 block w-full rounded-xl border border-slate-900/10 bg-white px-3 text-base tabular-nums outline-none focus:border-brand-600"
           />
         </label>
       </div>
@@ -154,7 +154,7 @@ export function CorrectPaymentButton({ jobId, upi, cash }: { jobId: string; upi:
           value={reason}
           onChange={(e) => setReason(e.target.value)}
           placeholder="e.g. Supervisor typed 1000, customer paid 2000"
-          className="tap mt-1 w-full rounded-xl border-2 border-slate-200 bg-white px-3 text-base font-normal outline-none focus:border-brand-600"
+          className="tap mt-1 w-full rounded-xl border border-slate-900/10 bg-white px-3 text-base font-normal outline-none focus:border-brand-600"
         />
       </label>
       <p className="text-xs text-slate-500">
@@ -163,7 +163,7 @@ export function CorrectPaymentButton({ jobId, upi, cash }: { jobId: string; upi:
       </p>
       {error ? <p className="rounded-xl bg-danger-50 p-2 text-sm text-danger-700">{error}</p> : null}
       <div className="flex gap-2">
-        <button type="button" onClick={() => setOpen(false)} className="tap flex-1 rounded-xl border-2 border-slate-200 text-sm font-semibold text-slate-600">
+        <button type="button" onClick={() => setOpen(false)} className="tap flex-1 rounded-xl border border-slate-900/10 text-sm font-semibold text-slate-600">
           Keep it
         </button>
         <button
@@ -223,7 +223,7 @@ export function UpiSettings({ upi }: { upi: { id: string; name: string } | null 
           placeholder="name@bank"
           autoCapitalize="none"
           autoCorrect="off"
-          className="tap mt-1 w-full rounded-xl border-2 border-slate-200 bg-white px-3 text-base font-normal outline-none focus:border-brand-600"
+          className="tap mt-1 w-full rounded-xl border border-slate-900/10 bg-white px-3 text-base font-normal outline-none focus:border-brand-600"
         />
       </label>
       <label className="block text-sm font-medium text-slate-700">
@@ -231,7 +231,7 @@ export function UpiSettings({ upi }: { upi: { id: string; name: string } | null 
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="tap mt-1 w-full rounded-xl border-2 border-slate-200 bg-white px-3 text-base font-normal outline-none focus:border-brand-600"
+          className="tap mt-1 w-full rounded-xl border border-slate-900/10 bg-white px-3 text-base font-normal outline-none focus:border-brand-600"
         />
       </label>
       {error ? <p className="rounded-xl bg-danger-50 p-2 text-sm text-danger-700">{error}</p> : null}

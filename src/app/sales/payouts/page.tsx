@@ -89,7 +89,7 @@ export default async function PayoutsPage(props: PageProps<"/sales/payouts">) {
           <Link
             href={`/sales/payouts?week=${addDays(week, -7)}`}
             aria-label="Previous week"
-            className="tap flex items-center justify-center rounded-xl border-2 border-slate-200 bg-white text-lg text-slate-700"
+            className="tap flex items-center justify-center rounded-xl border border-slate-900/10 bg-white text-lg text-slate-700"
           >
             ‹
           </Link>
@@ -102,7 +102,7 @@ export default async function PayoutsPage(props: PageProps<"/sales/payouts">) {
           <Link
             href={`/sales/payouts?week=${addDays(week, 7)}`}
             aria-label="Next week"
-            className="tap flex items-center justify-center rounded-xl border-2 border-slate-200 bg-white text-lg text-slate-700"
+            className="tap flex items-center justify-center rounded-xl border border-slate-900/10 bg-white text-lg text-slate-700"
           >
             ›
           </Link>

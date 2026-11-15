@@ -105,7 +105,7 @@ export function LoginForm() {
   }
 
   const field =
-    "w-full tap rounded-xl border-2 border-slate-200 bg-white px-4 text-base " +
+    "w-full tap rounded-xl border border-slate-900/10 bg-white px-4 text-base " +
     "outline-none focus:border-brand-600";
   const button =
     "w-full tap-lg rounded-xl bg-brand-900 text-base font-semibold text-white " +

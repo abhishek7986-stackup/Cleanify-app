@@ -61,7 +61,7 @@ export function SettleForm({ staffId, week, net }: { staffId: string; week: stri
             max={due}
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="tap mt-1 w-full rounded-xl border-2 border-slate-200 px-3 text-base font-semibold outline-none focus:border-brand-600"
+            className="tap mt-1 w-full rounded-xl border border-slate-900/10 px-3 text-base font-semibold outline-none focus:border-brand-600"
           />
         </label>
         <label className="w-28 shrink-0 text-sm font-medium text-slate-700">
@@ -69,7 +69,7 @@ export function SettleForm({ staffId, week, net }: { staffId: string; week: stri
           <select
             value={method}
             onChange={(e) => setMethod(e.target.value as typeof method)}
-            className="tap mt-1 w-full rounded-xl border-2 border-slate-200 bg-white px-2 text-base font-normal"
+            className="tap mt-1 w-full rounded-xl border border-slate-900/10 bg-white px-2 text-base font-normal"
           >
             <option value="upi">UPI</option>
             <option value="cash">Cash</option>
@@ -82,7 +82,7 @@ export function SettleForm({ staffId, week, net }: { staffId: string; week: stri
         <input
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          className="tap mt-1 w-full rounded-xl border-2 border-slate-200 px-3 text-base font-normal outline-none focus:border-brand-600"
+          className="tap mt-1 w-full rounded-xl border border-slate-900/10 px-3 text-base font-normal outline-none focus:border-brand-600"
         />
       </label>
       {short > 0 && given > 0 ? (
@@ -134,12 +134,12 @@ export function ReversePayoutButton({ payoutId }: { payoutId: string }) {
         <input
           value={reason}
           onChange={(e) => setReason(e.target.value)}
-          className="tap mt-1 w-full rounded-xl border-2 border-slate-200 bg-white px-3 text-base font-normal outline-none focus:border-brand-600"
+          className="tap mt-1 w-full rounded-xl border border-slate-900/10 bg-white px-3 text-base font-normal outline-none focus:border-brand-600"
         />
       </label>
       {error ? <p className="rounded-xl bg-danger-50 p-2 text-sm text-danger-700">{error}</p> : null}
       <div className="flex gap-2">
-        <button type="button" onClick={() => setOpen(false)} className="tap flex-1 rounded-xl border-2 border-slate-200 text-sm font-semibold text-slate-600">
+        <button type="button" onClick={() => setOpen(false)} className="tap flex-1 rounded-xl border border-slate-900/10 text-sm font-semibold text-slate-600">
           Keep it
         </button>
         <button

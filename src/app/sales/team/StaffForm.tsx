@@ -71,7 +71,7 @@ export function StaffForm({
     );
   }
 
-  const input = "tap mt-1 w-full rounded-xl border-2 border-slate-200 bg-white px-3 text-base font-normal outline-none focus:border-brand-600";
+  const input = "tap mt-1 w-full rounded-xl border border-slate-900/10 bg-white px-3 text-base font-normal outline-none focus:border-brand-600";
 
   return (
     <div className={`space-y-3 ${staff ? "mt-3 border-t border-slate-100 pt-3" : "card p-4"}`}>
@@ -133,7 +133,7 @@ export function StaffForm({
       ) : null}
       {error ? <p className="rounded-xl bg-danger-50 p-2 text-sm text-danger-700">{error}</p> : null}
       <div className="flex gap-2">
-        <button type="button" onClick={() => setOpen(false)} className="tap flex-1 rounded-xl border-2 border-slate-200 font-semibold text-slate-600">
+        <button type="button" onClick={() => setOpen(false)} className="tap flex-1 rounded-xl border border-slate-900/10 font-semibold text-slate-600">
           Cancel
         </button>
         <button type="button" disabled={busy} onClick={() => void save()} className="tap flex-1 rounded-xl bg-brand-900 font-semibold text-white disabled:opacity-40">

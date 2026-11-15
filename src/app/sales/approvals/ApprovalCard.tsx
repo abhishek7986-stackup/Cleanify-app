@@ -129,7 +129,7 @@ export function ApprovalCard({
               rows={2}
               autoFocus
               placeholder="What is wrong with these photos?"
-              className="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-base outline-none focus:border-brand-600"
+              className="w-full rounded-xl border border-slate-900/10 px-3 py-2 text-base outline-none focus:border-brand-600"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />

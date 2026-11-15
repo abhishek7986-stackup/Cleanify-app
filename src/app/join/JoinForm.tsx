@@ -35,7 +35,7 @@ async function prepare(file: File): Promise<File> {
 }
 
 const input =
-  "w-full tap rounded-xl border-2 border-slate-200 bg-white px-3 text-base outline-none focus:border-brand-600";
+  "w-full tap rounded-xl border border-slate-900/10 bg-white px-3 text-base outline-none focus:border-brand-600";
 
 export function JoinForm() {
   const [fullName, setFullName] = useState("");
@@ -161,7 +161,7 @@ export function JoinForm() {
         </div>
       </Field>
 
-      <section className="space-y-4 rounded-2xl border-2 border-slate-200 bg-white p-4">
+      <section className="space-y-4 rounded-2xl border border-slate-900/10 bg-white p-4">
         <div>
           <p className="font-semibold text-slate-900">ID documents</p>
           <p className="text-sm text-slate-500">Two are needed. The office checks them before your account is switched on.</p>
@@ -285,7 +285,7 @@ function DocPicker({
       <label
         htmlFor={id}
         className={`tap flex shrink-0 cursor-pointer items-center rounded-xl px-3 text-sm font-semibold ${
-          doc ? "border-2 border-slate-200 text-slate-600" : "bg-brand-900 text-white"
+          doc ? "border border-slate-900/10 text-slate-600" : "bg-brand-900 text-white"
         }`}
       >
         {doc ? "Change" : "Add photo"}

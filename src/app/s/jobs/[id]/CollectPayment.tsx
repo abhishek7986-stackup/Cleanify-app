@@ -98,7 +98,7 @@ export function CollectPayment({
           min="0"
           value={total}
           onChange={(e) => setTotal(e.target.value)}
-          className="tap w-full rounded-xl border-2 border-slate-200 px-3 text-lg font-semibold outline-none focus:border-brand-600"
+          className="tap w-full rounded-xl border border-slate-900/10 px-3 text-lg font-semibold outline-none focus:border-brand-600"
         />
       </label>
 
@@ -111,7 +111,7 @@ export function CollectPayment({
             min="0"
             value={cashPart}
             onChange={(e) => setCashPart(e.target.value)}
-            className="tap w-full rounded-xl border-2 border-slate-200 px-3 text-lg font-semibold outline-none focus:border-brand-600"
+            className="tap w-full rounded-xl border border-slate-900/10 px-3 text-lg font-semibold outline-none focus:border-brand-600"
           />
           {totalNum > 0 && !splitWrong ? (
             <span className="mt-1 block text-sm text-slate-600">
@@ -140,7 +140,7 @@ export function CollectPayment({
       <fieldset className="space-y-2">
         <legend className="mb-1.5 text-sm font-medium text-slate-700">Who worked with you on this job?</legend>
         {workers.map((w) => (
-          <label key={w.id} className="tap flex items-center gap-3 rounded-xl border-2 border-slate-200 px-3">
+          <label key={w.id} className="tap flex items-center gap-3 rounded-xl border border-slate-900/10 px-3">
             <input
               type="checkbox"
               className="size-5"
@@ -153,7 +153,7 @@ export function CollectPayment({
             <span className="font-medium text-slate-800">{w.full_name}</span>
           </label>
         ))}
-        <label className="tap flex items-center gap-3 rounded-xl border-2 border-slate-200 px-3">
+        <label className="tap flex items-center gap-3 rounded-xl border border-slate-900/10 px-3">
           <input
             type="checkbox"
             className="size-5"
@@ -181,7 +181,7 @@ export function CollectPayment({
           rows={2}
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          className="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-base outline-none focus:border-brand-600"
+          className="w-full rounded-xl border border-slate-900/10 px-3 py-2 text-base outline-none focus:border-brand-600"
         />
       </label>
 
@@ -225,7 +225,7 @@ function UpiQr({
   }, [link]);
 
   return (
-    <div className="rounded-xl border-2 border-slate-200 p-4 text-center">
+    <div className="rounded-xl border border-slate-900/10 p-4 text-center">
       <p className="text-sm text-slate-600">Show this to the customer</p>
       {/* Our own generated SVG, not outside content. */}
       <div

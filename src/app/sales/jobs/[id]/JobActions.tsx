@@ -258,7 +258,7 @@ function CancelModal({ job, reasons, onClose }: { job: Job; reasons: Reason[]; o
 /* ------------------------------------------------------------------------ */
 
 const inputCls =
-  "w-full tap rounded-xl border-2 border-slate-200 bg-white px-3 text-base outline-none focus:border-brand-600";
+  "w-full tap rounded-xl border border-slate-900/10 bg-white px-3 text-base outline-none focus:border-brand-600";
 
 function Labelled({ label, children }: { label: string; children: React.ReactNode }) {
   return (

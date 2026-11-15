@@ -94,7 +94,7 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
           </p>
         ) : null}
 
-        <div className="grid grid-cols-4 gap-2">
+        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none]">
           {(
             [
               ["today", "Today"],
@@ -107,8 +107,8 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
               key={key}
               href={`/sales/payments?range=${key}`}
               aria-current={range === key ? "true" : undefined}
-              className={`tap flex items-center justify-center rounded-xl px-1 text-center text-xs font-semibold ${
-                range === key ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-600"
+              className={`flex min-h-10 shrink-0 items-center justify-center rounded-full px-4 text-center text-sm font-semibold ${
+                range === key ? "bg-brand-900 text-white" : "bg-white text-slate-600 ring-1 ring-slate-900/10"
               }`}
             >
               {label}
@@ -121,11 +121,11 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
             <input type="hidden" name="range" value="custom" />
             <label className="min-w-0 flex-1 text-xs font-medium text-slate-600">
               From
-              <input type="date" name="from" defaultValue={from} className="tap mt-1 block w-full rounded-xl border-2 border-slate-200 bg-white px-2 text-sm" />
+              <input type="date" name="from" defaultValue={from} className="tap mt-1 block w-full rounded-xl border border-slate-900/10 bg-white px-2 text-sm" />
             </label>
             <label className="min-w-0 flex-1 text-xs font-medium text-slate-600">
               To
-              <input type="date" name="to" defaultValue={to} className="tap mt-1 block w-full rounded-xl border-2 border-slate-200 bg-white px-2 text-sm" />
+              <input type="date" name="to" defaultValue={to} className="tap mt-1 block w-full rounded-xl border border-slate-900/10 bg-white px-2 text-sm" />
             </label>
             <button className="tap rounded-xl bg-brand-900 px-4 text-sm font-semibold text-white">Show</button>
           </form>
