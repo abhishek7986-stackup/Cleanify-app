@@ -21,8 +21,8 @@ OWN-WORLD: Deep teal app bar (#0b3532) carrying the screen title and live shift 
 
 STORY: The supervisor opens the app and immediately sees their shift state, the current stop and its single next step, and taps the fixed bottom action to do it. Later stops sit below as a quiet numbered list.
 
-FIRST VIEWPORT: Teal app bar (title, name, shift status strip: check-in state, jobs done x/y, km). Under it, the Current stop section: stop number and time, client name at 22px, address, Navigate and Call as two compact buttons. Below, "Up next" list rows with dividers. Fixed above the bottom nav: the action bar with one full-width primary button naming the next step.
+FIRST VIEWPORT: Teal app bar (title, name, shift status strip: check-in state, jobs done x/y, and leave-depot time; km moved to the Roadmap strip because before departure the leave time is the figure the supervisor acts on). Under it, the Current stop section: stop number and time, client name at 22px, address, Navigate and Call as two compact buttons. Below, "Up next" list rows with dividers. Fixed above the bottom nav: the action bar with one full-width primary button naming the next step.
 
-FORM: Canon, user-pinned ("delivery partner app": Swiggy, Zomato, Uber driver), 16 Nov 2026. Signature move: the fixed bottom action bar that always names the one next step. seed: none (unavailable)
+FORM: Canon, user-pinned ("delivery partner app": Swiggy, Zomato, Uber driver), 16 Nov 2026. Signature move: the fixed bottom action bar that always names the one next step. seed: none (roll skipped: direction pinned by the user, so no concept-seed roll ran)
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance

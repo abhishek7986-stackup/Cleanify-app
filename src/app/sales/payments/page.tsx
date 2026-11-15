@@ -108,7 +108,7 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
               href={`/sales/payments?range=${key}`}
               aria-current={range === key ? "true" : undefined}
               className={`flex min-h-10 shrink-0 items-center justify-center rounded-full px-4 text-center text-sm font-semibold ${
-                range === key ? "bg-brand-900 text-white" : "bg-white text-slate-600 ring-1 ring-slate-900/10"
+                range === key ? "bg-brand-950 active:bg-brand-900 text-white" : "bg-white text-slate-600 ring-1 ring-slate-900/10"
               }`}
             >
               {label}
@@ -127,7 +127,7 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
               To
               <input type="date" name="to" defaultValue={to} className="tap mt-1 block w-full rounded-xl border border-slate-900/10 bg-white px-2 text-sm" />
             </label>
-            <button className="tap rounded-xl bg-brand-900 px-4 text-sm font-semibold text-white">Show</button>
+            <button className="tap rounded-xl bg-brand-950 active:bg-brand-900 px-4 text-sm font-semibold text-white">Show</button>
           </form>
         ) : null}
 

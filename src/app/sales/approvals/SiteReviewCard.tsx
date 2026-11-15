@@ -168,7 +168,7 @@ export function SiteReviewCard({
           <button type="button" onClick={() => setRejecting(true)} className="tap flex-1 rounded-xl border-2 border-danger-500 font-semibold text-danger-600">
             Reject
           </button>
-          <button type="button" disabled={busy} onClick={() => review(true)} className="tap flex-[2] rounded-xl bg-brand-900 font-semibold text-white disabled:opacity-50">
+          <button type="button" disabled={busy} onClick={() => review(true)} className="tap flex-[2] rounded-xl bg-brand-950 active:bg-brand-900 font-semibold text-white disabled:opacity-50">
             {busy ? "…" : stage === "before" ? "Approve, start cleaning" : "Approve and close job"}
           </button>
         </div>

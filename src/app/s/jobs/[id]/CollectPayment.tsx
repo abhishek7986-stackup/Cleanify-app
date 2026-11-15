@@ -62,7 +62,7 @@ export function CollectPayment({
   return (
     <section className="sheet -mx-4 space-y-4 px-4 py-5">
       <div>
-        <h2 className="text-lg font-bold text-slate-900">Collect payment</h2>
+        <h2 className="text-lg font-semibold text-slate-900">Collect payment</h2>
         <p className="text-sm text-slate-600">
           {quoted != null ? `Quoted ${rupees(quoted)}. ` : ""}Ask the customer how they want to pay.
         </p>
@@ -173,7 +173,7 @@ export function CollectPayment({
       <label className="block">
         <span className="mb-1.5 block text-sm font-medium text-slate-700">
           Note{" "}
-          <span className="font-normal text-slate-400">
+          <span className="font-normal text-slate-500">
             {differs ? "(needed: the amount is different from the quote)" : "(optional)"}
           </span>
         </span>
@@ -191,7 +191,7 @@ export function CollectPayment({
         type="button"
         disabled={!ready || busy}
         onClick={() => void submit()}
-        className="tap-lg w-full rounded-lg bg-brand-900 text-base font-bold text-white active:scale-[0.98] disabled:bg-slate-200 disabled:text-slate-500 disabled:shadow-none"
+        className="tap-lg w-full rounded-lg bg-brand-950 active:bg-brand-900 text-base font-semibold text-white active:scale-[0.98] disabled:bg-slate-200 disabled:text-slate-500 disabled:shadow-none"
       >
         {busy ? "Saving…" : `Mark ${rupees(totalNum)} received`}
       </button>
@@ -234,7 +234,7 @@ function UpiQr({
         className="mx-auto my-2 w-full max-w-64"
         dangerouslySetInnerHTML={svg ? { __html: svg } : undefined}
       />
-      <p className="text-2xl font-bold tabular-nums text-slate-900">{rupees(amount)}</p>
+      <p className="text-2xl font-semibold tabular-nums text-slate-900">{rupees(amount)}</p>
       <p className="text-sm text-slate-600">
         to {upi.name} ({upi.id})
       </p>

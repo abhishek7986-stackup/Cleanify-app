@@ -136,7 +136,7 @@ export function StaffForm({
         <button type="button" onClick={() => setOpen(false)} className="tap flex-1 rounded-xl border border-slate-900/10 font-semibold text-slate-600">
           Cancel
         </button>
-        <button type="button" disabled={busy} onClick={() => void save()} className="tap flex-1 rounded-xl bg-brand-900 font-semibold text-white disabled:opacity-40">
+        <button type="button" disabled={busy} onClick={() => void save()} className="tap flex-1 rounded-xl bg-brand-950 active:bg-brand-900 font-semibold text-white disabled:opacity-40">
           {busy ? "Saving…" : "Save"}
         </button>
       </div>

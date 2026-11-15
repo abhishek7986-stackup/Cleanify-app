@@ -202,7 +202,7 @@ export function DayPhotosFlow({
         </span>
         {mode === "checkin" ? (
           <>
-            <p className="mt-5 text-2xl font-bold text-slate-900">{retake ? "New photos sent" : "You're checked in"}</p>
+            <p className="mt-5 text-2xl font-semibold text-slate-900">{retake ? "New photos sent" : "You're checked in"}</p>
             <p className="mt-2 max-w-xs text-slate-600">
               {retake ? "" : `At ${formatIstTime(done.at)}${done.late ? " (late)" : ""}. `}
               Your jobs unlock as soon as the office approves the photos.
@@ -210,7 +210,7 @@ export function DayPhotosFlow({
           </>
         ) : (
           <>
-            <p className="mt-5 text-2xl font-bold text-slate-900">Checked out</p>
+            <p className="mt-5 text-2xl font-semibold text-slate-900">Checked out</p>
             <p className="mt-2 text-slate-600">
               {formatIstTime(done.at)}
               {done.kmToday != null ? ` · ${done.kmToday} km today` : ""}. Have a good evening.
@@ -219,7 +219,7 @@ export function DayPhotosFlow({
         )}
         <a
           href="/s"
-          className="tap-lg mt-8 flex w-full items-center justify-center rounded-lg bg-brand-900 text-base font-bold text-white active:scale-[0.98]"
+          className="tap-lg mt-8 flex w-full items-center justify-center rounded-lg bg-brand-950 active:bg-brand-900 text-base font-semibold text-white active:scale-[0.98]"
         >
           {mode === "checkin" ? "See today's jobs" : "Back to today"}
         </a>
@@ -236,7 +236,7 @@ export function DayPhotosFlow({
       {mode === "checkin" ? (
         retake ? (
           <div className="rounded-xl bg-danger-50 p-4 text-sm text-danger-700 ring-1 ring-danger-100">
-            <p className="font-bold">Your check-in photos were rejected</p>
+            <p className="font-semibold">Your check-in photos were rejected</p>
             {rejectionReason ? <p className="mt-1">&ldquo;{rejectionReason}&rdquo;</p> : null}
             <p className="mt-1">Take both photos again and send them.</p>
           </div>
@@ -247,7 +247,7 @@ export function DayPhotosFlow({
         )
       ) : openJobs > 0 ? (
         <div className="rounded-xl bg-warn-50 p-4 text-sm text-warn-700 ring-1 ring-warn-100">
-          <p className="font-bold">
+          <p className="font-semibold">
             {openJobs} job{openJobs === 1 ? " is" : "s are"} not finished yet
           </p>
           <p className="mt-1">You can still check out. The office will see that it was left open.</p>
@@ -260,7 +260,7 @@ export function DayPhotosFlow({
 
       <div>
         <div className="mb-2.5 flex items-baseline justify-between px-1">
-          <h2 className="text-lg font-bold text-slate-900">Steps</h2>
+          <h2 className="text-lg font-semibold text-slate-900">Steps</h2>
           <span className="text-sm font-medium text-slate-500">
             {doneCount} of {totalCount} done
           </span>
@@ -280,7 +280,7 @@ export function DayPhotosFlow({
                       : "border-2 border-dashed border-brand-600/50 bg-white"
                   }`}
                 >
-                  <span className="absolute left-3 top-3 text-xs font-bold text-slate-400">{i + 1}</span>
+                  <span className="absolute left-3 top-3 text-xs font-semibold text-slate-500">{i + 1}</span>
                   <span
                     className={`flex size-14 items-center justify-center rounded-full ${
                       taken ? "bg-ok-600 text-white" : "bg-brand-50 text-brand-700"
@@ -303,12 +303,12 @@ export function DayPhotosFlow({
                       )}
                     </svg>
                   </span>
-                  <span className="text-sm font-bold leading-tight text-slate-900">{p.title}</span>
+                  <span className="text-sm font-semibold leading-tight text-slate-900">{p.title}</span>
                   <span className="text-xs leading-snug text-slate-500">
                     {state === "uploaded" ? "Saved · tap to retake" : state === "queued" ? "Saved, uploads with signal" : p.hint}
                   </span>
                   {!taken ? (
-                    <span className="mt-1 rounded-full bg-brand-900 px-3 py-1 text-xs font-bold text-white">Open camera</span>
+                    <span className="mt-1 rounded-full bg-brand-950 active:bg-brand-900 px-3 py-1 text-xs font-semibold text-white">Open camera</span>
                   ) : null}
                 </button>
               </li>
@@ -319,7 +319,7 @@ export function DayPhotosFlow({
 
       {kmNeeded ? (
         <label className="block card p-5">
-          <span className="block text-lg font-bold text-slate-900">Km reading</span>
+          <span className="block text-lg font-semibold text-slate-900">Km reading</span>
           <span className="mt-0.5 block text-sm text-slate-500">
             The number on the scooter
             {mode === "checkout" && startKm != null ? ` (this morning: ${startKm} km)` : ""}
@@ -333,9 +333,9 @@ export function DayPhotosFlow({
               placeholder="12450"
               value={km}
               onChange={(e) => setKm(e.target.value)}
-              className="h-16 min-w-0 flex-1 bg-transparent text-3xl font-bold tabular-nums tracking-tight text-slate-900 outline-none placeholder:text-slate-300"
+              className="h-16 min-w-0 flex-1 bg-transparent text-3xl font-semibold tabular-nums tracking-tight text-slate-900 outline-none placeholder:text-slate-300"
             />
-            <span className="text-lg font-semibold text-slate-400">km</span>
+            <span className="text-lg font-semibold text-slate-500">km</span>
           </span>
           <OdometerHint reading={reading} typed={kmValid ? kmValue : null} />
           {mode === "checkout" && startKm != null && kmValid && kmValue! >= startKm ? (
@@ -355,7 +355,7 @@ export function DayPhotosFlow({
             type="button"
             onClick={() => void submit()}
             disabled={!ready || submitting !== null}
-            className="tap-lg w-full rounded-lg bg-brand-900 text-base font-bold text-white active:scale-[0.98] disabled:bg-slate-200 disabled:text-slate-500 disabled:shadow-none"
+            className="tap-lg w-full rounded-lg bg-brand-950 active:bg-brand-900 text-base font-semibold text-white active:scale-[0.98] disabled:bg-slate-200 disabled:text-slate-500 disabled:shadow-none"
           >
             {submitting ?? (ready ? (retake ? "Send new photos" : verb) : !photosReady ? "Take both photos first" : "Type the km reading")}
           </button>

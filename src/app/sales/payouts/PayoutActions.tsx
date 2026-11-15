@@ -95,7 +95,7 @@ export function SettleForm({ staffId, week, net }: { staffId: string; week: stri
         type="button"
         disabled={busy || given <= 0 || given > due}
         onClick={() => void settle()}
-        className="tap-lg w-full rounded-lg bg-brand-900 font-semibold text-white disabled:opacity-40"
+        className="tap-lg w-full rounded-lg bg-brand-950 active:bg-brand-900 font-semibold text-white disabled:opacity-40"
       >
         {busy ? "Saving…" : `Mark ${rupees(given)} ${verb}`}
       </button>

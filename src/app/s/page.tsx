@@ -112,7 +112,7 @@ export default async function SupervisorToday() {
         {/* ------------------------------------------------- the rest of the day */}
         {later.length ? (
           <section className="mt-5">
-            <p className="section-label px-4 pb-2">{phase === "working" ? "Up next and done" : "Today's jobs"}</p>
+            <p className="section-label px-4 pb-2">{phase === "working" ? "Rest of today" : "Today's jobs"}</p>
             <ol className="sheet divide-y divide-brand-950/[0.07]">
               {later.map((job) => {
                 const i = jobs.indexOf(job);
@@ -192,13 +192,10 @@ function CurrentStop({ job, index, total, unlocked }: { job: DayJob; index: numb
   const step = nextStep(job, unlocked);
   return (
     <section className="sheet border-t-0 px-4 pb-4 pt-5">
-      <div className="flex items-baseline justify-between gap-3">
-        <p className="section-label">
-          Stop {index} of {total}
-        </p>
-        <p className="text-sm font-semibold tabular-nums text-slate-900">{formatIstTime(job.scheduled_start)}</p>
-      </div>
-      <h2 className="mt-1.5 text-[1.375rem] font-semibold leading-snug tracking-[-0.01em] text-slate-950">
+      <p className="text-sm font-medium tabular-nums text-slate-600">
+        Stop {index} of {total} · {formatIstTime(job.scheduled_start)}
+      </p>
+      <h2 className="mt-1 text-[1.375rem] font-semibold leading-snug tracking-[-0.01em] text-slate-950">
         {job.client?.name ?? "Client"}
       </h2>
       <p className="mt-0.5 text-[0.9375rem] text-slate-600">{job.site_address}</p>
@@ -209,18 +206,10 @@ function CurrentStop({ job, index, total, unlocked }: { job: DayJob; index: numb
       </p>
 
       {step ? (
-        <p
-          className={`mt-4 flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold ${
-            step.tone === "wait"
-              ? "bg-amber-50 text-amber-800"
-              : step.tone === "bad"
-                ? "bg-danger-50 text-danger-700"
-                : "bg-brand-50 text-brand-950"
-          }`}
-        >
+        <p className="mt-4 flex items-center gap-2.5 text-lg font-semibold leading-snug text-slate-900">
           <span
-            className={`size-2 shrink-0 rounded-full ${
-              step.tone === "wait" ? "animate-pulse bg-amber-500" : step.tone === "bad" ? "bg-danger-600" : "bg-brand-600"
+            className={`size-2.5 shrink-0 rounded-full ${
+              step.tone === "wait" ? "animate-pulse bg-amber-500" : step.tone === "bad" ? "bg-danger-600" : "bg-brand-950"
             }`}
             aria-hidden
           />
@@ -228,7 +217,7 @@ function CurrentStop({ job, index, total, unlocked }: { job: DayJob; index: numb
         </p>
       ) : null}
 
-      <div className="mt-3 grid grid-cols-2 gap-2">
+      <div className="mt-4 grid grid-cols-2 gap-2">
         {unlocked && pin ? (
           <a
             href={`https://www.google.com/maps/dir/?api=1&destination=${pin.lat},${pin.lng}&travelmode=two-wheeler`}
@@ -240,7 +229,7 @@ function CurrentStop({ job, index, total, unlocked }: { job: DayJob; index: numb
             Navigate
           </a>
         ) : (
-          <span className="flex h-12 items-center justify-center gap-2 rounded-lg border border-brand-950/10 text-sm font-medium text-slate-400">
+          <span className="flex h-12 items-center justify-center gap-2 rounded-lg border border-brand-950/10 text-sm font-medium text-slate-500">
             <Glyph small d="M7 11V8a5 5 0 0 1 10 0v3M5.5 11h13v9.5h-13z" />
             Navigate
           </span>
@@ -254,7 +243,7 @@ function CurrentStop({ job, index, total, unlocked }: { job: DayJob; index: numb
             Call
           </a>
         ) : (
-          <span className="flex h-12 items-center justify-center rounded-lg border border-brand-950/10 text-sm font-medium text-slate-400">
+          <span className="flex h-12 items-center justify-center rounded-lg border border-brand-950/10 text-sm font-medium text-slate-500">
             No phone
           </span>
         )}
@@ -271,7 +260,7 @@ function JobRow({ job, index, waitingFor }: { job: DayJob; index: number; waitin
     <Link href={`/s/jobs/${job.id}`} className="flex items-center gap-3 px-4 py-3.5 active:bg-slate-50">
       <span
         className={`flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
-          done ? "bg-ok-600 text-white" : off ? "bg-slate-100 text-slate-400" : "bg-slate-100 text-slate-700"
+          done ? "bg-ok-600 text-white" : off ? "bg-slate-100 text-slate-500" : "bg-slate-100 text-slate-700"
         }`}
       >
         {done ? <Glyph small d="m5 12.5 4.5 4.5L19 7.5" /> : index}
@@ -316,13 +305,16 @@ function ActionBar({ phase, current }: { phase: Phase; current: DayJob | null })
       );
     case "pending":
       return <span className={quiet}>Waiting for approval</span>;
-    case "working":
-      return current ? (
-        <Link href={`/s/jobs/${current.id}`} className={primary}>
-          {actionLabel(current)}
-          <Glyph d="M5 12h14M13 6l6 6-6 6" />
+    case "working": {
+      if (!current) return null;
+      const label = actionLabel(current);
+      return (
+        <Link href={`/s/jobs/${current.id}`} className={label.waiting ? quiet : primary}>
+          {label.text}
+          {label.waiting ? null : <Glyph d="M5 12h14M13 6l6 6-6 6" />}
         </Link>
-      ) : null;
+      );
+    }
     case "finished":
       return (
         <Link href="/s/checkout" className={primary}>
@@ -334,21 +326,23 @@ function ActionBar({ phase, current }: { phase: Phase; current: DayJob | null })
   }
 }
 
-function actionLabel(job: Job): string {
+/** The bar names the step itself; the job screen has the same button in the same place. */
+function actionLabel(job: Job): { text: string; waiting?: boolean } {
   switch (job.status) {
     case "ASSIGNED":
     case "CHECKED_IN":
+      return { text: "Start trip" };
     case "EN_ROUTE":
-      return "Open job · I've reached";
+      return { text: "I've reached the site" };
     case "ON_SITE":
-      if (job.before_review === "PENDING") return "Open job · waiting for approval";
-      if (job.before_review === "APPROVED") return "Open job · start cleaning";
-      return "Open job · before photos";
+      if (job.before_review === "PENDING") return { text: "Waiting for approval", waiting: true };
+      if (job.before_review === "APPROVED") return { text: "Start cleaning" };
+      return { text: "Take before photos" };
     case "IN_PROGRESS":
-      if (job.after_review === "PENDING") return "Open job · waiting for approval";
-      return "Open job · after photos";
+      if (job.after_review === "PENDING") return { text: "Waiting for approval", waiting: true };
+      return { text: "Take after photos" };
     default:
-      return "Open job";
+      return { text: "Open job" };
   }
 }
 
@@ -357,8 +351,9 @@ function nextStep(job: Job, unlocked: boolean): { text: string; tone: "go" | "wa
   switch (job.status) {
     case "ASSIGNED":
     case "CHECKED_IN":
+      return unlocked ? { text: "Start the trip when you leave", tone: "go" } : null;
     case "EN_ROUTE":
-      return unlocked ? { text: "Ride to the site, then tap I've reached", tone: "go" } : null;
+      return { text: "On the way. Tap I've reached when you arrive", tone: "go" };
     case "ON_SITE":
       if (job.before_review === "PENDING") return { text: "Before photos sent, waiting for approval", tone: "wait" };
       if (job.before_review === "APPROVED") return { text: "Before photos approved: start cleaning", tone: "go" };

@@ -77,7 +77,7 @@ export function CheckinCountdown({
         <p className="text-xs font-semibold uppercase tracking-wider text-white/75">
           {state.late ? "Late by" : "Check in within"}
         </p>
-        <p className="mt-0.5 text-[2.75rem] font-extrabold leading-none tracking-tight tabular-nums text-white">
+        <p className="mt-0.5 text-[2.75rem] font-semibold leading-none tracking-tight tabular-nums text-white">
           {state.label}
         </p>
         <p className={`mt-2 text-sm ${state.late ? "font-semibold text-white" : "text-white/85"}`}>
@@ -92,7 +92,7 @@ export function CheckinCountdown({
   if (state.late) {
     return (
       <div className="rounded-xl bg-danger-50 p-3">
-        <p className="text-lg font-bold text-danger-700">
+        <p className="text-lg font-semibold text-danger-700">
           You&rsquo;re late by {state.label}
         </p>
         <p className="text-sm text-danger-600">
@@ -105,7 +105,7 @@ export function CheckinCountdown({
   return (
     <div className={`rounded-xl p-3 ${state.urgent ? "bg-warn-50" : "bg-slate-100"}`}>
       <p
-        className={`text-2xl font-bold tabular-nums ${
+        className={`text-2xl font-semibold tabular-nums ${
           state.urgent ? "text-warn-700" : "text-slate-900"
         }`}
       >

@@ -148,7 +148,7 @@ export function InstallGate({ audience = "supervisor" }: { audience?: "superviso
         type="button"
         onClick={() => void enableAlerts()}
         disabled={busy}
-        className="tap mt-3 rounded-xl bg-brand-900 px-5 font-semibold text-white disabled:opacity-50"
+        className="tap mt-3 rounded-xl bg-brand-950 active:bg-brand-900 px-5 font-semibold text-white disabled:opacity-50"
       >
         {busy ? "Enabling…" : "Enable alerts"}
       </button>
@@ -170,7 +170,7 @@ function Banner({
   const dot = { brand: "bg-brand-600", warn: "bg-warn-500", danger: "bg-danger-500" } as const;
 
   return (
-    <div className="card relative flex gap-3 p-4 pr-10 text-slate-600 [&_.font-semibold]:text-slate-900 [&_p.text-sm]:text-slate-600">
+    <div className="sheet relative -mx-4 flex gap-3 px-4 py-4 pr-14 text-slate-600 [&_.font-semibold]:text-slate-900 [&_p.text-sm]:text-slate-600">
       <span className={`mt-1.5 size-2 shrink-0 rounded-full ${dot[tone]}`} aria-hidden />
       <div className="min-w-0">{children}</div>
       {onDismiss ? (
@@ -178,9 +178,11 @@ function Banner({
           type="button"
           onClick={onDismiss}
           aria-label="Dismiss"
-          className="absolute right-1.5 top-1.5 flex size-9 items-center justify-center rounded-full text-lg leading-none text-slate-400 active:bg-slate-100"
+          className="absolute right-1 top-1 flex size-12 items-center justify-center rounded-full text-slate-500 active:bg-slate-100"
         >
-          ×
+          <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden>
+            <path d="M6 6l12 12M18 6 6 18" />
+          </svg>
         </button>
       ) : null}
     </div>

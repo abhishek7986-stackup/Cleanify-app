@@ -331,7 +331,7 @@ export function NewJobWizard({
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="tap-lg flex-1 rounded-lg bg-brand-900 font-semibold text-white"
+            className="tap-lg flex-1 rounded-lg bg-brand-950 active:bg-brand-900 font-semibold text-white"
           >
             Book another
           </button>
@@ -403,7 +403,7 @@ export function NewJobWizard({
                 <button
                   type="button"
                   onClick={searchClients}
-                  className="tap shrink-0 rounded-xl bg-brand-900 px-5 font-semibold text-white"
+                  className="tap shrink-0 rounded-xl bg-brand-950 active:bg-brand-900 px-5 font-semibold text-white"
                 >
                   {searching ? "…" : "Search"}
                 </button>
@@ -476,7 +476,7 @@ export function NewJobWizard({
                 <button
                   type="button"
                   onClick={pasteFromClipboard}
-                  className="tap shrink-0 rounded-xl bg-brand-900 px-4 text-sm font-semibold text-white"
+                  className="tap shrink-0 rounded-xl bg-brand-950 active:bg-brand-900 px-4 text-sm font-semibold text-white"
                 >
                   Paste
                 </button>
@@ -660,11 +660,11 @@ export function NewJobWizard({
           </button>
         ) : null}
         {step < STEPS.length - 1 ? (
-          <button type="button" onClick={next} className="tap-lg flex-[2] rounded-lg bg-brand-900 font-semibold text-white">
+          <button type="button" onClick={next} className="tap-lg flex-[2] rounded-lg bg-brand-950 active:bg-brand-900 font-semibold text-white">
             Continue
           </button>
         ) : (
-          <button type="button" onClick={submit} disabled={submitting} className="tap-lg flex-[2] rounded-lg bg-brand-900 font-semibold text-white disabled:opacity-50">
+          <button type="button" onClick={submit} disabled={submitting} className="tap-lg flex-[2] rounded-lg bg-brand-950 active:bg-brand-900 font-semibold text-white disabled:opacity-50">
             {submitting ? "Creating…" : "Create job"}
           </button>
         )}

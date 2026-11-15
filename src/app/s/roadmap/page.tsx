@@ -52,7 +52,10 @@ export default async function RoadmapPage() {
   });
   const totalKm = legs.reduce((a, l) => a + (l.km ?? 0), 0);
   const totalMin = legs.reduce((a, l) => a + (l.minutes ?? 0), 0);
-  const nextId = active.find((j) => j.status !== "COMPLETED")?.id ?? null;
+  const nextJob = active.find((j) => j.status !== "COMPLETED") ?? null;
+  const nextId = nextJob?.id ?? null;
+  const nextPin = nextJob ? parseEwkbPoint(nextJob.site_location) : null;
+  const nextName = nextJob?.client?.name?.replace(/\s*\(.*?\)\s*/g, "") ?? "the next stop";
 
   return (
     <AppShell
@@ -63,6 +66,19 @@ export default async function RoadmapPage() {
         { href: "/s/roadmap", label: "Roadmap" },
         { href: "/s/payments", label: "Payments" },
       ]}
+      action={
+        nextPin && unlocked ? (
+          <a
+            href={googleRoute([nextPin])}
+            target="_blank"
+            rel="noreferrer"
+            className="flex h-14 w-full items-center justify-center gap-2 rounded-lg bg-brand-950 text-base font-semibold text-white active:bg-brand-900"
+          >
+            <Glyph d="m3 11 18-8-8 18-2-8-8-2Z" />
+            Navigate to {nextName}
+          </a>
+        ) : undefined
+      }
       status={
         <dl className="grid grid-cols-3 divide-x divide-white/15 rounded-lg bg-white/[0.08] py-2 text-white">
           <Stat label={formatIstDate(day.date)} value={`${active.length} stop${active.length === 1 ? "" : "s"}`} />
@@ -74,130 +90,92 @@ export default async function RoadmapPage() {
       <div className="space-y-4">
 
         {active.length === 0 ? (
-          <p className="card p-8 text-center text-slate-500">No stops today.</p>
+          <section className="sheet -mx-4 -mt-4 border-t-0 px-4 py-6">
+            <p className="text-lg font-semibold text-slate-900">No stops today</p>
+            <p className="mt-1 text-sm text-slate-600">Nothing is booked for you today.</p>
+          </section>
         ) : unlocked && stops.length ? (
           <section className="-mx-4 -mt-4">
             <RouteMap flush stops={stops.map(({ id, n, lat, lng, done }) => ({ id, n, lat, lng, done }))} depot={depot} />
-            <div className="sheet border-t-0 px-4 py-3">
-              {routeHref ? (
-                <a
-                  href={routeHref}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="tap flex items-center justify-center gap-2 rounded-lg text-sm font-semibold text-slate-700 ring-1 ring-slate-900/10 active:bg-slate-50"
-                >
-                  <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                    <path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5 9 4ZM9 4v13M15 6.5v13" />
-                  </svg>
-                  See the whole route · {remaining.length} stop{remaining.length === 1 ? "" : "s"}
-                </a>
-              ) : (
-                <p className="flex items-center justify-center gap-2 py-2 text-sm font-semibold text-ok-700">
-                  All stops done today
-                </p>
-              )}
-              <p className="mt-2 text-center text-xs text-slate-500">
-                Just to look at the day. For directions, use Navigate here on the next stop.
-              </p>
-            </div>
+            {routeHref ? (
+              <a
+                href={routeHref}
+                target="_blank"
+                rel="noreferrer"
+                className="sheet flex min-h-12 items-center justify-between border-t-0 px-4 text-[0.9375rem] font-medium text-slate-700 active:bg-slate-50"
+              >
+                <span className="flex items-center gap-2">
+                  <Glyph small d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5 9 4ZM9 4v13M15 6.5v13" />
+                  Open the whole route in Google Maps
+                </span>
+                <Glyph small d="m9 5 7 7-7 7" />
+              </a>
+            ) : null}
           </section>
         ) : (
-          <section className="card flex items-center gap-3 p-5">
-            <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-canvas text-slate-500">
-              <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                <path d="M7 11V8a5 5 0 0 1 10 0v3M5.5 11h13v9.5h-13z" />
-              </svg>
-            </span>
-            <div className="min-w-0">
-              <p className="font-bold text-slate-900">
-                {unlocked ? "No map pins on today's jobs" : "Map opens after check-in"}
-              </p>
-              <p className="text-sm text-slate-500">
-                {unlocked
-                  ? "Ask the office to add the location pin to each job."
-                  : "Once the office approves your depot photos, the route and directions appear here."}
-              </p>
-            </div>
+          <section className="sheet -mx-4 -mt-4 border-t-0 px-4 py-5">
+            <p className="flex items-center gap-2.5 text-lg font-semibold text-slate-900">
+              <span className="size-2.5 rounded-full bg-amber-500" aria-hidden />
+              {unlocked ? "No map pins on today's jobs" : "Map opens after check-in"}
+            </p>
+            <p className="mt-1 text-sm text-slate-600">
+              {unlocked
+                ? "Ask the office to add the location pin to each job."
+                : "Once the office approves your depot photos, the route and directions appear here."}
+            </p>
           </section>
         )}
 
         {active.length ? (
-          <ol>
-            <li className="flex items-center gap-3">
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white text-brand-900 ring-1 ring-slate-900/10">
-                <Glyph d="M4 20V9l8-5 8 5v11M9 20v-6h6v6" />
-              </span>
-              <p className="text-sm font-semibold text-slate-700">
-                Start at the depot
-                {day.roster?.depart_by ? (
-                  <span className="font-normal text-slate-500"> · leave by {formatIstTime(day.roster.depart_by)}</span>
-                ) : null}
-              </p>
-            </li>
-            {active.map((job, i) => {
-              const done = job.status === "COMPLETED";
-              const isNext = job.id === nextId;
-              const leg = legs[i];
-              const pin = parseEwkbPoint(job.site_location);
-              return (
-                <li key={job.id}>
-                  {/* The leg into this stop. */}
-                  <div className="flex items-stretch gap-3">
-                    <span className="flex w-9 shrink-0 justify-center" aria-hidden>
-                      <span className={`my-1 w-0.5 border-l-2 border-dashed ${done ? "border-ok-600/40" : "border-brand-900/25"}`} />
-                    </span>
-                    <div className="my-2 flex min-w-0 flex-1 items-center gap-2 text-xs">
-                      <span className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-white px-2.5 py-1 font-semibold text-slate-700 ring-1 ring-slate-900/10">
-                        <Glyph small d="M5 17a2 2 0 1 0 4 0 2 2 0 0 0-4 0ZM15 17a2 2 0 1 0 4 0 2 2 0 0 0-4 0ZM7 17h8M17 17l-2-6h-4l-1 3M9 8h3l1 3" />
-                        {leg.km != null ? `≈ ${fmtKm(leg.km)}` : "Distance unknown"}
-                        {leg.minutes != null ? ` · ~${fmtMin(leg.minutes)}` : ""}
+          <section className="-mx-4">
+            <p className="section-label px-4 pb-2">Stops in order</p>
+            <ol className="sheet divide-y divide-brand-950/[0.07]">
+              <li className="flex items-center gap-3 px-4 py-3">
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-700">
+                  <Glyph small d="M4 20V9l8-5 8 5v11M9 20v-6h6v6" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-slate-900">Depot</p>
+                  <p className="text-sm tabular-nums text-slate-600">
+                    {day.roster?.depart_by ? `Leave by ${formatIstTime(day.roster.depart_by)}` : "Start of the day"}
+                  </p>
+                </div>
+              </li>
+              {active.map((job, i) => {
+                const done = job.status === "COMPLETED";
+                const isNext = job.id === nextId;
+                const leg = legs[i];
+                return (
+                  <li key={job.id}>
+                    <Link href={`/s/jobs/${job.id}`} className={`flex items-center gap-3 px-4 py-3 active:bg-slate-50 ${isNext ? "bg-brand-50/60" : ""}`}>
+                      <span
+                        className={`flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
+                          done ? "bg-ok-600 text-white" : isNext ? "bg-brand-950 text-white" : "bg-slate-100 text-slate-700"
+                        }`}
+                      >
+                        {done ? <Glyph small d="m5 12.5 4.5 4.5L19 7.5" /> : i + 1}
                       </span>
-                      <span className="truncate text-slate-400">
-                        from {leg.from}
-                        {leg.estimated ? " · estimate" : ""}
+                      <div className="min-w-0 flex-1">
+                        <p className={`truncate font-semibold ${done ? "text-slate-500" : "text-slate-900"}`}>
+                          {job.client?.name ?? "Client"}
+                          {isNext ? <span className="font-medium text-brand-950"> · next</span> : null}
+                        </p>
+                        <p className="truncate text-sm text-slate-600">{job.site_address}</p>
+                        <p className="text-sm tabular-nums text-slate-600">
+                          {leg.km != null ? `≈ ${fmtKm(leg.km)}` : "Distance unknown"}
+                          {leg.minutes != null ? ` · ~${fmtMin(leg.minutes)}` : ""} from {leg.from}
+                          {leg.estimated ? " (estimate)" : ""}
+                        </p>
+                      </div>
+                      <span className="shrink-0 text-sm font-semibold tabular-nums text-slate-900">
+                        {formatIstTime(job.scheduled_start)}
                       </span>
-                    </div>
-                  </div>
-
-                  {/* The stop. */}
-                  <div className="flex items-start gap-3">
-                    <span
-                      className={`relative z-10 mt-4 flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                        done ? "bg-ok-600 text-white" : isNext ? "bg-brand-900 text-white ring-4 ring-brand-100" : "bg-white text-slate-500 ring-1 ring-slate-900/10"
-                      }`}
-                    >
-                      {done ? <Glyph small d="m5 12.5 4.5 4.5L19 7.5" /> : i + 1}
-                    </span>
-                    <div className={`card min-w-0 flex-1 overflow-hidden ${done ? "opacity-70" : ""} ${isNext ? "ring-2 ring-brand-900" : ""}`}>
-                      <Link href={`/s/jobs/${job.id}`} className="block p-4 active:bg-slate-50">
-                        <div className="flex items-center justify-between gap-2">
-                          <p className="text-sm font-semibold text-slate-500">{formatIstTime(job.scheduled_start)}</p>
-                          {isNext ? (
-                            <span className="rounded-full bg-brand-900 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">Next</span>
-                          ) : done ? (
-                            <span className="text-xs font-semibold text-ok-700">Done</span>
-                          ) : null}
-                        </div>
-                        <p className="mt-0.5 truncate font-bold text-slate-900">{job.client?.name ?? "Client"}</p>
-                        <p className="truncate text-sm text-slate-500">{job.site_address}</p>
-                      </Link>
-                      {isNext && unlocked && pin ? (
-                        <a
-                          href={googleRoute([pin])}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="tap-lg flex items-center justify-center gap-2 bg-brand-900 text-base font-bold text-white active:bg-brand-950"
-                        >
-                          <Glyph d="m3 11 18-8-8 18-2-8-8-2Z" />
-                          Navigate here
-                        </a>
-                      ) : null}
-                    </div>
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
         ) : null}
       </div>
     </AppShell>

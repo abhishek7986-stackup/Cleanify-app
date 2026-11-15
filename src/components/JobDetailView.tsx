@@ -145,7 +145,7 @@ export function JobDetailView({
       {/* ------------------------------------------------------ audit trail */}
       {showAudit && events.length ? (
         <section className="card p-5">
-          <h2 className="mb-2 text-lg font-bold text-slate-900">History</h2>
+          <h2 className="mb-2 text-lg font-semibold text-slate-900">History</h2>
           <ol className="space-y-2 text-sm">
             {events.map((e) => (
               <li key={e.id} className="flex gap-3 border-b border-slate-100 pb-2 last:border-0">

@@ -85,7 +85,7 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
   return (
     <AppShell
       profile={profile}
-      title={detail.job.job_number}
+      title={detail.client?.name ?? detail.job.job_number}
       back="/s"
       nav={[
         { href: "/s", label: "Today" },
@@ -93,9 +93,8 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
         { href: "/s/payments", label: "Payments" },
       ]}
     >
-      <div className="space-y-4">
+      <div className="space-y-4 pb-32">
         <JobHeader
-          client={detail.client?.name ?? "Client"}
           phone={detail.client?.phone ?? null}
           service={service?.name ?? null}
           when={`${formatIstDate(job.scheduled_start)} · ${formatIstTime(job.scheduled_start)}`}
@@ -106,6 +105,7 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
           mapsHref={
             unlocked && !waitFor && job.status !== "COMPLETED" ? mapsLink(job.site_address, parseEwkbPoint(job.site_location)) : null
           }
+          jobNumber={job.job_number}
           mapNote={job.status === "COMPLETED" ? "Job finished" : waitFor ? "Opens after the earlier job" : "Map opens after check-in"}
         />
         <JobFlow
@@ -125,7 +125,7 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
         />
         {canCollect && paid?.length ? (
           <section className="sheet -mx-4 px-4 py-4">
-            <h2 className="text-lg font-bold text-ok-700">Payment marked</h2>
+            <h2 className="text-lg font-semibold text-ok-700">Payment marked</h2>
             <ul className="mt-1 text-sm text-ok-700">
               {paid.map((p) => (
                 <li key={p.id}>
@@ -163,7 +163,6 @@ function mapsLink(address: string, pin: { lat: number; lng: number } | null): st
 
 /** Who, what, when and where, with the two things a supervisor taps most. */
 function JobHeader({
-  client,
   phone,
   service,
   when,
@@ -172,8 +171,8 @@ function JobHeader({
   quoted,
   mapsHref,
   mapNote,
+  jobNumber,
 }: {
-  client: string;
   phone: string | null;
   service: string | null;
   when: string;
@@ -183,17 +182,19 @@ function JobHeader({
   mapsHref: string | null;
   /** Shown in place of Navigate when there is no map to open. */
   mapNote: string;
+  jobNumber: string;
 }) {
   return (
     <section className="-mx-4 -mt-4">
       {/* Continues the app bar: who and when, on the shift colour. */}
       <div className="bg-brand-950 px-4 pb-5 pt-1 text-white">
-        <p className="text-[0.8125rem] font-medium text-white/70">{service ?? "Job"}</p>
-        <p className="mt-0.5 text-[1.5rem] font-semibold leading-tight tracking-[-0.01em]">{client}</p>
-        <p className="mt-2 text-[0.9375rem] font-medium tabular-nums text-white/90">
+        <p className="text-[0.9375rem] font-medium tabular-nums text-white/90">
           {when}
           {quoted != null ? <span className="text-white/60"> · </span> : null}
           {quoted != null ? rupees(quoted) : null}
+        </p>
+        <p className="mt-0.5 text-[0.8125rem] text-white/70">
+          {service ?? "Job"} · {jobNumber}
         </p>
       </div>
       <div className="sheet space-y-4 border-t-0 px-4 py-4">
@@ -220,7 +221,7 @@ function JobHeader({
               Navigate
             </a>
           ) : (
-            <span className="flex h-12 items-center justify-center gap-1.5 rounded-lg border border-brand-950/10 px-2 text-center text-xs font-medium text-slate-400">
+            <span className="flex h-12 items-center justify-center gap-1.5 rounded-lg border border-brand-950/10 px-2 text-center text-xs font-medium text-slate-500">
               {mapNote}
             </span>
           )}
@@ -235,7 +236,7 @@ function JobHeader({
               Call client
             </a>
           ) : (
-            <span className="flex h-12 items-center justify-center rounded-lg border border-brand-950/10 text-xs font-medium text-slate-400">
+            <span className="flex h-12 items-center justify-center rounded-lg border border-brand-950/10 text-xs font-medium text-slate-500">
               No phone number
             </span>
           )}

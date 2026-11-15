@@ -138,6 +138,7 @@ test("a full working day, booking to check-out", async ({ browser }) => {
   await test.step("supervisor reaches the site and sends a before photo", async () => {
     await ravi.context().setGeolocation(SITE);
     await go(ravi, `/s/jobs/${jobId}`);
+    await ravi.getByRole("button", { name: "Start trip" }).click();
     await ravi.getByRole("button", { name: "I've reached the site" }).click();
     await expect(ravi.getByText(/take a before photo/)).toBeVisible();
     await ravi.waitForLoadState("networkidle"); // same re-key bug as after "Start cleaning"

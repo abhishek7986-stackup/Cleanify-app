@@ -62,17 +62,25 @@ export default async function CheckoutPage() {
 
 function Notice({ title, body, ok }: { title: string; body: string; ok?: boolean }) {
   return (
-    <div className="space-y-4">
-      <div className={`rounded-lg border p-5 ${ok ? "border-ok-100 bg-ok-50" : "border-slate-200 bg-white"}`}>
-        <p className={`text-lg font-semibold ${ok ? "text-ok-700" : "text-slate-900"}`}>{title}</p>
-        <p className={`mt-1 ${ok ? "text-ok-700" : "text-slate-600"}`}>{body}</p>
+    <div className="-mx-4 -mt-4">
+      <section className="sheet border-t-0 px-4 py-5">
+        <p className="flex items-center gap-2.5 text-lg font-semibold text-slate-900">
+          <span
+            className={`size-2.5 shrink-0 rounded-full ${ok ? "bg-ok-600" : "bg-amber-500"}`}
+            aria-hidden
+          />
+          {title}
+        </p>
+        <p className="mt-1 text-[0.9375rem] tabular-nums text-slate-600">{body}</p>
+      </section>
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-brand-950/10 bg-white px-4 pb-[calc(var(--safe-bottom)+0.75rem)] pt-3">
+        <a
+          href="/s"
+          className="mx-auto flex h-14 w-full max-w-3xl items-center justify-center rounded-lg bg-brand-950 text-base font-semibold text-white active:bg-brand-900"
+        >
+          Back to today
+        </a>
       </div>
-      <a
-        href="/s"
-        className="tap-lg flex items-center justify-center rounded-lg border-2 border-slate-300 font-semibold"
-      >
-        Back to today
-      </a>
     </div>
   );
 }
