@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { parseEwkbPoint } from "@/lib/location-link";
 import type { ApprovalStatus, JobStatus } from "@/lib/domain/database";
 import { PAYMENTS_START_AT, rupees } from "@/lib/domain/payments";
-import { formatIstDate, formatIstTime } from "@/lib/domain/checkin-policy";
+import { formatIstDate, formatIstTime, istDate } from "@/lib/domain/checkin-policy";
 import { JobFlow, type FlowUnit, type NextJob } from "./JobFlow";
 import { CollectPayment } from "./CollectPayment";
 
@@ -64,8 +64,9 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
   // Once this job is done, the completed screen hands over to whatever is
   // still open today (or to check-out), so the supervisor never has to go
   // back to Today to find the next Start trip.
+  // Only for today's jobs: an old job never offers today's check-out.
   let next: NextJob = null;
-  if (job.status === "COMPLETED") {
+  if (job.status === "COMPLETED" && job.service_date === istDate()) {
     const { data: open } = await supabase
       .from("jobs")
       .select("id, job_number, status, site_address, site_location, client:clients(name)")
@@ -218,7 +219,9 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
             </svg>
             The job size and amount show once {waitFor.client} is finished.
           </p>
-        ) : (
+        ) : canCollect || job.status === "COMPLETED" ? null : (
+          // The job's size and fields matter while doing the work; once it is
+          // done the screen is about the money, so they step aside.
           <JobDetailView detail={detail} hideSummary />
         )}
       </div>

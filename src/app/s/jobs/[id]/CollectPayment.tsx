@@ -6,6 +6,7 @@ import QRCode from "qrcode";
 import { createClient } from "@/lib/supabase/client";
 import { rupees, upiLink } from "@/lib/domain/payments";
 import { compressImage } from "@/lib/compress-image";
+import { CameraSnap } from "@/components/CameraSnap";
 
 type Method = "upi" | "cash" | "both";
 type ProofKind = "camera" | "screenshot" | "call";
@@ -273,6 +274,7 @@ function UpiProof({
   office: { full_name: string; phone: string } | null;
   onPick: (kind: ProofKind, file: File | null) => void;
 }) {
+  const [camera, setCamera] = useState(false);
   const options: { value: ProofKind; title: string; hint: string }[] = [
     { value: "camera", title: "Take a photo", hint: "Of the customer's \u201cpayment successful\u201d screen" },
     { value: "screenshot", title: "Upload a screenshot", hint: "One the customer sent you, e.g. on WhatsApp" },
@@ -303,9 +305,15 @@ function UpiProof({
               ) : null}
             </>
           );
-          if (o.value === "call") {
+          if (o.value === "call" || o.value === "camera") {
             return (
-              <button key={o.value} type="button" aria-pressed={on} onClick={() => onPick("call", null)} className={row}>
+              <button
+                key={o.value}
+                type="button"
+                aria-pressed={on}
+                onClick={() => (o.value === "call" ? onPick("call", null) : setCamera(true))}
+                className={row}
+              >
                 {body}
               </button>
             );
@@ -315,7 +323,6 @@ function UpiProof({
               <input
                 type="file"
                 accept="image/*"
-                capture={o.value === "camera" ? "environment" : undefined}
                 className="sr-only"
                 onChange={(e) => {
                   const f = e.target.files?.[0];
@@ -328,6 +335,17 @@ function UpiProof({
           );
         })}
       </div>
+      {camera ? (
+        <CameraSnap
+          title="Photo of the payment"
+          hint="The customer's “payment successful” screen"
+          onCancel={() => setCamera(false)}
+          onDone={(blob) => {
+            setCamera(false);
+            onPick("camera", new File([blob], "payment.jpg", { type: "image/jpeg" }));
+          }}
+        />
+      ) : null}
       {preview && kind !== "call" ? (
         // eslint-disable-next-line @next/next/no-img-element -- a local preview of the photo just taken
         <img src={preview} alt="Payment proof you added" className="mt-2 max-h-56 w-full rounded-xl border border-slate-900/10 bg-slate-50 object-contain" />
