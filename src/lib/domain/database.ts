@@ -556,6 +556,14 @@ export type Database = {
     };
     Functions: {
       create_job: { Args: { p_payload: unknown }; Returns: Job };
+      staff_pay_summary: {
+        Args: { p_staff_id: string };
+        Returns: Database["public"]["Functions"]["my_pay_summary"]["Returns"];
+      };
+      staff_daily: {
+        Args: { p_staff_id: string; p_days?: number };
+        Returns: { day: string; jobs: number; cash_collected: number; upi_collected: number; earned: number }[];
+      };
       set_pay_tiers: {
         Args: { p_kind: "supervisor" | "worker"; p_tiers: { from_earned: number; percent: number }[] };
         Returns: undefined;

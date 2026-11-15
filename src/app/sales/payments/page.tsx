@@ -65,8 +65,17 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
       .order("declared_at", { ascending: false })
       .limit(30)
       .overrideTypes<(CashHandover & { staff: { full_name: string } | null })[], { merge: false }>(),
-    supabase.from("pay_staff").select("id, full_name").eq("is_active", true).order("kind").order("full_name"),
+    supabase.from("pay_staff").select("id, full_name, kind").eq("is_active", true).order("kind").order("full_name"),
   ]);
+  // Each supervisor's cash in hand and today's earnings, for the list below.
+  const supervisors = (staffRes.data ?? []).filter((x) => x.kind === "supervisor");
+  const summaries = await Promise.all(
+    supervisors.map(async (x) => {
+      const { data } = await supabase.rpc("staff_pay_summary", { p_staff_id: x.id });
+      const r = data?.[0];
+      return { ...x, inHand: r ? Math.max(0, -Number(r.week_net)) : 0, today: r ? Number(r.today_earned) : 0 };
+    }),
+  );
   const handovers: HandoverRow[] = (handRes.data ?? []).map((h) => ({ ...h, staff_name: h.staff?.full_name ?? "Staff" }));
   const pendingHandovers = handovers.filter((h) => h.status === "PENDING" && !h.voided_at);
   const recentHandovers = handovers.filter((h) => h.status !== "PENDING" || h.voided_at).slice(0, 10);
@@ -97,6 +106,26 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
       <AutoRefresh seconds={30} />
       <div className="space-y-4">
         <OfficeTabs active="payments" />
+
+        <section>
+          <p className="section-label pb-2">Supervisors</p>
+          <ul className="sheet -mx-4 divide-y divide-brand-950/[0.07]">
+            {summaries.map((x) => (
+              <li key={x.id}>
+                <Link href={`/sales/payments/staff/${x.id}`} className="flex min-h-14 items-center justify-between gap-3 px-4 py-2.5 active:bg-slate-50">
+                  <span className="min-w-0">
+                    <span className="block truncate font-semibold text-slate-900">{x.full_name}</span>
+                    <span className="block text-sm tabular-nums text-slate-600">Earned today {rupees(x.today)}</span>
+                  </span>
+                  <span className="shrink-0 text-right">
+                    <span className={`block font-semibold tabular-nums ${x.inHand > 0 ? "text-danger-700" : "text-slate-950"}`}>{rupees(x.inHand)}</span>
+                    <span className="block text-xs text-slate-500">cash in hand</span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
 
         {canManageMoney ? (
           <OfficeHandovers pending={pendingHandovers} recent={recentHandovers} staff={staffRes.data ?? []} />
