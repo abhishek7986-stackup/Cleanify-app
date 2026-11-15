@@ -18,7 +18,7 @@ export function ComingSoon({
   backHref: string;
 }) {
   return (
-    <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-center">
+    <div className="rounded-lg border border-dashed border-slate-300 bg-white p-6 text-center">
       <p className="inline-block rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold tracking-wide text-slate-500 uppercase">
         {milestone}
       </p>

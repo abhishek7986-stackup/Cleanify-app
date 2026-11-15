@@ -78,7 +78,7 @@ export function JoinRequestCard({
   }
 
   return (
-    <section className="space-y-3 rounded-2xl border-2 border-warn-100 bg-white p-4">
+    <section className="space-y-3 rounded-lg border-2 border-warn-100 bg-white p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="font-semibold text-slate-900">{fullName}</p>

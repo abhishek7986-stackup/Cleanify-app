@@ -10,7 +10,7 @@ export default function LoginPage() {
         {/* New field staff create their own account; the office approves it. */}
         <a
           href="/join"
-          className="tap mb-8 flex items-center justify-between gap-3 rounded-2xl border-2 border-brand-200 bg-brand-50 px-4 py-3"
+          className="tap mb-8 flex items-center justify-between gap-3 rounded-lg border-2 border-brand-200 bg-brand-50 px-4 py-3"
         >
           <span>
             <span className="block font-semibold text-brand-800">New staff? Create your account</span>
@@ -23,7 +23,7 @@ export default function LoginPage() {
           <img
             src="/icons/icon-192.png"
             alt=""
-            className="mx-auto mb-4 size-16 rounded-2xl"
+            className="mx-auto mb-4 size-16 rounded-lg"
           />
           <h1 className="text-2xl font-semibold text-slate-900">Cleanify Operations</h1>
           <p className="mt-1 text-sm text-slate-500">Internal use only</p>

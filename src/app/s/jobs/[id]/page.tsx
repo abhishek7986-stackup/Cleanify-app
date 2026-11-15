@@ -125,7 +125,7 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
           waitFor={waitFor}
         />
         {canCollect && paid?.length ? (
-          <section className="rounded-3xl bg-ok-50 p-5 ring-1 ring-ok-100">
+          <section className="sheet -mx-4 px-4 py-4">
             <h2 className="text-lg font-bold text-ok-700">Payment marked</h2>
             <ul className="mt-1 text-sm text-ok-700">
               {paid.map((p) => (
@@ -186,16 +186,18 @@ function JobHeader({
   mapNote: string;
 }) {
   return (
-    <section className="card overflow-hidden">
-      <div className="bg-brand-950 p-6 text-white">
-        <p className="text-xs font-semibold uppercase tracking-wider text-white/75">{service ?? "Job"}</p>
-        <p className="mt-1 text-2xl font-bold leading-tight tracking-tight">{client}</p>
-        <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold">
-          <span className="rounded-full bg-white/10 px-2.5 py-1">{when}</span>
-          {quoted != null ? <span className="rounded-full bg-white/10 px-2.5 py-1">{rupees(quoted)}</span> : null}
-        </div>
+    <section className="-mx-4 -mt-4">
+      {/* Continues the app bar: who and when, on the shift colour. */}
+      <div className="bg-brand-950 px-4 pb-5 pt-1 text-white">
+        <p className="text-[0.8125rem] font-medium text-white/70">{service ?? "Job"}</p>
+        <p className="mt-0.5 text-[1.5rem] font-semibold leading-tight tracking-[-0.01em]">{client}</p>
+        <p className="mt-2 text-[0.9375rem] font-medium tabular-nums text-white/90">
+          {when}
+          {quoted != null ? <span className="text-white/60"> · </span> : null}
+          {quoted != null ? rupees(quoted) : null}
+        </p>
       </div>
-      <div className="space-y-4 p-5">
+      <div className="sheet space-y-4 border-t-0 px-4 py-4">
         <p className="flex items-start gap-2 text-sm text-slate-700">
           <svg viewBox="0 0 24 24" className="mt-0.5 size-5 shrink-0 text-brand-700" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11ZM12 12.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z" />
@@ -211,7 +213,7 @@ function JobHeader({
               href={mapsHref}
               target="_blank"
               rel="noreferrer"
-              className="tap flex items-center justify-center gap-2 rounded-2xl bg-brand-900 text-sm font-bold text-white active:scale-[0.98]"
+              className="flex h-12 items-center justify-center gap-2 rounded-lg border border-brand-950/15 text-[0.9375rem] font-semibold text-brand-950 active:bg-brand-50"
             >
               <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                 <path d="m3 11 18-8-8 18-2-8-8-2Z" />
@@ -219,14 +221,14 @@ function JobHeader({
               Navigate
             </a>
           ) : (
-            <span className="tap flex items-center justify-center gap-1.5 rounded-2xl bg-slate-100 px-2 text-center text-xs font-semibold text-slate-500">
+            <span className="flex h-12 items-center justify-center gap-1.5 rounded-lg border border-brand-950/10 px-2 text-center text-xs font-medium text-slate-400">
               {mapNote}
             </span>
           )}
           {phone ? (
             <a
               href={`tel:${phone}`}
-              className="tap flex items-center justify-center gap-2 rounded-2xl bg-brand-50 text-sm font-bold text-brand-800 active:scale-[0.98]"
+              className="flex h-12 items-center justify-center gap-2 rounded-lg border border-brand-950/15 text-[0.9375rem] font-semibold text-brand-950 active:bg-brand-50"
             >
               <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                 <path d="M5 4h3.5l1.5 4.5-2 1.5a11 11 0 0 0 6 6l1.5-2 4.5 1.5V19a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" />
@@ -234,7 +236,7 @@ function JobHeader({
               Call client
             </a>
           ) : (
-            <span className="tap flex items-center justify-center rounded-2xl bg-slate-100 text-xs font-semibold text-slate-500">
+            <span className="flex h-12 items-center justify-center rounded-lg border border-brand-950/10 text-xs font-medium text-slate-400">
               No phone number
             </span>
           )}

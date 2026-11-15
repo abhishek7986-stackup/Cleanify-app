@@ -56,7 +56,7 @@ export default async function TeamNowPage() {
             <span className="text-sm font-medium text-slate-500">updates every 30 s</span>
           </h2>
           {rows.length === 0 ? (
-            <p className="rounded-3xl border border-dashed border-slate-300 p-6 text-center text-slate-500">
+            <p className="rounded-xl border border-dashed border-slate-300 p-6 text-center text-slate-500">
               Nobody has checked in yet today.
             </p>
           ) : (

@@ -109,11 +109,11 @@ export default async function PayoutsPage(props: PageProps<"/sales/payouts">) {
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-2xl border border-ok-100 bg-ok-50 p-3">
+          <div className="rounded-lg border border-ok-100 bg-ok-50 p-3">
             <p className="text-sm font-semibold text-ok-700">Company pays staff</p>
             <p className="text-2xl font-bold tabular-nums text-ok-700">{rupees(toPay)}</p>
           </div>
-          <div className="rounded-2xl border border-danger-100 bg-danger-50 p-3">
+          <div className="rounded-lg border border-danger-100 bg-danger-50 p-3">
             <p className="text-sm font-semibold text-danger-700">Staff return to company</p>
             <p className="text-2xl font-bold tabular-nums text-danger-700">{rupees(toReturn)}</p>
           </div>
@@ -131,7 +131,7 @@ export default async function PayoutsPage(props: PageProps<"/sales/payouts">) {
         ) : null}
 
         {rows.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-slate-300 p-8 text-center text-slate-500">
+          <p className="rounded-lg border border-dashed border-slate-300 p-8 text-center text-slate-500">
             Nobody is on the staff list yet.
           </p>
         ) : (

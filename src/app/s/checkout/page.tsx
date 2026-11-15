@@ -64,13 +64,13 @@ export default async function CheckoutPage() {
 function Notice({ title, body, ok }: { title: string; body: string; ok?: boolean }) {
   return (
     <div className="space-y-4">
-      <div className={`rounded-2xl border p-5 ${ok ? "border-ok-100 bg-ok-50" : "border-slate-200 bg-white"}`}>
+      <div className={`rounded-lg border p-5 ${ok ? "border-ok-100 bg-ok-50" : "border-slate-200 bg-white"}`}>
         <p className={`text-lg font-semibold ${ok ? "text-ok-700" : "text-slate-900"}`}>{title}</p>
         <p className={`mt-1 ${ok ? "text-ok-700" : "text-slate-600"}`}>{body}</p>
       </div>
       <a
         href="/s"
-        className="tap-lg flex items-center justify-center rounded-2xl border-2 border-slate-300 font-semibold"
+        className="tap-lg flex items-center justify-center rounded-lg border-2 border-slate-300 font-semibold"
       >
         Back to today
       </a>

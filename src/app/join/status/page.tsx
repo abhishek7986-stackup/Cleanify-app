@@ -38,7 +38,7 @@ export default async function JoinStatusPage() {
         </h1>
 
         {status === "PENDING" ? (
-          <div className="rounded-2xl border border-brand-200 bg-brand-50 p-5">
+          <div className="rounded-lg border border-brand-200 bg-brand-50 p-5">
             <AutoRefresh seconds={20} />
             <p className="flex items-center gap-2 font-semibold text-brand-800">
               <span className="size-2.5 animate-pulse rounded-full bg-brand-600" aria-hidden />
@@ -51,13 +51,13 @@ export default async function JoinStatusPage() {
             </p>
           </div>
         ) : status === "APPROVED" ? (
-          <div className="space-y-3 rounded-2xl border border-ok-100 bg-ok-50 p-5">
+          <div className="space-y-3 rounded-lg border border-ok-100 bg-ok-50 p-5">
             <p className="font-semibold text-ok-700">Your account is approved</p>
             <p className="text-sm text-ok-700">Welcome to Cleanify. You can start using the app now.</p>
             <ContinueButton />
           </div>
         ) : status === "REJECTED" ? (
-          <div className="rounded-2xl border border-danger-100 bg-danger-50 p-5">
+          <div className="rounded-lg border border-danger-100 bg-danger-50 p-5">
             <p className="font-semibold text-danger-700">Your account was not approved</p>
             {app?.rejection_reason ? <p className="mt-1 text-sm text-danger-700">{app.rejection_reason}</p> : null}
             <p className="mt-2 text-sm text-danger-700">Please contact the Cleanify office.</p>

@@ -15,7 +15,7 @@ export function BottomNav({ items }: { items: { href: string; label: string }[] 
     .sort((a, b) => b.href.length - a.href.length)[0]?.href;
 
   return (
-    <nav className="sticky bottom-0 z-30 border-t border-slate-900/[0.06] bg-white/90 backdrop-blur-md">
+    <nav className="border-t border-brand-950/10 bg-white">
       <ul className="mx-auto flex w-full max-w-3xl pb-[var(--safe-bottom)]">
         {items.map((item) => {
           const on = item.href === active;
@@ -24,13 +24,13 @@ export function BottomNav({ items }: { items: { href: string; label: string }[] 
               <Link
                 href={item.href}
                 aria-current={on ? "page" : undefined}
-                className={`flex min-h-[3.75rem] flex-col items-center justify-center gap-0.5 px-1 text-[11px] font-semibold ${
-                  on ? "text-brand-700" : "text-slate-500"
+                className={`flex min-h-16 flex-col items-center justify-center gap-1 px-1 text-xs ${
+                  on ? "font-semibold text-brand-950" : "font-medium text-slate-500"
                 }`}
               >
                 <span
-                  className={`flex h-7 w-12 items-center justify-center rounded-full transition-colors ${
-                    on ? "bg-brand-100" : ""
+                  className={`flex h-8 w-16 items-center justify-center rounded-full transition-colors duration-200 ${
+                    on ? "bg-brand-100 text-brand-950" : ""
                   }`}
                 >
                   <NavIcon label={item.label} />

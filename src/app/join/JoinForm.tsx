@@ -161,7 +161,7 @@ export function JoinForm() {
         </div>
       </Field>
 
-      <section className="space-y-4 rounded-2xl border border-slate-900/10 bg-white p-4">
+      <section className="space-y-4 rounded-lg border border-slate-900/10 bg-white p-4">
         <div>
           <p className="font-semibold text-slate-900">ID documents</p>
           <p className="text-sm text-slate-500">Two are needed. The office checks them before your account is switched on.</p>

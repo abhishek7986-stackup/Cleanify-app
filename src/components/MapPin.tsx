@@ -134,7 +134,7 @@ export function MapPin({
   return (
     <div>
       <div
-        className="relative overflow-hidden rounded-2xl border border-slate-900/10"
+        className="relative overflow-hidden rounded-lg border border-slate-900/10"
         style={{ height }}
       >
         <div ref={container} className="size-full" />

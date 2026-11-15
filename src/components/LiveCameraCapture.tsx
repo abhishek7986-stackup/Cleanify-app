@@ -372,20 +372,20 @@ export function LiveCameraCapture({
             <button
               type="button"
               onClick={retake}
-              className="tap-lg flex-1 rounded-2xl border-2 border-white/40 font-semibold"
+              className="tap-lg flex-1 rounded-lg border-2 border-white/40 font-semibold"
             >
               Retake
             </button>
             <button
               type="button"
               onClick={() => void confirm()}
-              className="tap-lg flex-[2] rounded-2xl bg-brand-500 font-semibold text-white"
+              className="tap-lg flex-[2] rounded-lg bg-brand-500 font-semibold text-white"
             >
               Use this photo
             </button>
           </div>
         ) : phase === "uploading" ? (
-          <div className="tap-lg flex items-center justify-center rounded-2xl bg-white/15 font-semibold">
+          <div className="tap-lg flex items-center justify-center rounded-lg bg-white/15 font-semibold">
             Uploading…
           </div>
         ) : (

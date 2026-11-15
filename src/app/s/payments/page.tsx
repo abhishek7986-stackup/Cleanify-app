@@ -57,7 +57,7 @@ export default async function MyPaymentsPage() {
     >
       <div className="space-y-4">
         {due.length ? (
-          <section className="rounded-2xl border border-danger-100 bg-danger-50 p-4">
+          <section className="rounded-lg border border-danger-100 bg-danger-50 p-4">
             <h2 className="font-semibold text-danger-700">Payment not marked yet</h2>
             <ul className="mt-1 divide-y divide-danger-100 text-sm">
               {due.map((j) => (
@@ -78,7 +78,7 @@ export default async function MyPaymentsPage() {
         {current ? <Statement title="This week so far" week={thisMonday} row={current} /> : null}
 
         {!current && !last ? (
-          <p className="rounded-2xl border border-dashed border-slate-300 p-8 text-center text-slate-500">
+          <p className="rounded-lg border border-dashed border-slate-300 p-8 text-center text-slate-500">
             Nothing here yet. Ask the office to add you to the team list.
           </p>
         ) : null}

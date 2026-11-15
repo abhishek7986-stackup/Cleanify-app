@@ -50,10 +50,13 @@ export function RouteMap({
   stops,
   depot,
   height = 300,
+  flush = false,
 }: {
   stops: RouteStop[];
   depot: { lat: number; lng: number } | null;
   height?: number;
+  /** Edge to edge, no rounded frame (directly under the app bar). */
+  flush?: boolean;
 }) {
   const container = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -136,5 +139,5 @@ export function RouteMap({
     };
   }, [stops, depot, router]);
 
-  return <div ref={container} style={{ height }} className="w-full overflow-hidden rounded-3xl" />;
+  return <div ref={container} style={{ height }} className={`w-full overflow-hidden ${flush ? "" : "rounded-xl"}`} />;
 }

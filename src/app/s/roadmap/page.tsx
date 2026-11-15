@@ -64,29 +64,28 @@ export default async function RoadmapPage() {
         { href: "/s/history", label: "History" },
         { href: "/s/payments", label: "Payments" },
       ]}
+      status={
+        <dl className="grid grid-cols-3 divide-x divide-white/15 rounded-lg bg-white/[0.08] py-2 text-white">
+          <Stat label={formatIstDate(day.date)} value={`${active.length} stop${active.length === 1 ? "" : "s"}`} />
+          <Stat label={totalMin ? `Riding · ~${fmtMin(totalMin)}` : "Riding"} value={totalKm ? `≈ ${fmtKm(totalKm)}` : "—"} />
+          <Stat label="Leave depot" value={day.roster?.depart_by ? formatIstTime(day.roster.depart_by) : "—"} />
+        </dl>
+      }
     >
       <div className="space-y-4">
-        <section className="grid grid-cols-3 gap-px overflow-hidden rounded-3xl bg-slate-900/[0.06] ring-1 ring-slate-900/[0.06]">
-          <Stat label={formatIstDate(day.date)} value={`${active.length} stop${active.length === 1 ? "" : "s"}`} />
-          <Stat label="Riding" value={totalKm ? `≈ ${fmtKm(totalKm)}` : "—"} sub={totalMin ? `~${fmtMin(totalMin)}` : undefined} />
-          <Stat
-            label="Leave depot"
-            value={day.roster?.depart_by ? formatIstTime(day.roster.depart_by) : "—"}
-          />
-        </section>
 
         {active.length === 0 ? (
           <p className="card p-8 text-center text-slate-500">No stops today.</p>
         ) : unlocked && stops.length ? (
-          <section className="card overflow-hidden p-1.5">
-            <RouteMap stops={stops.map(({ id, n, lat, lng, done }) => ({ id, n, lat, lng, done }))} depot={depot} />
-            <div className="p-3.5 pt-3">
+          <section className="-mx-4 -mt-4">
+            <RouteMap flush stops={stops.map(({ id, n, lat, lng, done }) => ({ id, n, lat, lng, done }))} depot={depot} />
+            <div className="sheet border-t-0 px-4 py-3">
               {routeHref ? (
                 <a
                   href={routeHref}
                   target="_blank"
                   rel="noreferrer"
-                  className="tap flex items-center justify-center gap-2 rounded-2xl text-sm font-semibold text-slate-700 ring-1 ring-slate-900/10 active:bg-slate-50"
+                  className="tap flex items-center justify-center gap-2 rounded-lg text-sm font-semibold text-slate-700 ring-1 ring-slate-900/10 active:bg-slate-50"
                 >
                   <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                     <path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5 9 4ZM9 4v13M15 6.5v13" />
@@ -252,12 +251,15 @@ function fmtMin(min: number): string {
   return m ? `${h} h ${m} min` : `${h} h`;
 }
 
+/** One figure in the app bar's shift strip. */
 function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="bg-white px-3 py-3">
-      <p className="truncate text-[11px] font-semibold uppercase tracking-wide text-slate-400">{label}</p>
-      <p className="mt-0.5 truncate text-base font-bold tabular-nums text-slate-900">{value}</p>
-      {sub ? <p className="text-xs font-medium tabular-nums text-slate-500">{sub}</p> : null}
+    <div className="min-w-0 px-3">
+      <dt className="truncate text-[0.6875rem] font-medium text-white/60">{label}</dt>
+      <dd className="mt-0.5 truncate text-[0.9375rem] font-semibold tabular-nums">
+        {value}
+        {sub ? <span className="font-normal text-white/60"> {sub}</span> : null}
+      </dd>
     </div>
   );
 }

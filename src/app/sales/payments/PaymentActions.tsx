@@ -210,7 +210,7 @@ export function UpiSettings({ upi }: { upi: { id: string; name: string } | null 
     );
   }
   return (
-    <section className="space-y-3 rounded-2xl border-2 border-warn-100 bg-warn-50 p-4">
+    <section className="space-y-3 rounded-lg border-2 border-warn-100 bg-warn-50 p-4">
       <div>
         <h2 className="font-semibold text-slate-900">Company UPI for the QR</h2>
         <p className="text-sm text-slate-600">Customers&apos; money goes to this ID. Copy it carefully from your bank app.</p>

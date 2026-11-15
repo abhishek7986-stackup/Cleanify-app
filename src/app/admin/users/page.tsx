@@ -72,7 +72,7 @@ export default async function UsersPage() {
             Join requests {pending.length ? `(${pending.length})` : ""}
           </h2>
           {pending.length === 0 ? (
-            <p className="rounded-2xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">
+            <p className="rounded-lg border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">
               No one is waiting. New workers create their account from the sign-in screen and appear here.
             </p>
           ) : (

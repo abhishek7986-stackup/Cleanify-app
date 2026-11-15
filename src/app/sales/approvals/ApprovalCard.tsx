@@ -188,7 +188,7 @@ function OdometerCheck({ typed, photo }: { typed: number; photo: number | null }
   const differs = photo != null && photo !== typed;
   return (
     <div
-      className={`mt-3 grid grid-cols-2 gap-px overflow-hidden rounded-2xl text-sm ${
+      className={`mt-3 grid grid-cols-2 gap-px overflow-hidden rounded-lg text-sm ${
         differs ? "bg-warn-100 ring-1 ring-warn-100" : "bg-slate-900/[0.06] ring-1 ring-slate-900/[0.06]"
       }`}
     >

@@ -137,7 +137,7 @@ export default async function ApprovalsPage() {
         </p>
 
         {reviews.length === 0 && pendingRosters.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-slate-300 p-8 text-center text-slate-500">
+          <p className="rounded-lg border border-dashed border-slate-300 p-8 text-center text-slate-500">
             Nothing waiting for review. This page updates by itself.
           </p>
         ) : null}

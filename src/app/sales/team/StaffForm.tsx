@@ -64,7 +64,7 @@ export function StaffForm({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="tap w-full rounded-2xl border-2 border-brand-600 font-semibold text-brand-700"
+        className="tap w-full rounded-lg border-2 border-brand-600 font-semibold text-brand-700"
       >
         Add a worker
       </button>

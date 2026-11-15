@@ -12,7 +12,7 @@ export function ApprovalsWaiting({ count }: { count: number }) {
       {count > 0 ? (
         <Link
           href="/sales/approvals"
-          className="flex items-center justify-between gap-3 rounded-2xl border-2 border-warn-100 bg-warn-50 p-4"
+          className="flex items-center justify-between gap-3 rounded-lg border-2 border-warn-100 bg-warn-50 p-4"
         >
           <span>
             <span className="block font-semibold text-warn-700">

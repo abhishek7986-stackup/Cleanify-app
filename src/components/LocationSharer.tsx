@@ -65,15 +65,16 @@ export function LocationSharer() {
 
   if (state === "sharing") {
     return (
-      <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-ok-50 px-1.5 py-0.5 text-[10px] font-semibold text-ok-700 ring-1 ring-ok-100">
-        <span className="size-1.5 animate-pulse rounded-full bg-ok-600" aria-hidden />
+      <span className="inline-flex shrink-0 items-center gap-1.5 text-[0.75rem] font-medium text-white">
+        <span className="size-2 animate-pulse rounded-full bg-emerald-400" aria-hidden />
         Sharing location
       </span>
     );
   }
   if (state === "blocked") {
     return (
-      <span className="inline-flex shrink-0 items-center rounded-full bg-warn-50 px-1.5 py-0.5 text-[10px] font-semibold text-warn-700 ring-1 ring-warn-100">
+      <span className="inline-flex shrink-0 items-center gap-1.5 text-[0.75rem] font-medium text-amber-300">
+        <span className="size-2 rounded-full bg-amber-400" aria-hidden />
         Location off
       </span>
     );

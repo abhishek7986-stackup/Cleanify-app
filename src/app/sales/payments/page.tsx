@@ -89,7 +89,7 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
         {canManageMoney ? (
           <UpiSettings upi={upi} />
         ) : !upi ? (
-          <p className="rounded-2xl border border-warn-100 bg-warn-50 p-3 text-sm text-warn-700">
+          <p className="rounded-lg border border-warn-100 bg-warn-50 p-3 text-sm text-warn-700">
             The company UPI ID is not set up, so supervisors have no QR to show. Calling staff can add it here.
           </p>
         ) : null}
@@ -155,13 +155,13 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
         </section>
 
         {unchecked > 0 ? (
-          <p className="rounded-2xl border border-warn-100 bg-warn-50 p-3 text-sm font-medium text-warn-700">
+          <p className="rounded-lg border border-warn-100 bg-warn-50 p-3 text-sm font-medium text-warn-700">
             {rupees(unchecked)} of the UPI is marked by supervisors but not yet checked against the bank.
           </p>
         ) : null}
 
         {due.length > 0 ? (
-          <section className="rounded-2xl border border-danger-100 bg-danger-50 p-4">
+          <section className="rounded-lg border border-danger-100 bg-danger-50 p-4">
             <h2 className="font-semibold text-danger-700">
               Not collected yet: {due.length} {due.length === 1 ? "job" : "jobs"}
               {dueTotal > 0 ? `, ${rupees(dueTotal)} quoted` : ""}
@@ -217,7 +217,7 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
         <section className="space-y-2">
           <h2 className="font-semibold text-slate-900">Every payment</h2>
           {byJob.size === 0 ? (
-            <p className="rounded-2xl border border-dashed border-slate-300 p-8 text-center text-slate-500">
+            <p className="rounded-lg border border-dashed border-slate-300 p-8 text-center text-slate-500">
               No payments in these dates.
             </p>
           ) : (

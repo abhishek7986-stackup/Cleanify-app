@@ -219,7 +219,7 @@ export function DayPhotosFlow({
         )}
         <a
           href="/s"
-          className="tap-lg mt-8 flex w-full items-center justify-center rounded-2xl bg-brand-900 text-base font-bold text-white active:scale-[0.98]"
+          className="tap-lg mt-8 flex w-full items-center justify-center rounded-lg bg-brand-900 text-base font-bold text-white active:scale-[0.98]"
         >
           {mode === "checkin" ? "See today's jobs" : "Back to today"}
         </a>
@@ -235,25 +235,25 @@ export function DayPhotosFlow({
     <div className="space-y-5 pb-28">
       {mode === "checkin" ? (
         retake ? (
-          <div className="rounded-3xl bg-danger-50 p-4 text-sm text-danger-700 ring-1 ring-danger-100">
+          <div className="rounded-xl bg-danger-50 p-4 text-sm text-danger-700 ring-1 ring-danger-100">
             <p className="font-bold">Your check-in photos were rejected</p>
             {rejectionReason ? <p className="mt-1">&ldquo;{rejectionReason}&rdquo;</p> : null}
             <p className="mt-1">Take both photos again and send them.</p>
           </div>
         ) : (
-          <section className="rounded-3xl bg-brand-950 p-6 text-white">
+          <section className="-mx-4 -mt-4 bg-brand-950 px-4 pb-6 pt-1 text-white">
             <CheckinCountdown tone="hero" deadline={deadline} submittedAt={null} />
           </section>
         )
       ) : openJobs > 0 ? (
-        <div className="rounded-3xl bg-warn-50 p-4 text-sm text-warn-700 ring-1 ring-warn-100">
+        <div className="rounded-xl bg-warn-50 p-4 text-sm text-warn-700 ring-1 ring-warn-100">
           <p className="font-bold">
             {openJobs} job{openJobs === 1 ? " is" : "s are"} not finished yet
           </p>
           <p className="mt-1">You can still check out. The office will see that it was left open.</p>
         </div>
       ) : (
-        <p className="rounded-3xl bg-ok-50 p-4 text-sm font-semibold text-ok-700 ring-1 ring-ok-100">
+        <p className="rounded-xl bg-ok-50 p-4 text-sm font-semibold text-ok-700 ring-1 ring-ok-100">
           All of today&apos;s jobs are done. Check out to finish your day.
         </p>
       )}
@@ -274,7 +274,7 @@ export function DayPhotosFlow({
                 <button
                   type="button"
                   onClick={() => setCamera(p)}
-                  className={`relative flex aspect-[4/5] w-full flex-col items-center justify-center gap-2 rounded-3xl p-3 text-center active:scale-[0.98] ${
+                  className={`relative flex aspect-[4/5] w-full flex-col items-center justify-center gap-2 rounded-xl p-3 text-center active:scale-[0.98] ${
                     taken
                       ? "bg-ok-50 ring-2 ring-ok-600"
                       : "border-2 border-dashed border-brand-600/50 bg-white"
@@ -324,7 +324,7 @@ export function DayPhotosFlow({
             The number on the scooter
             {mode === "checkout" && startKm != null ? ` (this morning: ${startKm} km)` : ""}
           </span>
-          <span className="mt-3 flex items-center gap-2 rounded-2xl bg-slate-50 px-4 ring-2 ring-slate-200 focus-within:ring-brand-600">
+          <span className="mt-3 flex items-center gap-2 rounded-lg bg-slate-50 px-4 ring-2 ring-slate-200 focus-within:ring-brand-600">
             <input
               type="number"
               inputMode="decimal"
@@ -346,7 +346,7 @@ export function DayPhotosFlow({
         </label>
       ) : null}
 
-      {error ? <p className="rounded-2xl bg-danger-50 p-3 text-sm font-medium text-danger-700">{error}</p> : null}
+      {error ? <p className="rounded-lg bg-danger-50 p-3 text-sm font-medium text-danger-700">{error}</p> : null}
 
       {/* The one action, always under the thumb. */}
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 px-4 pb-[calc(var(--safe-bottom)+0.75rem)] pt-3 backdrop-blur">
@@ -355,7 +355,7 @@ export function DayPhotosFlow({
             type="button"
             onClick={() => void submit()}
             disabled={!ready || submitting !== null}
-            className="tap-lg w-full rounded-2xl bg-brand-900 text-base font-bold text-white active:scale-[0.98] disabled:bg-slate-200 disabled:text-slate-500 disabled:shadow-none"
+            className="tap-lg w-full rounded-lg bg-brand-900 text-base font-bold text-white active:scale-[0.98] disabled:bg-slate-200 disabled:text-slate-500 disabled:shadow-none"
           >
             {submitting ?? (ready ? (retake ? "Send new photos" : verb) : !photosReady ? "Take both photos first" : "Type the km reading")}
           </button>

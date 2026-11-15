@@ -13,7 +13,7 @@ export default async function ServicesPage() {
   return (
     <AppShell profile={profile} title="Services" nav={officeNav(profile)}>
       <div className="space-y-3">
-        <p className="rounded-2xl bg-slate-100 p-3 text-sm text-slate-600">
+        <p className="rounded-lg bg-slate-100 p-3 text-sm text-slate-600">
           The drag-and-drop field builder is <b>Milestone 5</b>. The data model
           behind it is already live — these fields are rows, not code, and a new
           service can be added today by inserting into{" "}

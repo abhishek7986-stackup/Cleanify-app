@@ -98,9 +98,9 @@ export function JobDetailView({
 
       {/* ------------------------------------------------- service details */}
       {jobFields.length ? (
-        <section className="card p-5">
-          <h2 className="mb-2 text-lg font-bold text-slate-900">Job details</h2>
-          <dl className="space-y-1.5 text-sm">
+        <section>
+          <h2 className="section-label pb-2">Job details</h2>
+          <dl className="sheet -mx-4 space-y-1.5 px-4 py-3.5 text-sm">
             {jobFields.map((f) => (
               <Row key={f.id} k={f.label} v={renderValue(f, job.service_details?.[f.key])} />
             ))}
@@ -110,20 +110,19 @@ export function JobDetailView({
 
       {/* ------------------------------------------------------ line items */}
       {lineItems.length ? (
-        <section className="space-y-2">
-          <h2 className="px-1 text-lg font-bold text-slate-900">
+        <section>
+          <h2 className="section-label pb-2">
             {lineItems.length} {service?.has_line_items ? (lineItems.length === 1 ? service.line_item_singular : service.line_item_plural) : "items"}
           </h2>
+          <div className="sheet -mx-4 divide-y divide-brand-950/[0.07]">
           {lineItems.map((li) => {
             const ba = beforeAfter(li.id);
             return (
-              <div key={li.id} className="card p-5">
+              <div key={li.id} className="px-4 py-3.5">
                 <div className="flex items-center justify-between">
                   <p className="font-semibold text-slate-800">{li.label}</p>
                   {li.is_done ? (
-                    <span className="rounded-full bg-ok-100 px-2 py-0.5 text-xs font-semibold text-ok-700">
-                      done
-                    </span>
+                    <span className="text-xs font-semibold text-ok-700">Done</span>
                   ) : null}
                 </div>
                 <dl className="mt-2 space-y-1 text-sm">
@@ -133,12 +132,13 @@ export function JobDetailView({
                 </dl>
                 {ba.before || ba.after ? (
                   <p className="mt-2 text-xs text-slate-500">
-                    {ba.before ? "before ✓" : "before —"} · {ba.after ? "after ✓" : "after —"}
+                    Before photo {ba.before ? "taken" : "not yet"} · After photo {ba.after ? "taken" : "not yet"}
                   </p>
                 ) : null}
               </div>
             );
           })}
+          </div>
         </section>
       ) : null}
 

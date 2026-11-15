@@ -76,13 +76,13 @@ function Notice({ title, body, ok, waiting }: { title: string; body: string; ok?
   return (
     <div className="space-y-4">
       {waiting ? <AutoRefresh seconds={8} /> : null}
-      <div className={`rounded-3xl p-5 ${ok ? "bg-ok-50 ring-1 ring-ok-100" : "card"}`}>
+      <div className={`rounded-xl p-5 ${ok ? "bg-ok-50 ring-1 ring-ok-100" : "card"}`}>
         <p className={`text-lg font-semibold ${ok ? "text-ok-700" : "text-slate-900"}`}>{title}</p>
         <p className={`mt-1 ${ok ? "text-ok-700" : "text-slate-600"}`}>{body}</p>
       </div>
       <a
         href="/s"
-        className="tap-lg flex items-center justify-center rounded-2xl bg-brand-900 font-bold text-white active:scale-[0.98]"
+        className="tap-lg flex items-center justify-center rounded-lg bg-brand-900 font-bold text-white active:scale-[0.98]"
       >
         Back to today
       </a>

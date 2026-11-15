@@ -26,7 +26,7 @@ export function JobActions({
 
   if (terminal) {
     return (
-      <p className="rounded-2xl bg-slate-100 p-3 text-center text-sm text-slate-600">
+      <p className="rounded-lg bg-slate-100 p-3 text-center text-sm text-slate-600">
         This job is {job.status.toLowerCase()} and can no longer be changed here.
       </p>
     );
@@ -38,14 +38,14 @@ export function JobActions({
         <button
           type="button"
           onClick={() => setOpen("reschedule")}
-          className="tap-lg flex-1 rounded-2xl bg-brand-900 font-semibold text-white"
+          className="tap-lg flex-1 rounded-lg bg-brand-900 font-semibold text-white"
         >
           Reschedule
         </button>
         <button
           type="button"
           onClick={() => setOpen("cancel")}
-          className="tap-lg flex-1 rounded-2xl border-2 border-danger-500 font-semibold text-danger-600"
+          className="tap-lg flex-1 rounded-lg border-2 border-danger-500 font-semibold text-danger-600"
         >
           Cancel job
         </button>
@@ -185,7 +185,7 @@ function RescheduleModal({
         type="button"
         disabled={busy || !reasonId}
         onClick={submit}
-        className="tap-lg w-full rounded-2xl bg-brand-900 font-semibold text-white disabled:opacity-50"
+        className="tap-lg w-full rounded-lg bg-brand-900 font-semibold text-white disabled:opacity-50"
       >
         {busy ? "Rescheduling…" : "Confirm reschedule"}
       </button>
@@ -249,7 +249,7 @@ function CancelModal({ job, reasons, onClose }: { job: Job; reasons: Reason[]; o
         type="button"
         disabled={busy || !reasonId}
         onClick={submit}
-        className="tap-lg w-full rounded-2xl bg-danger-600 font-semibold text-white disabled:opacity-50"
+        className="tap-lg w-full rounded-lg bg-danger-600 font-semibold text-white disabled:opacity-50"
       >
         {busy ? "Cancelling…" : "Cancel this job"}
       </button>
@@ -274,7 +274,7 @@ function Labelled({ label, children }: { label: string; children: React.ReactNod
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center">
-      <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-5 pb-[calc(var(--safe-bottom)+1.25rem)] sm:rounded-3xl">
+      <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-5 pb-[calc(var(--safe-bottom)+1.25rem)] sm:rounded-xl">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
           <button type="button" onClick={onClose} aria-label="Close" className="tap rounded-full px-3 text-2xl leading-none text-slate-400">

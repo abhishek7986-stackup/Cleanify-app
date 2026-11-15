@@ -222,7 +222,7 @@ export function JobFlow({
   }
 
   return (
-    <section className="space-y-4 card p-5">
+    <section className="sheet -mx-4 space-y-4 px-4 py-5">
       <Stepper status={status} before={beforeStatus} after={afterStatus} />
 
       {/* -------------------------------------------- before arriving */}
@@ -233,7 +233,7 @@ export function JobFlow({
           </Waiting>
         ) : (
           <div className="space-y-3">
-            <p className="flex items-start gap-2 rounded-2xl bg-slate-50 p-3 text-sm text-slate-600">
+            <p className="flex items-start gap-2 rounded-lg bg-slate-50 p-3 text-sm text-slate-600">
               <Glyph d="M7 11V8a5 5 0 0 1 10 0v3M5.5 11h13v9.5h-13z" />
               {depot === "REJECTED"
                 ? "Your depot photos were rejected. Retake them to unlock this job."
@@ -241,7 +241,7 @@ export function JobFlow({
             </p>
             <a
               href="/s/checkin"
-              className="tap-lg flex items-center justify-center rounded-2xl bg-brand-900 text-base font-bold text-white active:scale-[0.98]"
+              className="tap-lg flex items-center justify-center rounded-lg bg-brand-900 text-base font-bold text-white active:scale-[0.98]"
             >
               {depot === "REJECTED" ? "Retake depot photos" : "Go to depot check-in"}
             </a>
@@ -250,7 +250,7 @@ export function JobFlow({
       ) : null}
 
       {preArrival && depot === "APPROVED" && waitFor ? (
-        <div className="flex items-start gap-3 rounded-2xl bg-slate-50 p-4">
+        <div className="flex items-start gap-3 rounded-lg bg-slate-50 p-4">
           <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 ring-1 ring-slate-900/10">
             <Glyph d="M7 11V8a5 5 0 0 1 10 0v3M5.5 11h13v9.5h-13z" />
           </span>
@@ -275,7 +275,7 @@ export function JobFlow({
               onClick={() =>
                 void advance(status === "ASSIGNED" ? ["CHECKED_IN", "EN_ROUTE"] : ["EN_ROUTE"], "Starting trip…")
               }
-              className="tap-lg w-full rounded-2xl bg-brand-50 text-base font-bold text-brand-800 active:scale-[0.98] disabled:opacity-40"
+              className="h-14 w-full rounded-lg border border-brand-950/15 text-base font-semibold text-brand-950 active:bg-brand-50 disabled:opacity-40"
             >
               Start trip
             </button>
@@ -292,7 +292,7 @@ export function JobFlow({
 
       {status === "ON_SITE" && beforeStatus === "APPROVED" ? (
         <div className="space-y-2">
-          <p className="flex items-center gap-2 rounded-2xl bg-ok-50 p-3 text-sm font-semibold text-ok-700">
+          <p className="flex items-center gap-2 rounded-lg bg-ok-50 p-3 text-sm font-semibold text-ok-700">
             <Glyph d="m5 12.5 4.5 4.5L19 7.5" />
             Before photos approved
           </p>
@@ -312,7 +312,7 @@ export function JobFlow({
             </p>
           )}
           {units.map((u) => (
-            <div key={u.id} className="space-y-3 rounded-2xl bg-slate-50 p-3 ring-1 ring-slate-100">
+            <div key={u.id} className="space-y-3 rounded-lg bg-slate-50 p-3 ring-1 ring-slate-100">
               <UnitPhotoRow
                 unit={u}
                 which="before"
@@ -366,7 +366,7 @@ export function JobFlow({
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder={`e.g. ${units.length} ${units.length === 1 ? noun : `${noun}s`} cleaned and disinfected`}
-              className="w-full rounded-2xl bg-slate-50 px-4 py-3 text-base outline-none ring-2 ring-slate-200 focus:ring-brand-600"
+              className="w-full rounded-lg bg-slate-50 px-4 py-3 text-base outline-none ring-2 ring-slate-200 focus:ring-brand-600"
             />
           </label>
           <BigButton busy={busy} disabled={!allAfter} onClick={() => void sendAfter()}>
@@ -378,7 +378,7 @@ export function JobFlow({
         </div>
       ) : null}
 
-      {error ? <p className="rounded-2xl bg-danger-50 p-3 text-sm font-medium text-danger-700">{error}</p> : null}
+      {error ? <p className="rounded-lg bg-danger-50 p-3 text-sm font-medium text-danger-700">{error}</p> : null}
 
       {camera ? (
         <LiveCameraCapture
@@ -468,13 +468,13 @@ function UnitPhotoRow({ unit, which, onShoot }: { unit: FlowUnit; which: "before
     <button
       type="button"
       onClick={onShoot}
-      className={`flex w-full items-center gap-3 rounded-2xl p-3 text-left active:scale-[0.99] ${
+      className={`flex w-full items-center gap-3 rounded-lg p-3 text-left active:scale-[0.99] ${
         taken ? "bg-ok-50 ring-2 ring-ok-600" : "border-2 border-dashed border-brand-600/50 bg-white"
       }`}
     >
       <span
         aria-hidden
-        className={`flex size-12 shrink-0 items-center justify-center rounded-2xl ${
+        className={`flex size-12 shrink-0 items-center justify-center rounded-lg ${
           taken ? "bg-ok-600 text-white" : "bg-brand-50 text-brand-700"
         }`}
       >
@@ -506,7 +506,7 @@ function UnitPhotoRow({ unit, which, onShoot }: { unit: FlowUnit; which: "before
 
 function Waiting({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-start gap-3 rounded-2xl bg-brand-50 p-4">
+    <div className="flex items-start gap-3 rounded-lg bg-brand-50 p-4">
       <AutoRefresh seconds={8} />
       <span className="relative flex size-11 shrink-0 items-center justify-center rounded-full bg-white text-brand-700">
         <span className="absolute inset-0 animate-ping rounded-full bg-brand-200/60" aria-hidden />
@@ -523,7 +523,7 @@ function Waiting({ title, children }: { title: string; children: React.ReactNode
 
 function Rejected({ reason, children }: { reason: string | null; children: React.ReactNode }) {
   return (
-    <div className="flex items-start gap-2 rounded-2xl bg-danger-50 p-4 text-sm text-danger-700 ring-1 ring-danger-100">
+    <div className="flex items-start gap-2 rounded-lg bg-danger-50 p-4 text-sm text-danger-700 ring-1 ring-danger-100">
       <Glyph d="M12 8v5M12 16.5v.5M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" />
       <div>
         <p className="font-bold">Not approved{reason ? `: ${reason}` : ""}</p>
@@ -552,7 +552,7 @@ function BigButton({
       type="button"
       onClick={onClick}
       disabled={disabled || busy !== null}
-      className="tap-lg flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-900 text-base font-bold text-white active:scale-[0.98] disabled:bg-slate-200 disabled:text-slate-500 disabled:shadow-none"
+      className="tap-lg flex w-full items-center justify-center gap-2 rounded-lg bg-brand-900 text-base font-bold text-white active:scale-[0.98] disabled:bg-slate-200 disabled:text-slate-500 disabled:shadow-none"
     >
       {busy ? null : icon ? <Glyph d={icon} /> : null}
       {busy ?? children}
@@ -563,7 +563,7 @@ function BigButton({
 function Panel({ tone, title, children }: { tone: "ok" | "plain"; title: string; children: React.ReactNode }) {
   return (
     <div
-      className={`flex items-center gap-3 rounded-3xl p-5 ring-1 ${
+      className={`flex items-center gap-3 rounded-xl p-5 ring-1 ${
         tone === "ok" ? "bg-ok-50 ring-ok-100" : "card"
       }`}
     >

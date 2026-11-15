@@ -55,7 +55,7 @@ export default async function SalesToday(props: PageProps<"/sales">) {
           <Stat label="Late" value={late.length} tone={late.length ? "danger" : "plain"} />
         </div>
 
-        <div className="flex gap-1 rounded-2xl bg-slate-900/[0.05] p-1">
+        <div className="flex gap-1 rounded-lg bg-slate-900/[0.05] p-1">
           <TabLink href={`/sales?date=${date}&tab=assigned`} active={tab === "assigned"}>
             Assigned ({open.length})
           </TabLink>
@@ -65,7 +65,7 @@ export default async function SalesToday(props: PageProps<"/sales">) {
         </div>
 
         {shown.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-slate-300 p-8 text-center text-slate-500">
+          <p className="rounded-lg border border-dashed border-slate-300 p-8 text-center text-slate-500">
             {tab === "done" ? "Nothing completed yet." : "Nothing scheduled."}
           </p>
         ) : (
@@ -129,7 +129,7 @@ function TabLink({ href, active, children }: { href: string; active: boolean; ch
 
 function Stat({ label, value, tone = "plain" }: { label: string; value: number; tone?: "plain" | "danger" }) {
   return (
-    <div className={`rounded-3xl p-3 text-center ${tone === "danger" ? "bg-danger-50 ring-1 ring-danger-100" : "card"}`}>
+    <div className={`rounded-xl p-3 text-center ${tone === "danger" ? "bg-danger-50 ring-1 ring-danger-100" : "card"}`}>
       <p className={`text-2xl font-bold tabular-nums ${tone === "danger" ? "text-danger-700" : "text-slate-900"}`}>{value}</p>
       <p className="text-xs text-slate-500">{label}</p>
     </div>

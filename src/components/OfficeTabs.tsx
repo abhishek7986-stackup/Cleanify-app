@@ -8,7 +8,7 @@ const TABS = [
 
 export function OfficeTabs({ active }: { active: (typeof TABS)[number]["key"] }) {
   return (
-    <nav aria-label="Payment sections" className="grid grid-cols-3 gap-1 rounded-2xl bg-slate-900/[0.05] p-1">
+    <nav aria-label="Payment sections" className="grid grid-cols-3 gap-1 rounded-lg bg-slate-900/[0.05] p-1">
       {TABS.map((t) => (
         <Link
           key={t.key}

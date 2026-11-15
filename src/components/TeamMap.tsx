@@ -69,7 +69,7 @@ export function TeamMap({ pins, height = 340 }: { pins: TeamPin[]; height?: numb
     };
   }, [key]);
 
-  return <div ref={container} style={{ height }} className="w-full overflow-hidden rounded-3xl" />;
+  return <div ref={container} style={{ height }} className="w-full overflow-hidden rounded-xl" />;
 }
 
 function escapeHtml(s: string): string {

@@ -19,7 +19,7 @@ import { extractShortMapLink, parseCoordinates } from "@/lib/location-link";
 // MapLibre touches `window` on import, so it must never run on the server.
 const MapPin = dynamicImport(
   () => import("@/components/MapPin").then((m) => m.MapPin),
-  { ssr: false, loading: () => <div className="h-[260px] animate-pulse rounded-2xl bg-slate-200" /> },
+  { ssr: false, loading: () => <div className="h-[260px] animate-pulse rounded-lg bg-slate-200" /> },
 );
 
 type Supervisor = { id: string; full_name: string };
@@ -307,7 +307,7 @@ export function NewJobWizard({
     const supervisorName = supervisors.find((s) => s.id === supervisorId)?.full_name ?? "The supervisor";
     return (
       <div className="space-y-4">
-        <div className="rounded-2xl border border-ok-100 bg-ok-50 p-5">
+        <div className="rounded-lg border border-ok-100 bg-ok-50 p-5">
           <p className="text-lg font-semibold text-ok-700">Job {created.jobNumber} created</p>
           <p className="mt-2 text-ok-700">
             {created.checkinAt ? (
@@ -324,14 +324,14 @@ export function NewJobWizard({
           <button
             type="button"
             onClick={() => router.push("/sales")}
-            className="tap-lg flex-1 rounded-2xl border-2 border-slate-300 font-semibold"
+            className="tap-lg flex-1 rounded-lg border-2 border-slate-300 font-semibold"
           >
             Back to today
           </button>
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="tap-lg flex-1 rounded-2xl bg-brand-900 font-semibold text-white"
+            className="tap-lg flex-1 rounded-lg bg-brand-900 font-semibold text-white"
           >
             Book another
           </button>
@@ -380,7 +380,7 @@ export function NewJobWizard({
       {/* ------------------------------------------------------ 0. client */}
       {step === 0 ? (
         <section className="space-y-3">
-          <div className="flex gap-1 rounded-2xl bg-slate-900/[0.05] p-1">
+          <div className="flex gap-1 rounded-lg bg-slate-900/[0.05] p-1">
             <TabButton active={clientMode === "search"} onClick={() => setClientMode("search")}>
               Existing client
             </TabButton>
@@ -458,7 +458,7 @@ export function NewJobWizard({
       {/* ---------------------------------------------------- 1. location */}
       {step === 1 ? (
         <section className="space-y-3">
-          <div className="rounded-2xl border border-slate-900/10 bg-white p-3">
+          <div className="rounded-lg border border-slate-900/10 bg-white p-3">
             <p className="text-sm font-medium text-slate-700">Location shared on WhatsApp?</p>
             <p className="mt-0.5 text-xs text-slate-500">
               Paste the Google Maps link or the coordinates and the pin moves there.
@@ -510,7 +510,7 @@ export function NewJobWizard({
               key={s.id}
               type="button"
               onClick={() => pickService(s)}
-              className={`w-full rounded-2xl border-2 p-4 text-left ${
+              className={`w-full rounded-lg border-2 p-4 text-left ${
                 serviceId === s.id ? "border-brand-600 bg-brand-50" : "border-slate-200 bg-white"
               }`}
             >
@@ -571,7 +571,7 @@ export function NewJobWizard({
               </div>
 
               {items.map((it, i) => (
-                <div key={it.key} className="rounded-2xl border border-slate-900/10 bg-white p-4">
+                <div key={it.key} className="rounded-lg border border-slate-900/10 bg-white p-4">
                   <div className="mb-3 flex items-center justify-between">
                     <p className="font-semibold text-slate-800">
                       {service.line_item_singular} {i + 1}
@@ -655,16 +655,16 @@ export function NewJobWizard({
 
       <div className="flex gap-3">
         {step > 0 ? (
-          <button type="button" onClick={() => { setFormError(null); setStep((s) => s - 1); }} className="tap-lg flex-1 rounded-2xl border-2 border-slate-300 font-semibold">
+          <button type="button" onClick={() => { setFormError(null); setStep((s) => s - 1); }} className="tap-lg flex-1 rounded-lg border-2 border-slate-300 font-semibold">
             Back
           </button>
         ) : null}
         {step < STEPS.length - 1 ? (
-          <button type="button" onClick={next} className="tap-lg flex-[2] rounded-2xl bg-brand-900 font-semibold text-white">
+          <button type="button" onClick={next} className="tap-lg flex-[2] rounded-lg bg-brand-900 font-semibold text-white">
             Continue
           </button>
         ) : (
-          <button type="button" onClick={submit} disabled={submitting} className="tap-lg flex-[2] rounded-2xl bg-brand-900 font-semibold text-white disabled:opacity-50">
+          <button type="button" onClick={submit} disabled={submitting} className="tap-lg flex-[2] rounded-lg bg-brand-900 font-semibold text-white disabled:opacity-50">
             {submitting ? "Creating…" : "Create job"}
           </button>
         )}

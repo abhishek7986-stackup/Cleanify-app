@@ -52,7 +52,7 @@ export default async function AdminDashboard() {
         <ApprovalsWaiting count={waiting} />
         <TeamNowLink />
         {schedulerStale ? (
-          <div className="rounded-2xl border border-danger-100 bg-danger-50 p-4">
+          <div className="rounded-lg border border-danger-100 bg-danger-50 p-4">
             <p className="font-semibold text-danger-700">Scheduler is not running</p>
             <p className="mt-1 text-sm text-danger-600">
               {lastTick
@@ -66,7 +66,7 @@ export default async function AdminDashboard() {
         {joinRequests ? (
           <a
             href="/admin/users"
-            className="flex items-center justify-between gap-3 rounded-2xl border-2 border-warn-100 bg-warn-50 p-4"
+            className="flex items-center justify-between gap-3 rounded-lg border-2 border-warn-100 bg-warn-50 p-4"
           >
             <span>
               <span className="block font-semibold text-warn-700">
@@ -185,7 +185,7 @@ function Tile({
     warn: "border-warn-100 bg-warn-50 text-warn-700",
   } as const;
   return (
-    <div className={`rounded-2xl border p-4 ${tones[tone]}`}>
+    <div className={`rounded-lg border p-4 ${tones[tone]}`}>
       <p className="text-3xl font-bold tabular-nums">{value}</p>
       <p className="mt-1 text-sm opacity-80">{label}</p>
     </div>
