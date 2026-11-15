@@ -6,6 +6,7 @@ import { InstallGate } from "@/components/InstallGate";
 import { TravelRefresh } from "@/components/TravelRefresh";
 import { CheckinCountdown } from "@/components/CheckinCountdown";
 import { AutoRefresh } from "@/components/AutoRefresh";
+import { TripAction } from "@/components/TripAction";
 import { parseEwkbPoint } from "@/lib/location-link";
 import { formatIstDate, formatIstTime } from "@/lib/domain/checkin-policy";
 import type { DayRoster, Job } from "@/lib/domain/database";
@@ -217,8 +218,9 @@ function CurrentStop({ job, index, total, unlocked }: { job: DayJob; index: numb
         </p>
       ) : null}
 
-      <div className="mt-4 grid grid-cols-2 gap-2">
-        {unlocked && pin ? (
+      <div className={`mt-4 grid gap-2 ${job.status === "EN_ROUTE" && pin ? "grid-cols-2" : "grid-cols-1"}`}>
+        {/* Directions only once the trip has started: Start trip opens them. */}
+        {job.status !== "EN_ROUTE" || !pin ? null : unlocked ? (
           <a
             href={`https://www.google.com/maps/dir/?api=1&destination=${pin.lat},${pin.lng}&travelmode=two-wheeler`}
             target="_blank"
@@ -307,6 +309,17 @@ function ActionBar({ phase, current }: { phase: Phase; current: DayJob | null })
       return <span className={quiet}>Waiting for approval</span>;
     case "working": {
       if (!current) return null;
+      if (["ASSIGNED", "CHECKED_IN", "EN_ROUTE"].includes(current.status)) {
+        const pin = parseEwkbPoint(current.site_location);
+        return (
+          <TripAction
+            jobId={current.id}
+            status={current.status}
+            mapsUrl={pin ? `https://www.google.com/maps/dir/?api=1&destination=${pin.lat},${pin.lng}&travelmode=two-wheeler` : null}
+            className={`${primary} disabled:opacity-60`}
+          />
+        );
+      }
       const label = actionLabel(current);
       return (
         <Link href={`/s/jobs/${current.id}`} className={label.waiting ? quiet : `${primary} justify-between px-5`}>
@@ -354,9 +367,9 @@ function nextStep(job: Job, unlocked: boolean): { text: string; tone: "go" | "wa
   switch (job.status) {
     case "ASSIGNED":
     case "CHECKED_IN":
-      return unlocked ? { text: "Start the trip when you leave for the site", tone: "go" } : null;
+      return unlocked ? { text: "Tap Start trip when you leave. It opens the map to the site.", tone: "go" } : null;
     case "EN_ROUTE":
-      return { text: "On the way. Tap I've reached when you arrive", tone: "go" };
+      return { text: "On the way. Tap I've reached the site when you arrive", tone: "go" };
     case "ON_SITE":
       if (job.before_review === "PENDING") return { text: "Before photos sent, waiting for approval", tone: "wait" };
       if (job.before_review === "APPROVED") return { text: "Before photos approved: start cleaning", tone: "go" };

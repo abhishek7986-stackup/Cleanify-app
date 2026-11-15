@@ -4,6 +4,7 @@ import { getSupervisorDay } from "@/lib/data/supervisor";
 import { createAdminClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/AppShell";
 import { RouteMap, type RouteStop } from "@/components/RouteMap";
+import { TripAction } from "@/components/TripAction";
 import { parseEwkbPoint } from "@/lib/location-link";
 import { formatIstDate, formatIstTime } from "@/lib/domain/checkin-policy";
 
@@ -67,7 +68,14 @@ export default async function RoadmapPage() {
         { href: "/s/payments", label: "Payments" },
       ]}
       action={
-        nextPin && unlocked ? (
+        nextPin && unlocked && nextJob && ["ASSIGNED", "CHECKED_IN"].includes(nextJob.status) ? (
+          <TripAction
+            jobId={nextJob.id}
+            status={nextJob.status}
+            mapsUrl={googleRoute([nextPin])}
+            className="flex h-14 w-full items-center justify-center gap-2 rounded-lg bg-brand-950 text-base font-semibold text-white active:bg-brand-900 disabled:opacity-60"
+          />
+        ) : nextPin && unlocked && nextJob?.status === "EN_ROUTE" ? (
           <a
             href={googleRoute([nextPin])}
             target="_blank"

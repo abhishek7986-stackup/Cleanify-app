@@ -68,19 +68,29 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
   if (job.status === "COMPLETED") {
     const { data: open } = await supabase
       .from("jobs")
-      .select("id, job_number, status, client:clients(name)")
+      .select("id, job_number, status, site_address, site_location, client:clients(name)")
       .eq("assigned_supervisor_id", job.assigned_supervisor_id ?? "")
       .eq("service_date", job.service_date)
       .neq("id", job.id)
       .not("status", "in", "(COMPLETED,CANCELLED,NO_SHOW,DRAFT)")
       .order("scheduled_start")
       .limit(1);
-    const n = open?.[0] as { id: string; job_number: string; status: JobStatus; client: { name: string } | null } | undefined;
+    const n = open?.[0] as
+      | { id: string; job_number: string; status: JobStatus; site_address: string; site_location: unknown; client: { name: string } | null }
+      | undefined;
     next = n
-      ? { kind: "job", id: n.id, jobNumber: n.job_number, client: n.client?.name ?? n.job_number, status: n.status }
+      ? {
+          kind: "job",
+          id: n.id,
+          jobNumber: n.job_number,
+          client: n.client?.name ?? n.job_number,
+          status: n.status,
+          mapsUrl: mapsLink(n.site_address, parseEwkbPoint(n.site_location)),
+        }
       : { kind: "checkout" };
   }
 
+  const siteMaps = mapsLink(job.site_address, parseEwkbPoint(job.site_location));
   const depot = roster?.submitted_at ? (roster.approval_status as ApprovalStatus) : "none";
   // The location is the reward for an approved depot check-in.
   const unlocked = depot === "APPROVED";
@@ -122,11 +132,20 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
           landmark={job.site_landmark}
           quoted={job.quoted_amount != null ? Number(job.quoted_amount) : null}
           // The location is the reward for an approved depot check-in.
-          mapsHref={
-            unlocked && !waitFor && job.status !== "COMPLETED" ? mapsLink(job.site_address, parseEwkbPoint(job.site_location)) : null
-          }
+          // Directions only once the trip has started (Start trip opens them).
+          mapsHref={unlocked && !waitFor && job.status === "EN_ROUTE" ? siteMaps : null}
           jobNumber={job.job_number}
-          mapNote={job.status === "COMPLETED" ? "Job finished" : waitFor ? "Opens after the earlier job" : "Map opens after check-in"}
+          mapNote={
+            job.status === "COMPLETED"
+              ? "Job finished"
+              : waitFor
+                ? "Opens after the earlier job"
+                : !unlocked
+                  ? "Map opens after check-in"
+                  : ["ASSIGNED", "CHECKED_IN"].includes(job.status)
+                    ? "Start trip opens the map"
+                    : "You are at the site"
+          }
         />
         <JobFlow
           // Remount when the server state moves (e.g. an approval arrives via
@@ -142,6 +161,7 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
           after={{ status: job.after_review, reason: job.after_rejection_reason }}
           completedAt={job.completed_at}
           waitFor={waitFor}
+          mapsUrl={unlocked && !waitFor ? siteMaps : null}
           next={next}
           unpaid={canCollect && !paid?.length}
         />
@@ -180,7 +200,7 @@ function mapsLink(address: string, pin: { lat: number; lng: number } | null): st
   // goes first: it is what the rep placed (often pasted from the client's own
   // WhatsApp location), and Indian street addresses rarely geocode exactly.
   const q = pin ? `${pin.lat},${pin.lng}` : encodeURIComponent(address);
-  return `https://www.google.com/maps/dir/?api=1&destination=${q}`;
+  return `https://www.google.com/maps/dir/?api=1&destination=${q}&travelmode=two-wheeler`;
 }
 
 /** Who, what, when and where, with the two things a supervisor taps most. */

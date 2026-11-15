@@ -48,7 +48,7 @@ type Review = { status: ApprovalStatus | null; reason: string | null };
 
 /** What comes after a completed job: the next open job today, or check-out. */
 export type NextJob =
-  | { kind: "job"; id: string; jobNumber: string; client: string; status: JobStatus }
+  | { kind: "job"; id: string; jobNumber: string; client: string; status: JobStatus; mapsUrl?: string | null }
   | { kind: "checkout" }
   | null;
 
@@ -65,6 +65,7 @@ export function JobFlow({
   waitFor = null,
   next = null,
   unpaid = false,
+  mapsUrl = null,
 }: {
   jobId: string;
   initialStatus: JobStatus;
@@ -82,6 +83,8 @@ export function JobFlow({
   next?: NextJob;
   /** Payment is open on this job but not marked yet. */
   unpaid?: boolean;
+  /** Directions to the site, opened as soon as the trip starts. */
+  mapsUrl?: string | null;
 }) {
   const router = useRouter();
   const [status, setStatus] = useState(initialStatus);
@@ -110,12 +113,13 @@ export function JobFlow({
         setBusy(null);
         setError(err.message);
         router.refresh();
-        return;
+        return false;
       }
       setStatus(to);
     }
     setBusy(null);
     router.refresh();
+    return true;
   }
 
   async function reached() {
@@ -282,17 +286,22 @@ export function JobFlow({
       {preArrival && depot === "APPROVED" && !waitFor ? (
         status === "EN_ROUTE" ? (
           <>
-            <StepStatus tone="go">On the way. Tap I&apos;ve reached when you arrive</StepStatus>
+            <StepStatus tone="go">On the way. Tap I&apos;ve reached the site when you arrive</StepStatus>
             <BigButton busy={busy} onClick={() => void reached()} icon="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11ZM12 12.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z">
               I&apos;ve reached the site
             </BigButton>
           </>
         ) : (
           <>
-            <StepStatus tone="go">Start the trip when you leave for the site</StepStatus>
+            <StepStatus tone="go">Tap Start trip when you leave. It opens the map to the site.</StepStatus>
             <BigButton
               busy={busy}
-              onClick={() => void advance(status === "ASSIGNED" ? ["CHECKED_IN", "EN_ROUTE"] : ["EN_ROUTE"], "Starting trip…")}
+              onClick={() =>
+                void advance(status === "ASSIGNED" ? ["CHECKED_IN", "EN_ROUTE"] : ["EN_ROUTE"], "Starting trip…").then((ok) => {
+                  // Straight into directions; back in the app, the step is "I've reached".
+                  if (ok && mapsUrl) window.location.href = mapsUrl;
+                })
+              }
               icon="m3 11 18-8-8 18-2-8-8-2Z"
             >
               Start trip
@@ -559,7 +568,13 @@ function AfterCompleted({ next, unpaid }: { next: NonNullable<NextJob>; unpaid: 
         return;
       }
     }
-    router.push(`/s/jobs/${next.id}`);
+    // Into directions to the next site; back in the app, that job asks "I've reached".
+    if (next.mapsUrl) {
+      // Coming back from Maps lands on the next job, not this finished one.
+      window.history.replaceState(null, "", `/s/jobs/${next.id}`);
+      window.location.href = next.mapsUrl;
+    }
+    else router.push(`/s/jobs/${next.id}`);
   }
 
   return (
