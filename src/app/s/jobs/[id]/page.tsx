@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { requireRole } from "@/lib/data/session";
 import { getJobDetail } from "@/lib/data/jobs";
 import { AppShell } from "@/components/AppShell";
@@ -8,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { parseEwkbPoint } from "@/lib/location-link";
 import type { ApprovalStatus } from "@/lib/domain/database";
 import { PAYMENTS_START_AT, rupees } from "@/lib/domain/payments";
+import { formatIstDate, formatIstTime } from "@/lib/domain/checkin-policy";
 import { JobFlow, type FlowUnit } from "./JobFlow";
 import { CollectPayment } from "./CollectPayment";
 
@@ -72,6 +72,7 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
     <AppShell
       profile={profile}
       title={detail.job.job_number}
+      back="/s"
       nav={[
         { href: "/s", label: "Today" },
         { href: "/s/roadmap", label: "Roadmap" },
@@ -80,9 +81,20 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
       ]}
     >
       <div className="space-y-4">
-        {unlocked && job.status !== "COMPLETED" ? (
-          <NavigateButton address={job.site_address} pin={parseEwkbPoint(job.site_location)} />
-        ) : null}
+        <JobHeader
+          client={detail.client?.name ?? "Client"}
+          phone={detail.client?.phone ?? null}
+          service={service?.name ?? null}
+          when={`${formatIstDate(job.scheduled_start)} · ${formatIstTime(job.scheduled_start)}`}
+          address={job.site_address}
+          landmark={job.site_landmark}
+          quoted={job.quoted_amount != null ? Number(job.quoted_amount) : null}
+          // The location is the reward for an approved depot check-in.
+          mapsHref={
+            unlocked && job.status !== "COMPLETED" ? mapsLink(job.site_address, parseEwkbPoint(job.site_location)) : null
+          }
+          mapNote={job.status === "COMPLETED" ? "Job finished" : "Map opens after check-in"}
+        />
         <JobFlow
           // Remount when the server state moves (e.g. an approval arrives via
           // AutoRefresh) so local state never shows a stale step.
@@ -98,8 +110,8 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
           completedAt={job.completed_at}
         />
         {canCollect && paid?.length ? (
-          <section className="rounded-2xl border border-ok-100 bg-ok-50 p-4">
-            <h2 className="font-semibold text-ok-700">Payment marked</h2>
+          <section className="rounded-3xl bg-ok-50 p-5 ring-1 ring-ok-100">
+            <h2 className="text-lg font-bold text-ok-700">Payment marked</h2>
             <ul className="mt-1 text-sm text-ok-700">
               {paid.map((p) => (
                 <li key={p.id}>
@@ -120,38 +132,99 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
             workers={workers ?? []}
           />
         ) : null}
-        <JobDetailView detail={detail} />
-        <Link
-          href="/s"
-          className="tap-lg flex items-center justify-center rounded-2xl border-2 border-slate-300 font-semibold text-slate-700"
-        >
-          Back to today
-        </Link>
+        <JobDetailView detail={detail} hideSummary />
       </div>
     </AppShell>
   );
 }
 
-function NavigateButton({
-  address,
-  pin,
-}: {
-  address: string;
-  pin: { lat: number; lng: number } | null;
-}) {
+function mapsLink(address: string, pin: { lat: number; lng: number } | null): string {
   // Hand off to whichever map app the supervisor already knows. Building a
   // turn-by-turn view would be worse than Google's in every respect. The pin
   // goes first: it is what the rep placed (often pasted from the client's own
   // WhatsApp location), and Indian street addresses rarely geocode exactly.
   const q = pin ? `${pin.lat},${pin.lng}` : encodeURIComponent(address);
+  return `https://www.google.com/maps/dir/?api=1&destination=${q}`;
+}
+
+/** Who, what, when and where, with the two things a supervisor taps most. */
+function JobHeader({
+  client,
+  phone,
+  service,
+  when,
+  address,
+  landmark,
+  quoted,
+  mapsHref,
+  mapNote,
+}: {
+  client: string;
+  phone: string | null;
+  service: string | null;
+  when: string;
+  address: string;
+  landmark: string | null;
+  quoted: number | null;
+  mapsHref: string | null;
+  /** Shown in place of Navigate when there is no map to open. */
+  mapNote: string;
+}) {
   return (
-    <a
-      href={`https://www.google.com/maps/dir/?api=1&destination=${q}`}
-      target="_blank"
-      rel="noreferrer"
-      className="tap-lg flex items-center justify-center rounded-2xl bg-brand-700 font-semibold text-white"
-    >
-      Navigate there
-    </a>
+    <section className="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-slate-200">
+      <div className="bg-gradient-to-br from-brand-600 to-brand-900 p-5 text-white">
+        <p className="text-xs font-semibold uppercase tracking-wider text-white/75">{service ?? "Job"}</p>
+        <p className="mt-1 text-2xl font-bold leading-tight tracking-tight">{client}</p>
+        <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold">
+          <span className="rounded-full bg-white/15 px-2.5 py-1">{when}</span>
+          {quoted != null ? <span className="rounded-full bg-white/15 px-2.5 py-1">{rupees(quoted)}</span> : null}
+        </div>
+      </div>
+      <div className="space-y-4 p-5">
+        <p className="flex items-start gap-2 text-sm text-slate-700">
+          <svg viewBox="0 0 24 24" className="mt-0.5 size-5 shrink-0 text-brand-700" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11ZM12 12.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z" />
+          </svg>
+          <span>
+            {address}
+            {landmark ? <span className="block text-slate-500">{landmark}</span> : null}
+          </span>
+        </p>
+        <div className="grid grid-cols-2 gap-2">
+          {mapsHref ? (
+            <a
+              href={mapsHref}
+              target="_blank"
+              rel="noreferrer"
+              className="tap flex items-center justify-center gap-2 rounded-2xl bg-brand-700 text-sm font-bold text-white active:scale-[0.98]"
+            >
+              <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="m3 11 18-8-8 18-2-8-8-2Z" />
+              </svg>
+              Navigate
+            </a>
+          ) : (
+            <span className="tap flex items-center justify-center gap-1.5 rounded-2xl bg-slate-100 px-2 text-center text-xs font-semibold text-slate-500">
+              {mapNote}
+            </span>
+          )}
+          {phone ? (
+            <a
+              href={`tel:${phone}`}
+              className="tap flex items-center justify-center gap-2 rounded-2xl bg-brand-50 text-sm font-bold text-brand-800 active:scale-[0.98]"
+            >
+              <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M5 4h3.5l1.5 4.5-2 1.5a11 11 0 0 0 6 6l1.5-2 4.5 1.5V19a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" />
+              </svg>
+              Call client
+            </a>
+          ) : (
+            <span className="tap flex items-center justify-center rounded-2xl bg-slate-100 text-xs font-semibold text-slate-500">
+              No phone number
+            </span>
+          )}
+        </div>
+      </div>
+    </section>
   );
 }

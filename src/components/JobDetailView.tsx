@@ -22,9 +22,12 @@ export function renderValue(field: ServiceField, raw: unknown): string {
 export function JobDetailView({
   detail,
   showAudit = false,
+  hideSummary = false,
 }: {
   detail: JobDetail;
   showAudit?: boolean;
+  /** The supervisor's job screen has its own header card with these facts. */
+  hideSummary?: boolean;
 }) {
   const { job, client, service, lineItems, jobFields, lineItemFields, events, photos, supervisorName, payment } = detail;
 
@@ -36,7 +39,8 @@ export function JobDetailView({
   return (
     <div className="space-y-4">
       {/* --------------------------------------------------------- summary */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-4">
+      {hideSummary ? null : (
+      <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-lg font-semibold text-slate-900">{client?.name ?? "Client"}</p>
@@ -90,11 +94,12 @@ export function JobDetailView({
           ))}
         </div>
       </section>
+      )}
 
       {/* ------------------------------------------------- service details */}
       {jobFields.length ? (
-        <section className="rounded-2xl border border-slate-200 bg-white p-4">
-          <h2 className="mb-2 font-semibold text-slate-900">Job details</h2>
+        <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+          <h2 className="mb-2 text-lg font-bold text-slate-900">Job details</h2>
           <dl className="space-y-1.5 text-sm">
             {jobFields.map((f) => (
               <Row key={f.id} k={f.label} v={renderValue(f, job.service_details?.[f.key])} />
@@ -106,13 +111,13 @@ export function JobDetailView({
       {/* ------------------------------------------------------ line items */}
       {lineItems.length ? (
         <section className="space-y-2">
-          <h2 className="px-1 font-semibold text-slate-900">
+          <h2 className="px-1 text-lg font-bold text-slate-900">
             {lineItems.length} {service?.has_line_items ? (lineItems.length === 1 ? service.line_item_singular : service.line_item_plural) : "items"}
           </h2>
           {lineItems.map((li) => {
             const ba = beforeAfter(li.id);
             return (
-              <div key={li.id} className="rounded-2xl border border-slate-200 bg-white p-4">
+              <div key={li.id} className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
                 <div className="flex items-center justify-between">
                   <p className="font-semibold text-slate-800">{li.label}</p>
                   {li.is_done ? (
@@ -139,8 +144,8 @@ export function JobDetailView({
 
       {/* ------------------------------------------------------ audit trail */}
       {showAudit && events.length ? (
-        <section className="rounded-2xl border border-slate-200 bg-white p-4">
-          <h2 className="mb-2 font-semibold text-slate-900">History</h2>
+        <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+          <h2 className="mb-2 text-lg font-bold text-slate-900">History</h2>
           <ol className="space-y-2 text-sm">
             {events.map((e) => (
               <li key={e.id} className="flex gap-3 border-b border-slate-100 pb-2 last:border-0">

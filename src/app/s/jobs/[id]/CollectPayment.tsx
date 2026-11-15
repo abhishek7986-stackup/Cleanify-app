@@ -60,9 +60,9 @@ export function CollectPayment({
   }
 
   return (
-    <section className="space-y-4 rounded-2xl border-2 border-brand-200 bg-white p-4">
+    <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
       <div>
-        <h2 className="text-lg font-semibold text-slate-900">Collect payment</h2>
+        <h2 className="text-lg font-bold text-slate-900">Collect payment</h2>
         <p className="text-sm text-slate-600">
           {quoted != null ? `Quoted ${rupees(quoted)}. ` : ""}Ask the customer how they want to pay.
         </p>
@@ -191,7 +191,7 @@ export function CollectPayment({
         type="button"
         disabled={!ready || busy}
         onClick={() => void submit()}
-        className="tap-lg w-full rounded-2xl bg-brand-700 text-base font-semibold text-white disabled:opacity-40"
+        className="tap-lg w-full rounded-2xl bg-brand-700 text-base font-bold text-white shadow-sm active:scale-[0.98] disabled:bg-slate-200 disabled:text-slate-500 disabled:shadow-none"
       >
         {busy ? "Saving…" : `Mark ${rupees(totalNum)} received`}
       </button>

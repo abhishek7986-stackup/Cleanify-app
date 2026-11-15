@@ -219,7 +219,7 @@ export function JobFlow({
   }
 
   return (
-    <section className="space-y-3 rounded-2xl border-2 border-brand-200 bg-white p-4">
+    <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
       <Stepper status={status} before={beforeStatus} after={afterStatus} />
 
       {/* -------------------------------------------- before arriving */}
@@ -230,14 +230,15 @@ export function JobFlow({
           </Waiting>
         ) : (
           <div className="space-y-3">
-            <p className="text-sm text-slate-600">
+            <p className="flex items-start gap-2 rounded-2xl bg-slate-50 p-3 text-sm text-slate-600">
+              <Glyph d="M7 11V8a5 5 0 0 1 10 0v3M5.5 11h13v9.5h-13z" />
               {depot === "REJECTED"
                 ? "Your depot photos were rejected. Retake them to unlock this job."
                 : "Check in at the depot first. The job unlocks once your photos are approved."}
             </p>
             <a
               href="/s/checkin"
-              className="tap-lg flex items-center justify-center rounded-2xl bg-brand-700 font-semibold text-white"
+              className="tap-lg flex items-center justify-center rounded-2xl bg-brand-700 text-base font-bold text-white active:scale-[0.98]"
             >
               {depot === "REJECTED" ? "Retake depot photos" : "Go to depot check-in"}
             </a>
@@ -247,7 +248,7 @@ export function JobFlow({
 
       {preArrival && depot === "APPROVED" ? (
         <div className="space-y-2">
-          <BigButton busy={busy} onClick={() => void reached()}>
+          <BigButton busy={busy} onClick={() => void reached()} icon="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11ZM12 12.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z">
             I&apos;ve reached the site
           </BigButton>
           {status !== "EN_ROUTE" ? (
@@ -257,7 +258,7 @@ export function JobFlow({
               onClick={() =>
                 void advance(status === "ASSIGNED" ? ["CHECKED_IN", "EN_ROUTE"] : ["EN_ROUTE"], "Starting trip…")
               }
-              className="tap-lg w-full rounded-2xl border-2 border-brand-600 font-semibold text-brand-700 disabled:opacity-40"
+              className="tap-lg w-full rounded-2xl bg-brand-50 text-base font-bold text-brand-800 active:scale-[0.98] disabled:opacity-40"
             >
               Start trip
             </button>
@@ -274,8 +275,11 @@ export function JobFlow({
 
       {status === "ON_SITE" && beforeStatus === "APPROVED" ? (
         <div className="space-y-2">
-          <p className="rounded-xl bg-ok-50 p-3 text-sm font-medium text-ok-700">Before photos approved.</p>
-          <BigButton busy={busy} onClick={() => void advance(["IN_PROGRESS"], "Starting…")}>
+          <p className="flex items-center gap-2 rounded-2xl bg-ok-50 p-3 text-sm font-semibold text-ok-700">
+            <Glyph d="m5 12.5 4.5 4.5L19 7.5" />
+            Before photos approved
+          </p>
+          <BigButton busy={busy} onClick={() => void advance(["IN_PROGRESS"], "Starting…")} icon="M8 5.5v13l10.5-6.5L8 5.5Z">
             Start cleaning
           </BigButton>
         </div>
@@ -291,7 +295,7 @@ export function JobFlow({
             </p>
           )}
           {units.map((u) => (
-            <div key={u.id} className="space-y-3 rounded-xl border-2 border-slate-200 p-3">
+            <div key={u.id} className="space-y-3 rounded-2xl bg-slate-50 p-3 ring-1 ring-slate-100">
               <UnitPhotoRow
                 unit={u}
                 which="before"
@@ -332,12 +336,12 @@ export function JobFlow({
             </p>
           )}
           {units.map((u) => (
-            <div key={u.id} className="rounded-xl border-2 border-slate-200 p-3">
+            <div key={u.id}>
               <UnitPhotoRow unit={u} which="after" onShoot={() => setCamera({ unit: u, kind: "SITE_AFTER" })} />
             </div>
           ))}
           <label className="block">
-            <span className="mb-1.5 block text-sm font-medium text-slate-700">
+            <span className="mb-1.5 block text-sm font-bold text-slate-800">
               Notes <span className="font-normal text-slate-400">(optional)</span>
             </span>
             <textarea
@@ -345,7 +349,7 @@ export function JobFlow({
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder={`e.g. ${units.length} ${units.length === 1 ? noun : `${noun}s`} cleaned and disinfected`}
-              className="w-full rounded-xl border-2 border-slate-200 bg-white px-3 py-2 text-base outline-none focus:border-brand-600"
+              className="w-full rounded-2xl bg-slate-50 px-4 py-3 text-base outline-none ring-2 ring-slate-200 focus:ring-brand-600"
             />
           </label>
           <BigButton busy={busy} disabled={!allAfter} onClick={() => void sendAfter()}>
@@ -357,7 +361,7 @@ export function JobFlow({
         </div>
       ) : null}
 
-      {error ? <p className="rounded-xl bg-danger-50 p-3 text-sm text-danger-700">{error}</p> : null}
+      {error ? <p className="rounded-2xl bg-danger-50 p-3 text-sm font-medium text-danger-700">{error}</p> : null}
 
       {camera ? (
         <LiveCameraCapture
@@ -399,12 +403,41 @@ function Stepper({
     { label: "Cleaning", on: at >= 4 },
     { label: "After OK", on: after === "APPROVED" || at >= 5 },
   ];
+  const current = steps.findIndex((s) => !s.on);
   return (
-    <ol className="flex gap-1 text-[11px]">
-      {steps.map((s) => (
-        <li key={s.label} className="flex-1">
-          <div className={`h-1.5 rounded-full ${s.on ? "bg-brand-600" : "bg-slate-200"}`} />
-          <p className={`mt-1 ${s.on ? "font-semibold text-brand-700" : "text-slate-400"}`}>{s.label}</p>
+    <ol className="flex">
+      {steps.map((s, i) => (
+        <li key={s.label} className="relative flex flex-1 flex-col items-center text-center">
+          {i > 0 ? (
+            <span
+              aria-hidden
+              className={`absolute right-1/2 top-3.5 h-0.5 w-full -translate-y-1/2 ${steps[i - 1].on ? "bg-brand-600" : "bg-slate-200"}`}
+            />
+          ) : null}
+          <span
+            className={`relative z-10 flex size-7 items-center justify-center rounded-full text-xs font-bold ${
+              s.on
+                ? "bg-brand-600 text-white"
+                : i === current
+                  ? "bg-white text-brand-700 ring-2 ring-brand-600"
+                  : "bg-slate-100 text-slate-400"
+            }`}
+          >
+            {s.on ? (
+              <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="m5 12.5 4.5 4.5L19 7.5" />
+              </svg>
+            ) : (
+              i + 1
+            )}
+          </span>
+          <span
+            className={`mt-1.5 text-[11px] leading-tight ${
+              s.on ? "font-semibold text-brand-700" : i === current ? "font-bold text-slate-900" : "text-slate-400"
+            }`}
+          >
+            {s.label}
+          </span>
         </li>
       ))}
     </ol>
@@ -413,58 +446,72 @@ function Stepper({
 
 function UnitPhotoRow({ unit, which, onShoot }: { unit: FlowUnit; which: "before" | "after"; onShoot: () => void }) {
   const state = unit[which];
+  const taken = state !== "none";
   return (
-    <div className="flex items-center gap-3">
+    <button
+      type="button"
+      onClick={onShoot}
+      className={`flex w-full items-center gap-3 rounded-2xl p-3 text-left active:scale-[0.99] ${
+        taken ? "bg-ok-50 ring-2 ring-ok-600" : "border-2 border-dashed border-brand-600/50 bg-white"
+      }`}
+    >
       <span
         aria-hidden
-        className={`flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-          state === "none" ? "bg-slate-100 text-slate-400" : "bg-ok-600 text-white"
+        className={`flex size-12 shrink-0 items-center justify-center rounded-2xl ${
+          taken ? "bg-ok-600 text-white" : "bg-brand-50 text-brand-700"
         }`}
       >
-        {state === "none" ? "·" : "✓"}
+        <Glyph
+          big
+          d={
+            taken
+              ? "m5 12.5 4.5 4.5L19 7.5"
+              : "M4 8.5A2.5 2.5 0 0 1 6.5 6h1.7l1.3-2h5l1.3 2h1.7A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5v-8ZM12 16a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z"
+          }
+        />
       </span>
-      <div className="min-w-0 flex-1">
-        <p className="font-semibold text-slate-900">{unit.label}</p>
-        <p className="text-xs text-slate-500">
+      <span className="min-w-0 flex-1">
+        <span className="block font-bold text-slate-900">{unit.label}</span>
+        <span className="block text-xs text-slate-500">
           {state === "saved"
-            ? `${which === "before" ? "Before" : "After"} photo saved`
+            ? `${which === "before" ? "Before" : "After"} photo saved · tap to retake`
             : state === "queued"
               ? "Saved on this phone, uploads when there is signal"
-              : `No ${which} photo yet`}
-        </p>
-      </div>
-      <button
-        type="button"
-        onClick={onShoot}
-        className={`tap shrink-0 rounded-xl px-4 text-sm font-semibold ${
-          state === "none" ? "bg-brand-700 text-white" : "border-2 border-slate-200 text-slate-600"
-        }`}
-      >
-        {state === "none" ? "Photo" : "Retake"}
-      </button>
-    </div>
+              : `Take the ${which} photo`}
+        </span>
+      </span>
+      {!taken ? (
+        <span className="shrink-0 rounded-full bg-brand-700 px-3 py-1.5 text-xs font-bold text-white">Camera</span>
+      ) : null}
+    </button>
   );
 }
 
 function Waiting({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-xl bg-brand-50 p-4">
+    <div className="flex items-start gap-3 rounded-2xl bg-brand-50 p-4">
       <AutoRefresh seconds={8} />
-      <p className="flex items-center gap-2 font-semibold text-brand-800">
-        <span className="size-2.5 animate-pulse rounded-full bg-brand-600" aria-hidden />
-        {title}
-      </p>
-      <p className="mt-1 text-sm text-brand-900">{children}</p>
-      <p className="mt-2 text-xs text-brand-700">This updates by itself.</p>
+      <span className="relative flex size-11 shrink-0 items-center justify-center rounded-full bg-white text-brand-700">
+        <span className="absolute inset-0 animate-ping rounded-full bg-brand-200/60" aria-hidden />
+        <Glyph d="M12 7v5l3 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" />
+      </span>
+      <div className="min-w-0">
+        <p className="font-bold text-brand-900">{title}</p>
+        <p className="mt-0.5 text-sm text-brand-900">{children}</p>
+        <p className="mt-1.5 text-xs text-brand-700">This updates by itself.</p>
+      </div>
     </div>
   );
 }
 
 function Rejected({ reason, children }: { reason: string | null; children: React.ReactNode }) {
   return (
-    <div className="rounded-xl bg-danger-50 p-3 text-sm text-danger-700">
-      <p className="font-semibold">Not approved{reason ? `: ${reason}` : ""}</p>
-      <p className="mt-0.5">{children}</p>
+    <div className="flex items-start gap-2 rounded-2xl bg-danger-50 p-4 text-sm text-danger-700 ring-1 ring-danger-100">
+      <Glyph d="M12 8v5M12 16.5v.5M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" />
+      <div>
+        <p className="font-bold">Not approved{reason ? `: ${reason}` : ""}</p>
+        <p className="mt-0.5">{children}</p>
+      </div>
     </div>
   );
 }
@@ -474,19 +521,23 @@ function BigButton({
   onClick,
   busy,
   disabled,
+  icon,
 }: {
   children: React.ReactNode;
   onClick: () => void;
   busy: string | null;
   disabled?: boolean;
+  /** Optional SVG path drawn before the label. */
+  icon?: string;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={disabled || busy !== null}
-      className="tap-lg w-full rounded-2xl bg-brand-700 text-base font-semibold text-white disabled:opacity-40"
+      className="tap-lg flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-700 text-base font-bold text-white shadow-sm active:scale-[0.98] disabled:bg-slate-200 disabled:text-slate-500 disabled:shadow-none"
     >
+      {busy ? null : icon ? <Glyph d={icon} /> : null}
       {busy ?? children}
     </button>
   );
@@ -494,9 +545,38 @@ function BigButton({
 
 function Panel({ tone, title, children }: { tone: "ok" | "plain"; title: string; children: React.ReactNode }) {
   return (
-    <div className={`rounded-2xl border p-4 ${tone === "ok" ? "border-ok-100 bg-ok-50" : "border-slate-200 bg-white"}`}>
-      <p className={`font-semibold ${tone === "ok" ? "text-ok-700" : "text-slate-900"}`}>{title}</p>
-      <p className={`mt-1 text-sm ${tone === "ok" ? "text-ok-700" : "text-slate-600"}`}>{children}</p>
+    <div
+      className={`flex items-center gap-3 rounded-3xl p-5 ring-1 ${
+        tone === "ok" ? "bg-ok-50 ring-ok-100" : "bg-white shadow-sm ring-slate-200"
+      }`}
+    >
+      {tone === "ok" ? (
+        <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-ok-600 text-white">
+          <Glyph big d="m5 12.5 4.5 4.5L19 7.5" />
+        </span>
+      ) : null}
+      <div className="min-w-0">
+        <p className={`text-lg font-bold ${tone === "ok" ? "text-ok-700" : "text-slate-900"}`}>{title}</p>
+        <p className={`mt-0.5 text-sm ${tone === "ok" ? "text-ok-700" : "text-slate-600"}`}>{children}</p>
+      </div>
     </div>
+  );
+}
+
+/** A line icon; `d` is the SVG path. */
+function Glyph({ d, big }: { d: string; big?: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={`${big ? "size-6" : "size-5"} shrink-0`}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path d={d} />
+    </svg>
   );
 }
