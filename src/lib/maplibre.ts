@@ -1,4 +1,4 @@
-import { setWorkerUrl } from "maplibre-gl";
+import { getVersion, setWorkerUrl } from "maplibre-gl";
 
 /**
  * Point MapLibre at its worker, served as a plain file from public/maplibre
@@ -7,5 +7,7 @@ import { setWorkerUrl } from "maplibre-gl";
  * Call before creating a map; repeating it is harmless.
  */
 export function setupMaplibreWorker() {
-  setWorkerUrl("/maplibre/maplibre-gl-worker.mjs");
+  // The version in the URL keeps a phone from using a cached worker from an
+  // older MapLibre after an upgrade.
+  setWorkerUrl(`/maplibre/maplibre-gl-worker.mjs?v=${getVersion()}`);
 }
