@@ -13,7 +13,8 @@
     "demo:week": "node --env-file=.env.local scripts/demo-week.mjs",
     "db:push": "node --env-file=.env.local scripts/migrate.mjs",
     "db:status": "node --env-file=.env.local scripts/migrate.mjs --status",
-    "test:e2e": "next build && playwright test"
+    "test:e2e": "next build && playwright test",
+    "postinstall": "node scripts/copy-maplibre-worker.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",

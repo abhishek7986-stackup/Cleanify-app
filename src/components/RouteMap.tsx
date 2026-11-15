@@ -11,6 +11,7 @@ import {
   type StyleSpecification,
 } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import { setupMaplibreWorker } from "@/lib/maplibre";
 
 /**
  * The day on one map: the depot, then each job as a numbered pin in the order
@@ -62,6 +63,7 @@ export function RouteMap({
     const points = [...(depot ? [depot] : []), ...stops];
     const first = points[0] ?? { lat: 17.4401, lng: 78.3489 };
 
+    setupMaplibreWorker();
     const m = new MapLibreMap({
       container: container.current,
       style: OSM_STYLE,

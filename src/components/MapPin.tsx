@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 // maplibre-gl ships ESM with no default export — named imports only.
 import { Map as MapLibreMap, NavigationControl, type StyleSpecification } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import { setupMaplibreWorker } from "@/lib/maplibre";
 
 /**
  * ============================================================================
@@ -68,6 +69,7 @@ export function MapPin({
     // Default view: Hyderabad. Overridden immediately if a pin already exists.
     const start = value ?? { lat: 17.4401, lng: 78.3489 };
 
+    setupMaplibreWorker();
     const m = new MapLibreMap({
       container: container.current,
       style: OSM_STYLE,

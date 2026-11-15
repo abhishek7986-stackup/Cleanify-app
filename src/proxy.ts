@@ -119,8 +119,9 @@ export const config = {
     /*
      * Everything except static assets and the service worker. `sw.js` in
      * particular must never be redirected — a service worker that 302s to
-     * /login will not register.
+     * /login will not register. maplibre/ is the map's worker, loaded as a
+     * plain script; redirected to /login it breaks every map.
      */
-    "/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|sw.js|icons/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|woff2?)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|sw.js|icons/|maplibre/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|woff2?)$).*)",
   ],
 };
