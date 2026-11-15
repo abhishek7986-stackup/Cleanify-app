@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getSessionUserId, requireRole } from "@/lib/data/session";
-import { getSupervisorDay } from "@/lib/data/supervisor";
+import { getSupervisorDay, getUnpaidFinishedJobs } from "@/lib/data/supervisor";
 import { AppShell } from "@/components/AppShell";
 import { InstallGate } from "@/components/InstallGate";
 import { TravelRefresh } from "@/components/TravelRefresh";
@@ -59,6 +59,8 @@ export default async function SupervisorToday() {
             : current
               ? "working"
               : "finished";
+  // The day closes only once every finished job's money is marked.
+  const unpaid = phase === "finished" ? await getUnpaidFinishedJobs(jobs) : [];
 
   return (
     <AppShell
@@ -76,7 +78,7 @@ export default async function SupervisorToday() {
         phase === "none" ||
         phase === "off" ||
         (phase === "working" && current != null && ["ASSIGNED", "CHECKED_IN", "EN_ROUTE"].includes(current.status)) ? undefined : (
-          <ActionBar phase={phase} current={current} />
+          <ActionBar phase={phase} current={current} unpaid={unpaid} />
         )
       }
     >
@@ -118,7 +120,16 @@ export default async function SupervisorToday() {
         ) : phase === "working" && current ? (
           <CurrentStop job={current} index={currentIndex + 1} total={jobs.length} unlocked={approved} info={info} />
         ) : phase === "finished" ? (
-          <Empty title="All jobs done" body="Take a selfie and the scooter km photo to check out and end your day." />
+          unpaid.length ? (
+            <Empty
+              title="Mark the payment to finish"
+              body={`${unpaid.map((u) => u.name).join(", ")}: no payment marked yet. Check-out opens once ${
+                unpaid.length === 1 ? "it is" : "they are"
+              } marked. If the customer has not paid, call the office.`}
+            />
+          ) : (
+            <Empty title="All jobs done" body="Take a selfie and the scooter km photo to check out and end your day." />
+          )
         ) : (
           <Empty
             title="Day finished"
@@ -331,7 +342,15 @@ function mapsUrlFor(pin: { lat: number; lng: number }): string {
 }
 
 /** The fixed bar above the tabs: one full-width button for the next step. */
-function ActionBar({ phase, current }: { phase: Phase; current: DayJob | null }) {
+function ActionBar({
+  phase,
+  current,
+  unpaid,
+}: {
+  phase: Phase;
+  current: DayJob | null;
+  unpaid: { id: string; name: string }[];
+}) {
   const primary = "flex h-14 w-full items-center justify-center gap-2 rounded-lg bg-brand-950 text-base font-semibold text-white active:bg-brand-900";
   const quiet = "flex h-14 w-full items-center justify-center gap-2 rounded-lg bg-slate-100 text-[0.9375rem] font-semibold text-slate-500";
   switch (phase) {
@@ -366,6 +385,18 @@ function ActionBar({ phase, current }: { phase: Phase; current: DayJob | null })
       );
     }
     case "finished":
+      // Money first: the bar takes them to the job whose payment is not marked.
+      if (unpaid.length) {
+        return (
+          <Link href={`/s/jobs/${unpaid[0].id}`} className={`${primary} justify-between px-5`}>
+            <span className="min-w-0 text-left leading-tight">
+              <span className="block text-xs font-medium text-white/70">Before check-out</span>
+              <span className="block truncate">Mark payment: {unpaid[0].name}</span>
+            </span>
+            <Glyph d="M5 12h14M13 6l6 6-6 6" />
+          </Link>
+        );
+      }
       return (
         <Link href="/s/checkout" className={primary}>
           Check out

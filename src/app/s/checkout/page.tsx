@@ -1,5 +1,6 @@
 import { getSessionUserId, requireRole } from "@/lib/data/session";
-import { getSupervisorDay } from "@/lib/data/supervisor";
+import Link from "next/link";
+import { getSupervisorDay, getUnpaidFinishedJobs } from "@/lib/data/supervisor";
 import { AppShell } from "@/components/AppShell";
 import { DayPhotosFlow } from "@/components/DayPhotosFlow";
 import { formatIstTime } from "@/lib/domain/checkin-policy";
@@ -16,6 +17,7 @@ export default async function CheckoutPage() {
   const r = day.roster;
   const startKm = r?.start_odometer_km != null ? Number(r.start_odometer_km) : null;
   const openJobs = day.jobs.filter((j) => !DONE_STATUSES.includes(j.status)).length;
+  const unpaid = openJobs === 0 && r && !r.checked_out_at ? await getUnpaidFinishedJobs(day.jobs) : [];
 
   return (
     <AppShell
@@ -45,6 +47,23 @@ export default async function CheckoutPage() {
           title="Check-out opens after your last job"
           body={`${openJobs} job${openJobs === 1 ? " is" : "s are"} still waiting to be finished and approved. Once the last one is approved, come back here to check out.`}
         />
+      ) : unpaid.length ? (
+        <>
+          <Notice
+            title="Mark the payment first"
+            body={`Check-out opens once every finished job has its payment marked. If the customer has not paid, call the office.`}
+          />
+          <ul className="sheet -mx-4 mt-3 divide-y divide-brand-950/[0.07]">
+            {unpaid.map((u) => (
+              <li key={u.id}>
+                <Link href={`/s/jobs/${u.id}`} className="flex min-h-14 items-center justify-between gap-3 px-4 active:bg-slate-50">
+                  <span className="min-w-0 truncate font-semibold text-slate-900">{u.name}</span>
+                  <span className="shrink-0 text-sm font-semibold text-danger-700">Mark payment</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </>
       ) : (
         <DayPhotosFlow
           mode="checkout"

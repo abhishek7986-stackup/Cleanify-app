@@ -544,7 +544,11 @@ function AfterCompleted({ next, unpaid }: { next: NonNullable<NextJob>; unpaid: 
     return (
       <>
         <StepStatus tone="ok">That was your last job today.</StepStatus>
-        <BigButton busy={busy} hint={hint} onClick={() => router.push("/s/checkout")} icon="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9">
+        <BigButton
+          busy={busy}
+          disabled={unpaid}
+          hint={unpaid ? "Mark the payment above. Check-out opens after that." : null}
+          onClick={() => router.push("/s/checkout")} icon="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9">
           Go to check-out
         </BigButton>
       </>
