@@ -548,7 +548,7 @@ export function NewJobWizard({
                       aria-pressed={items.length === n}
                       className={`tap flex-1 rounded-xl border-2 text-base font-semibold ${
                         items.length === n
-                          ? "border-brand-600 bg-brand-600 text-white"
+                          ? "border-brand-800 bg-brand-800 text-white"
                           : "border-slate-200 bg-white text-slate-700"
                       }`}
                     >
@@ -561,7 +561,7 @@ export function NewJobWizard({
                     aria-label={`One more ${service.line_item_singular?.toLowerCase()}`}
                     className={`tap flex-1 rounded-xl border-2 text-base font-semibold ${
                       items.length > QUICK_COUNTS.length
-                        ? "border-brand-600 bg-brand-600 text-white"
+                        ? "border-brand-800 bg-brand-800 text-white"
                         : "border-slate-200 bg-white text-slate-700"
                     }`}
                   >

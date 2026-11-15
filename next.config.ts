@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
   // so the Docker image for AWS needs no node_modules install. See Dockerfile.
   output: "standalone",
   poweredByHeader: false,
+  // The round "N" badge Next.js draws in development sat on the teal app bar
+  // and read as part of the app. Errors still show without it.
+  devIndicators: false,
 
   // The free odometer reader starts its engine from files on disk, so it must
   // run from node_modules rather than be bundled, and those files must ship

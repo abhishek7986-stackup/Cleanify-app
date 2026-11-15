@@ -130,7 +130,7 @@ export function CameraSnap({
             <button type="button" onClick={() => void start()} className="tap-lg flex-1 rounded-lg border-2 border-white/40 font-semibold">
               Retake
             </button>
-            <button type="button" onClick={() => onDone(shot.blob)} className="tap-lg flex-[2] rounded-lg bg-brand-500 font-semibold text-white">
+            <button type="button" onClick={() => onDone(shot.blob)} className="tap-lg flex-[2] rounded-lg bg-white font-semibold text-brand-950">
               Use this photo
             </button>
           </div>

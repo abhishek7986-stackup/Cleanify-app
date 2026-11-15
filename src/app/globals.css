@@ -20,6 +20,12 @@
      as raised without needing heavy shadows. */
   --color-canvas: #eef1f0;
 
+  /* Secondary text sits on the grey canvas as well as on white, often in
+     sunlight. Tailwind's stock slate-400/500 fall below 4.5:1 on the canvas,
+     so both are a step darker here. */
+  --color-slate-400: oklch(52% 0.046 257.417);
+  --color-slate-500: oklch(47.5% 0.046 257.417);
+
   --color-danger-50:  #fef2f2;
   --color-danger-100: #fee2e2;
   --color-danger-500: #ef4444;

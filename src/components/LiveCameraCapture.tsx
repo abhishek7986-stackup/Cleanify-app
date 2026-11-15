@@ -379,7 +379,7 @@ export function LiveCameraCapture({
             <button
               type="button"
               onClick={() => void confirm()}
-              className="tap-lg flex-[2] rounded-lg bg-brand-500 font-semibold text-white"
+              className="tap-lg flex-[2] rounded-lg bg-white font-semibold text-brand-950"
             >
               Use this photo
             </button>
