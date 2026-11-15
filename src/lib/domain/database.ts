@@ -893,6 +893,7 @@ export type Database = {
         Args: { p_job_id: string; p_kind: "camera" | "screenshot" | "call"; p_path?: string | null };
         Returns: undefined;
       };
+      office_contact_for_job: { Args: { p_job_id: string }; Returns: { full_name: string; phone: string }[] };
       confirm_payment_call: { Args: { p_payment_id: string }; Returns: undefined };
       verify_upi_payment: { Args: { p_payment_id: string }; Returns: undefined };
       void_job_payment: { Args: { p_job_id: string; p_reason: string }; Returns: undefined };

@@ -21,12 +21,15 @@ export function CollectPayment({
   quoted,
   upi,
   workers,
+  office,
 }: {
   jobId: string;
   jobNumber: string;
   quoted: number | null;
   upi: { id: string; name: string } | null;
   workers: { id: string; full_name: string }[];
+  /** Who to ring when there is no photo of the payment. */
+  office: { full_name: string; phone: string } | null;
 }) {
   const router = useRouter();
   const [method, setMethod] = useState<Method>("upi");
@@ -84,6 +87,8 @@ export function CollectPayment({
       });
       if (err) throw new Error(err.message);
       router.refresh();
+      // No photo: straight into the dialler with the office's number.
+      if (needsProof && proofKind === "call" && office) window.location.href = `tel:${office.phone.replace(/[^\d+]/g, "")}`;
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong");
     } finally {
@@ -164,7 +169,7 @@ export function CollectPayment({
       ) : null}
 
       {needsProof ? (
-        <UpiProof kind={proofKind} preview={preview} amount={upiAmount} onPick={pickProof} />
+        <UpiProof kind={proofKind} preview={preview} amount={upiAmount} office={office} onPick={pickProof} />
       ) : null}
 
       {method !== "upi" && cash > 0 ? (
@@ -229,7 +234,11 @@ export function CollectPayment({
         onClick={() => void submit()}
         className="tap-lg w-full rounded-lg bg-brand-950 active:bg-brand-900 text-base font-semibold text-white active:scale-[0.98] disabled:bg-slate-200 disabled:text-slate-500 disabled:shadow-none"
       >
-        {busy ? "Saving…" : `Mark ${rupees(totalNum)} received`}
+        {busy
+          ? "Saving…"
+          : needsProof && proofKind === "call" && office
+            ? `Mark ${rupees(totalNum)} received and call`
+            : `Mark ${rupees(totalNum)} received`}
       </button>
       {!proofDone ? (
         <p className="text-center text-sm text-slate-500">Add proof of the UPI payment first.</p>
@@ -255,11 +264,13 @@ function UpiProof({
   kind,
   preview,
   amount,
+  office,
   onPick,
 }: {
   kind: ProofKind | null;
   preview: string | null;
   amount: number;
+  office: { full_name: string; phone: string } | null;
   onPick: (kind: ProofKind, file: File | null) => void;
 }) {
   const options: { value: ProofKind; title: string; hint: string }[] = [
@@ -323,7 +334,9 @@ function UpiProof({
       ) : null}
       {kind === "call" ? (
         <p className="mt-2 rounded-xl bg-warn-50 p-3 text-sm text-warn-700">
-          Call the office now and tell them the amount. The payment stays open until they confirm it with the customer.
+          {office
+            ? `After you mark it, your phone opens the dialler to call ${office.full_name} (${office.phone}). Tell them the amount; the payment stays open until they confirm it with the customer.`
+            : "Call the office now and tell them the amount. The payment stays open until they confirm it with the customer."}
         </p>
       ) : null}
     </fieldset>

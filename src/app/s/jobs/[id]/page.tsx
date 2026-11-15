@@ -100,7 +100,7 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
   const canCollect =
     (job.status === "COMPLETED" && Boolean(job.completed_at) && new Date(job.completed_at!) >= new Date(PAYMENTS_START_AT)) ||
     (job.status === "IN_PROGRESS" && job.after_review !== null);
-  const [{ data: paid }, { data: workers }, { data: upiSetting }] = canCollect
+  const [{ data: paid }, { data: workers }, { data: upiSetting }, { data: contact }] = canCollect
     ? await Promise.all([
         supabase
           .from("payments")
@@ -109,8 +109,11 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
           .is("voided_at", null),
         supabase.rpc("list_workers"),
         supabase.from("app_settings").select("value").eq("key", "payments.upi").maybeSingle(),
+        supabase.rpc("office_contact_for_job", { p_job_id: job.id }),
       ])
-    : [{ data: null }, { data: null }, { data: null }];
+    : [{ data: null }, { data: null }, { data: null }, { data: null }];
+  const office = contact?.[0] ?? null;
+  const callPending = (paid ?? []).some((p) => p.proof_kind === "call" && !p.proof_confirmed_at);
 
   return (
     <AppShell
@@ -188,6 +191,14 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
               ))}
             </ul>
             {paid[0].note ? <p className="mt-1 text-sm text-ok-700">Note: {paid[0].note}</p> : null}
+            {callPending && office ? (
+              <a
+                href={`tel:${office.phone.replace(/[^\d+]/g, "")}`}
+                className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-brand-950 font-semibold text-white active:bg-brand-900"
+              >
+                Call {office.full_name} to confirm
+              </a>
+            ) : null}
             <p className="mt-2 text-xs text-ok-700">Wrong? Call the office. They can cancel it so you can mark it again.</p>
           </section>
         ) : canCollect ? (
@@ -197,6 +208,7 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
             quoted={job.quoted_amount != null ? Number(job.quoted_amount) : null}
             upi={(upiSetting?.value as { id: string; name: string } | undefined) ?? null}
             workers={workers ?? []}
+            office={office}
           />
         ) : null}
         {waitFor ? (
