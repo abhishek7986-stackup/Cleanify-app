@@ -370,6 +370,12 @@ export type Payment = {
   voided_at: string | null;
   voided_by: string | null;
   void_reason: string | null;
+  /** How the supervisor proved a UPI payment. */
+  proof_kind: "camera" | "screenshot" | "call" | null;
+  proof_path: string | null;
+  /** For "call": when the office confirmed it with the customer. */
+  proof_confirmed_at: string | null;
+  proof_confirmed_by: string | null;
 };
 
 export type PayStaff = {
@@ -871,6 +877,23 @@ export type Database = {
         };
         Returns: number;
       };
+      record_job_payment_with_proof: {
+        Args: {
+          p_job_id: string;
+          p_upi_amount: number;
+          p_cash_amount: number;
+          p_worker_ids?: string[];
+          p_note?: string | null;
+          p_proof_kind?: "camera" | "screenshot" | "call" | null;
+          p_proof_path?: string | null;
+        };
+        Returns: undefined;
+      };
+      attach_payment_proof: {
+        Args: { p_job_id: string; p_kind: "camera" | "screenshot" | "call"; p_path?: string | null };
+        Returns: undefined;
+      };
+      confirm_payment_call: { Args: { p_payment_id: string }; Returns: undefined };
       verify_upi_payment: { Args: { p_payment_id: string }; Returns: undefined };
       void_job_payment: { Args: { p_job_id: string; p_reason: string }; Returns: undefined };
       correct_job_payment: {

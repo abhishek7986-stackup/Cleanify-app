@@ -73,3 +73,15 @@ export async function getSignedBillUrls(paths: string[]): Promise<Record<string,
   for (const row of data ?? []) if (row.path && row.signedUrl) out[row.path] = row.signedUrl;
   return out;
 }
+
+/** Signed links to UPI payment proofs (photos and screenshots), for the office only. */
+export async function getSignedProofUrls(paths: string[]): Promise<Record<string, string>> {
+  const unique = [...new Set(paths.filter(Boolean))];
+  if (unique.length === 0) return {};
+  const profile = await getSessionProfile();
+  if (!profile || !["admin", "sales_rep"].includes(profile.role)) return {};
+  const { data } = await createAdminClient().storage.from("payment-proofs").createSignedUrls(unique, 60 * 30);
+  const out: Record<string, string> = {};
+  for (const row of data ?? []) if (row.path && row.signedUrl) out[row.path] = row.signedUrl;
+  return out;
+}

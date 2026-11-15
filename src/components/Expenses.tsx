@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { rupees } from "@/lib/domain/payments";
+import { compressImage as compress } from "@/lib/compress-image";
 
 export type Category = "fuel" | "chemicals" | "tools" | "food" | "travel" | "other";
 export const CATEGORY_LABEL: Record<Category, string> = {
@@ -37,19 +38,6 @@ const secondary =
 
 function dayLabel(iso: string) {
   return new Date(`${iso}T00:00:00+05:30`).toLocaleDateString("en-IN", { day: "numeric", month: "short", timeZone: "Asia/Kolkata" });
-}
-
-/** Shrinks a phone photo of a bill to a readable JPEG under ~1 MB. */
-async function compress(file: File): Promise<Blob> {
-  const img = await createImageBitmap(file);
-  const scale = Math.min(1, 1600 / Math.max(img.width, img.height));
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.round(img.width * scale);
-  canvas.height = Math.round(img.height * scale);
-  canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
-  return new Promise((resolve, reject) =>
-    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("Could not read the photo"))), "image/jpeg", 0.82),
-  );
 }
 
 /* -------------------------------------------------------------- supervisor */

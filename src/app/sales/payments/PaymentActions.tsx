@@ -33,6 +33,36 @@ export function VerifyUpiButton({ paymentId }: { paymentId: string }) {
   );
 }
 
+/** For a "call the office" UPI payment: tapped after confirming it with the customer. */
+export function ConfirmCallButton({ paymentId }: { paymentId: string }) {
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function confirm() {
+    setBusy(true);
+    setError(null);
+    const { error: err } = await createClient().rpc("confirm_payment_call", { p_payment_id: paymentId });
+    setBusy(false);
+    if (err) return setError(err.message);
+    router.refresh();
+  }
+
+  return (
+    <span className="shrink-0 text-right">
+      <button
+        type="button"
+        disabled={busy}
+        onClick={() => void confirm()}
+        className="tap rounded-xl bg-brand-950 px-3 text-sm font-semibold text-white active:bg-brand-900 disabled:opacity-40"
+      >
+        {busy ? "Saving…" : "Confirmed on call"}
+      </button>
+      {error ? <span className="mt-1 block text-xs text-danger-700">{error}</span> : null}
+    </span>
+  );
+}
+
 export function CancelPaymentButton({ jobId }: { jobId: string }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -179,9 +209,23 @@ export function CorrectPaymentButton({ jobId, upi, cash }: { jobId: string; upi:
   );
 }
 
-export function UpiSettings({ upi }: { upi: { id: string; name: string } | null }) {
+export type UpiChange = { at: string; by: string; from: string | null; to: string };
+
+/**
+ * The UPI ID every customer QR pays into. Only an admin can change it, since a
+ * swapped ID would quietly divert payments; each change is listed for them.
+ */
+export function UpiSettings({
+  upi,
+  canChange,
+  history = [],
+}: {
+  upi: { id: string; name: string } | null;
+  canChange: boolean;
+  history?: UpiChange[];
+}) {
   const router = useRouter();
-  const [open, setOpen] = useState(!upi);
+  const [open, setOpen] = useState(!upi && canChange);
   const [id, setId] = useState(upi?.id ?? "");
   const [name, setName] = useState(upi?.name ?? "");
   const [busy, setBusy] = useState(false);
@@ -197,15 +241,46 @@ export function UpiSettings({ upi }: { upi: { id: string; name: string } | null 
     router.refresh();
   }
 
+  if (!upi && !canChange) {
+    return (
+      <p className="rounded-lg border border-warn-100 bg-warn-50 p-3 text-sm text-warn-700">
+        The company UPI ID is not set up, so supervisors have no QR to show. Ask an admin to add it.
+      </p>
+    );
+  }
   if (!open) {
     return (
-      <div className="flex items-center justify-between gap-3 card p-3 text-sm">
-        <span className="min-w-0 break-words text-slate-600">
-          Customers pay <b className="text-slate-900">{upi?.name}</b> ({upi?.id})
-        </span>
-        <button type="button" onClick={() => setOpen(true)} className="tap shrink-0 text-sm font-semibold text-brand-700">
-          Change
-        </button>
+      <div className="card p-3 text-sm">
+        <div className="flex items-center justify-between gap-3">
+          <span className="min-w-0 break-words text-slate-600">
+            Customers pay <b className="text-slate-900">{upi?.name}</b> ({upi?.id})
+          </span>
+          {canChange ? (
+            <button type="button" onClick={() => setOpen(true)} className="tap shrink-0 text-sm font-semibold text-brand-700">
+              Change
+            </button>
+          ) : (
+            <span className="shrink-0 text-xs text-slate-500">Admin only</span>
+          )}
+        </div>
+        {canChange && history.length ? (
+          <details className="mt-1">
+            <summary className="tap flex cursor-pointer items-center text-sm font-medium text-slate-600">Change history</summary>
+            <ul className="divide-y divide-brand-950/[0.07] text-sm">
+              {history.map((h) => (
+                <li key={h.at} className="py-2">
+                  <span className="block text-slate-900">
+                    {h.from ? `${h.from} → ` : "Set to "}
+                    {h.to}
+                  </span>
+                  <span className="block text-xs text-slate-500">
+                    {h.by} · {h.at}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </details>
+        ) : null}
       </div>
     );
   }

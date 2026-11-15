@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import QRCode from "qrcode";
 import { createClient } from "@/lib/supabase/client";
 import { rupees, upiLink } from "@/lib/domain/payments";
+import { compressImage } from "@/lib/compress-image";
 
 type Method = "upi" | "cash" | "both";
+type ProofKind = "camera" | "screenshot" | "call";
 
 /**
  * After the work: show the customer the QR or take cash, then mark it. A plain
@@ -35,6 +37,17 @@ export function CollectPayment({
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [proofKind, setProofKind] = useState<ProofKind | null>(null);
+  const [proofFile, setProofFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+
+  useEffect(() => () => void (preview && URL.revokeObjectURL(preview)), [preview]);
+
+  function pickProof(kind: ProofKind, file: File | null) {
+    setProofKind(kind);
+    setProofFile(file);
+    setPreview(file ? URL.createObjectURL(file) : null);
+  }
 
   const totalNum = Number(total) || 0;
   const cash = method === "cash" ? totalNum : method === "both" ? Number(cashPart) || 0 : 0;
@@ -42,21 +55,40 @@ export function CollectPayment({
   const splitWrong = method === "both" && (cash <= 0 || cash >= totalNum);
   const differs = quoted != null && totalNum !== quoted;
   const teamChosen = alone || picked.length > 0;
-  const ready = totalNum > 0 && !splitWrong && teamChosen && (!differs || note.trim().length > 0);
+  const needsProof = upiAmount > 0 && !splitWrong;
+  const proofDone = !needsProof || proofKind === "call" || (proofKind !== null && proofFile !== null);
+  const ready = totalNum > 0 && !splitWrong && teamChosen && proofDone && (!differs || note.trim().length > 0);
 
   async function submit() {
     setError(null);
     setBusy(true);
-    const { error: err } = await createClient().rpc("record_job_payment", {
-      p_job_id: jobId,
-      p_upi_amount: upiAmount,
-      p_cash_amount: cash,
-      p_worker_ids: alone ? [] : picked,
-      p_note: note.trim() || null,
-    });
-    setBusy(false);
-    if (err) return setError(err.message);
-    router.refresh();
+    try {
+      const supabase = createClient();
+      let path: string | null = null;
+      if (needsProof && proofKind !== "call" && proofFile) {
+        const { data: auth } = await supabase.auth.getUser();
+        if (!auth.user) throw new Error("Sign in again");
+        const blob = await compressImage(proofFile);
+        path = `${auth.user.id}/${crypto.randomUUID()}.jpg`;
+        const up = await supabase.storage.from("payment-proofs").upload(path, blob, { contentType: "image/jpeg" });
+        if (up.error) throw new Error(up.error.message);
+      }
+      const { error: err } = await supabase.rpc("record_job_payment_with_proof", {
+        p_job_id: jobId,
+        p_upi_amount: upiAmount,
+        p_cash_amount: cash,
+        p_worker_ids: alone ? [] : picked,
+        p_note: note.trim() || null,
+        p_proof_kind: needsProof ? proofKind : null,
+        p_proof_path: path,
+      });
+      if (err) throw new Error(err.message);
+      router.refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Something went wrong");
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -126,9 +158,13 @@ export function CollectPayment({
           <UpiQr upi={upi} amount={upiAmount} jobNumber={jobNumber} />
         ) : (
           <p className="rounded-xl bg-warn-50 p-3 text-sm text-warn-700">
-            The company UPI ID is not set up yet, so there is no QR to show. Ask the office.
+            The company UPI ID is not set up yet, so there is no QR to show. Ask an admin to add it.
           </p>
         )
+      ) : null}
+
+      {needsProof ? (
+        <UpiProof kind={proofKind} preview={preview} amount={upiAmount} onPick={pickProof} />
       ) : null}
 
       {method !== "upi" && cash > 0 ? (
@@ -195,10 +231,102 @@ export function CollectPayment({
       >
         {busy ? "Saving…" : `Mark ${rupees(totalNum)} received`}
       </button>
-      {!teamChosen ? (
+      {!proofDone ? (
+        <p className="text-center text-sm text-slate-500">Add proof of the UPI payment first.</p>
+      ) : !teamChosen ? (
         <p className="text-center text-sm text-slate-500">Choose who worked with you, or &ldquo;I worked alone&rdquo;.</p>
       ) : null}
     </section>
+  );
+}
+
+const PROOF_ICON: Record<ProofKind, string> = {
+  camera: "M4 8.5A2.5 2.5 0 0 1 6.5 6h1.2l1.3-2h6l1.3 2h1.2A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5v-8ZM12 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z",
+  screenshot: "M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2ZM11 18h2M9 9l2 2 4-4",
+  call: "M5 4h3.5l1.5 4-2.2 1.4a11 11 0 0 0 4.8 4.8L14 12l4 1.5V17a2 2 0 0 1-2 2A13 13 0 0 1 3 6a2 2 0 0 1 2-2Z",
+};
+
+/**
+ * After the customer pays by UPI: proof the office can check. A live photo of
+ * the customer's success screen, a screenshot they sent, or (when neither is
+ * possible) a call to the office, who confirm it with the customer.
+ */
+function UpiProof({
+  kind,
+  preview,
+  amount,
+  onPick,
+}: {
+  kind: ProofKind | null;
+  preview: string | null;
+  amount: number;
+  onPick: (kind: ProofKind, file: File | null) => void;
+}) {
+  const options: { value: ProofKind; title: string; hint: string }[] = [
+    { value: "camera", title: "Take a photo", hint: "Of the customer's \u201cpayment successful\u201d screen" },
+    { value: "screenshot", title: "Upload a screenshot", hint: "One the customer sent you, e.g. on WhatsApp" },
+    { value: "call", title: "No photo? Call the office", hint: "They confirm the payment with the customer" },
+  ];
+  return (
+    <fieldset>
+      <legend className="mb-1.5 text-sm font-medium text-slate-700">Proof of the {rupees(amount)} UPI payment</legend>
+      <div className="divide-y divide-brand-950/[0.07] overflow-hidden rounded-xl border border-slate-900/10">
+        {options.map((o) => {
+          const on = kind === o.value;
+          const row = `flex min-h-16 w-full items-center gap-3 px-3 py-2 text-left ${on ? "bg-brand-50" : "active:bg-slate-50"}`;
+          const body = (
+            <>
+              <span className={`flex size-10 shrink-0 items-center justify-center rounded-full ${on ? "bg-brand-950 text-white" : "bg-slate-100 text-slate-700"}`}>
+                <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d={PROOF_ICON[o.value]} />
+                </svg>
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block font-semibold text-slate-900">{o.title}</span>
+                <span className="block text-sm text-slate-600">{o.hint}</span>
+              </span>
+              {on ? (
+                <svg viewBox="0 0 24 24" className="size-5 shrink-0 text-brand-700" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="m5 12.5 4.5 4.5L19 7.5" />
+                </svg>
+              ) : null}
+            </>
+          );
+          if (o.value === "call") {
+            return (
+              <button key={o.value} type="button" aria-pressed={on} onClick={() => onPick("call", null)} className={row}>
+                {body}
+              </button>
+            );
+          }
+          return (
+            <label key={o.value} className={`${row} cursor-pointer`}>
+              <input
+                type="file"
+                accept="image/*"
+                capture={o.value === "camera" ? "environment" : undefined}
+                className="sr-only"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) onPick(o.value, f);
+                  e.target.value = "";
+                }}
+              />
+              {body}
+            </label>
+          );
+        })}
+      </div>
+      {preview && kind !== "call" ? (
+        // eslint-disable-next-line @next/next/no-img-element -- a local preview of the photo just taken
+        <img src={preview} alt="Payment proof you added" className="mt-2 max-h-56 w-full rounded-xl border border-slate-900/10 bg-slate-50 object-contain" />
+      ) : null}
+      {kind === "call" ? (
+        <p className="mt-2 rounded-xl bg-warn-50 p-3 text-sm text-warn-700">
+          Call the office now and tell them the amount. The payment stays open until they confirm it with the customer.
+        </p>
+      ) : null}
+    </fieldset>
   );
 }
 

@@ -7,11 +7,11 @@ import { OfficeTabs } from "@/components/OfficeTabs";
 import { officeNav } from "@/lib/nav";
 import { formatIstDate, formatIstTime, istDate } from "@/lib/domain/checkin-policy";
 import { mondayOf, rupees, shortDate } from "@/lib/domain/payments";
-import { CancelPaymentButton, UpiSettings, VerifyUpiButton, CorrectPaymentButton } from "./PaymentActions";
+import { CancelPaymentButton, ConfirmCallButton, UpiSettings, VerifyUpiButton, CorrectPaymentButton, type UpiChange } from "./PaymentActions";
 import { OfficeHandovers, type HandoverRow } from "@/components/CashHandover";
 import type { CashHandover } from "@/lib/domain/database";
 import { ReviewExpenses, type ExpenseRow } from "@/components/Expenses";
-import { getSignedBillUrls } from "@/lib/data/photos";
+import { getSignedBillUrls, getSignedProofUrls } from "@/lib/data/photos";
 
 export const metadata = { title: "Payments" };
 export const dynamic = "force-dynamic";
@@ -26,12 +26,18 @@ type Row = {
   collected_at: string;
   verified_at: string | null;
   note: string | null;
+  proof_kind: "camera" | "screenshot" | "call" | null;
+  proof_path: string | null;
+  proof_confirmed_at: string | null;
   job: {
     job_number: string;
     assigned_supervisor_id: string | null;
-    client: { name: string } | null;
+    client: { name: string; phone: string | null } | null;
   } | null;
 };
+
+const ROW_SELECT =
+  "id, job_id, amount, mode, collected_at, verified_at, note, proof_kind, proof_path, proof_confirmed_at, job:jobs(job_number, assigned_supervisor_id, client:clients(name, phone))";
 
 export default async function PaymentsPage(props: PageProps<"/sales/payments">) {
   const sp = await props.searchParams;
@@ -44,13 +50,11 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
 
   const profile = await requireRole("sales_rep");
   const supabase = await createClient();
-  const [totalsRes, listRes, dueRes, directoryRes, upiRes, handRes, staffRes, expRes] = await Promise.all([
+  const [totalsRes, listRes, dueRes, directoryRes, upiRes, handRes, staffRes, expRes, callsRes, upiLogRes] = await Promise.all([
     supabase.rpc("payment_totals", { p_from: from, p_to: to }),
     supabase
       .from("payments")
-      .select(
-        "id, job_id, amount, mode, collected_at, verified_at, note, job:jobs(job_number, assigned_supervisor_id, client:clients(name))",
-      )
+      .select(ROW_SELECT)
       .is("voided_at", null)
       .in("mode", ["upi", "cash"])
       .gte("collected_at", `${from}T00:00:00+05:30`)
@@ -78,7 +82,26 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
         (Omit<ExpenseRow, "bill_url" | "staff_name"> & { bill_path: string | null; staff: { full_name: string } | null })[],
         { merge: false }
       >(),
+    // UPI payments the supervisor could not prove with a photo: the office calls the customer.
+    supabase
+      .from("payments")
+      .select(ROW_SELECT)
+      .eq("proof_kind", "call")
+      .is("proof_confirmed_at", null)
+      .is("voided_at", null)
+      .order("collected_at")
+      .overrideTypes<Row[], { merge: false }>(),
+    profile.role === "admin"
+      ? supabase
+          .from("job_events")
+          .select("occurred_at, actor_id, payload")
+          .eq("event_type", "upi.changed")
+          .order("occurred_at", { ascending: false })
+          .limit(5)
+      : Promise.resolve({ data: [] as { occurred_at: string; actor_id: string | null; payload: unknown }[] }),
   ]);
+  const pendingCalls = callsRes.data ?? [];
+  const proofUrls = await getSignedProofUrls((listRes.data ?? []).map((r) => r.proof_path ?? ""));
   const billUrls = await getSignedBillUrls((expRes.data ?? []).map((x) => x.bill_path ?? ""));
   const pendingExpenses: ExpenseRow[] = (expRes.data ?? []).map((x) => ({
     ...x,
@@ -103,6 +126,19 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
   const upi = (upiRes.data?.value as { id: string; name: string } | undefined) ?? null;
   const nameOf = (id: string | null | undefined) =>
     (directoryRes.data ?? []).find((s) => s.id === id)?.full_name ?? "Supervisor";
+  const upiLabel = (v: unknown) => {
+    const u = v as { id?: string; name?: string } | null;
+    return u?.id ? `${u.name ?? ""} (${u.id})`.trim() : null;
+  };
+  const upiHistory: UpiChange[] = (upiLogRes.data ?? []).map((e) => {
+    const p = e.payload as { from?: unknown; to?: unknown };
+    return {
+      at: `${formatIstDate(e.occurred_at)}, ${formatIstTime(e.occurred_at)}`,
+      by: nameOf(e.actor_id),
+      from: upiLabel(p.from),
+      to: upiLabel(p.to) ?? "—",
+    };
+  });
 
   const sum = (key: "upi_total" | "cash_total" | "upi_unchecked") =>
     totals.reduce((n, r) => n + Number(r[key]), 0);
@@ -135,6 +171,35 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
           </svg>
         </Link>
 
+        {canManageMoney && pendingCalls.length ? (
+          <section>
+            <p className="section-label pb-2 text-danger-700">Confirm these UPI payments on call</p>
+            <ul className="sheet -mx-4 divide-y divide-brand-950/[0.07]">
+              {pendingCalls.map((r) => (
+                <li key={r.id} className="flex items-center justify-between gap-3 px-4 py-3">
+                  <span className="min-w-0">
+                    <span className="block truncate font-semibold text-slate-900">
+                      {r.job?.client?.name ?? r.job?.job_number} · {rupees(r.amount)}
+                    </span>
+                    <span className="block text-sm text-slate-600">
+                      {nameOf(r.job?.assigned_supervisor_id)} had no photo · {formatIstDate(r.collected_at)}
+                    </span>
+                    {r.job?.client?.phone ? (
+                      <a href={`tel:${r.job.client.phone}`} className="tap inline-flex items-center text-sm font-semibold text-brand-700">
+                        Call customer {r.job.client.phone}
+                      </a>
+                    ) : null}
+                  </span>
+                  <ConfirmCallButton paymentId={r.id} />
+                </li>
+              ))}
+            </ul>
+            <p className="pt-2 text-xs text-slate-500">
+              Ask the customer if they paid, then tap Confirmed on call. Still check it in the bank afterwards.
+            </p>
+          </section>
+        ) : null}
+
         {canManageMoney ? <ReviewExpenses rows={pendingExpenses} /> : null}
 
         <section>
@@ -161,13 +226,7 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
           <OfficeHandovers pending={pendingHandovers} recent={recentHandovers} staff={staffRes.data ?? []} />
         ) : null}
 
-        {canManageMoney ? (
-          <UpiSettings upi={upi} />
-        ) : !upi ? (
-          <p className="rounded-lg border border-warn-100 bg-warn-50 p-3 text-sm text-warn-700">
-            The company UPI ID is not set up, so supervisors have no QR to show. Calling staff can add it here.
-          </p>
-        ) : null}
+        <UpiSettings upi={upi} canChange={profile.role === "admin"} history={upiHistory} />
 
         <div className="-mx-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none]">
           {(
@@ -330,6 +389,7 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
                               {r.verified_at ? "Checked in bank" : "Not checked yet"}
                             </span>
                           ) : null}
+                          {r.mode === "upi" ? <ProofTag row={r} url={r.proof_path ? (proofUrls[r.proof_path] ?? null) : null} /> : null}
                         </span>
                         {canManageMoney && r.mode === "upi" && !r.verified_at ? <VerifyUpiButton paymentId={r.id} /> : null}
                       </li>
@@ -359,4 +419,25 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
       </div>
     </AppShell>
   );
+}
+
+/** What the supervisor gave as proof of a UPI payment. */
+function ProofTag({ row, url }: { row: Row; url: string | null }) {
+  if (row.proof_kind === "call") {
+    return (
+      <span className={`text-xs ${row.proof_confirmed_at ? "text-ok-700" : "text-danger-700"}`}>
+        · {row.proof_confirmed_at ? "Confirmed on call" : "Call to confirm"}
+      </span>
+    );
+  }
+  if (row.proof_kind && url) {
+    return (
+      <a href={url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-700">
+        {/* eslint-disable-next-line @next/next/no-img-element -- short-lived signed link */}
+        <img src={url} alt="" className="size-8 rounded border border-slate-900/10 object-cover" />
+        {row.proof_kind === "camera" ? "Photo" : "Screenshot"}
+      </a>
+    );
+  }
+  return <span className="text-xs text-slate-500">· No proof</span>;
 }

@@ -28,7 +28,7 @@ export default async function SalesToday(props: PageProps<"/sales">) {
   const tab = sp.tab === "done" ? "done" : "assigned";
 
   const supabase = await createClient();
-  const [profile, jobs, waiting, handRes] = await Promise.all([
+  const [profile, jobs, waiting, handRes, callRes] = await Promise.all([
     requireRole("sales_rep"),
     getDayJobs(date),
     getPendingApprovalCount(),
@@ -37,7 +37,15 @@ export default async function SalesToday(props: PageProps<"/sales">) {
       .select("amount")
       .eq("status", "PENDING")
       .is("voided_at", null),
+    supabase
+      .from("payments")
+      .select("amount")
+      .eq("proof_kind", "call")
+      .is("proof_confirmed_at", null)
+      .is("voided_at", null),
   ]);
+  const callCount = callRes.data?.length ?? 0;
+  const callTotal = (callRes.data ?? []).reduce((n, p) => n + Number(p.amount), 0);
   const handoverCount = handRes.data?.length ?? 0;
   const handoverTotal = (handRes.data ?? []).reduce((n, h) => n + Number(h.amount), 0);
   const done = jobs.filter((j) => j.status === "COMPLETED");
@@ -61,6 +69,17 @@ export default async function SalesToday(props: PageProps<"/sales">) {
             <span className="flex items-center gap-2.5 font-semibold text-slate-900">
               <span className="size-2.5 animate-pulse rounded-full bg-amber-500" aria-hidden />
               Confirm cash handed back: {handoverCount} · {rupees(handoverTotal)}
+            </span>
+            <svg viewBox="0 0 24 24" className="size-5 shrink-0 text-slate-500" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="m9 5 7 7-7 7" />
+            </svg>
+          </Link>
+        ) : null}
+        {callCount ? (
+          <Link href="/sales/payments" className="sheet -mx-4 flex min-h-14 items-center justify-between gap-3 px-4 active:bg-slate-50">
+            <span className="flex items-center gap-2.5 font-semibold text-slate-900">
+              <span className="size-2.5 animate-pulse rounded-full bg-danger-600" aria-hidden />
+              Confirm UPI on call: {callCount} · {rupees(callTotal)}
             </span>
             <svg viewBox="0 0 24 24" className="size-5 shrink-0 text-slate-500" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="m9 5 7 7-7 7" />

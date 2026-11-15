@@ -104,7 +104,7 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
     ? await Promise.all([
         supabase
           .from("payments")
-          .select("id, amount, mode, verified_at, note")
+          .select("id, amount, mode, verified_at, note, proof_kind, proof_confirmed_at")
           .eq("job_id", job.id)
           .is("voided_at", null),
         supabase.rpc("list_workers"),
@@ -173,7 +173,17 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
               {paid.map((p) => (
                 <li key={p.id}>
                   {p.mode === "upi" ? "UPI" : "Cash"} {rupees(p.amount)}
-                  {p.mode === "upi" ? (p.verified_at ? " · checked by office" : " · office to check") : " · with you"}
+                  {p.mode === "upi"
+                    ? p.verified_at
+                      ? " · checked by office"
+                      : p.proof_kind === "call"
+                        ? p.proof_confirmed_at
+                          ? " · confirmed on call"
+                          : " · waiting for the office to confirm on call"
+                        : p.proof_kind
+                          ? " · proof added, office to check"
+                          : " · office to check"
+                    : " · with you"}
                 </li>
               ))}
             </ul>
