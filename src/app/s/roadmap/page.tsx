@@ -86,12 +86,12 @@ export default async function RoadmapPage() {
                   href={routeHref}
                   target="_blank"
                   rel="noreferrer"
-                  className="tap-lg flex items-center justify-center gap-2 rounded-2xl bg-brand-900 text-base font-bold text-white active:scale-[0.98]"
+                  className="tap flex items-center justify-center gap-2 rounded-2xl text-sm font-semibold text-slate-700 ring-1 ring-slate-900/10 active:bg-slate-50"
                 >
-                  <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                    <path d="m3 11 18-8-8 18-2-8-8-2Z" />
+                  <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5 9 4ZM9 4v13M15 6.5v13" />
                   </svg>
-                  Start route · {remaining.length} stop{remaining.length === 1 ? "" : "s"}
+                  See the whole route · {remaining.length} stop{remaining.length === 1 ? "" : "s"}
                 </a>
               ) : (
                 <p className="flex items-center justify-center gap-2 py-2 text-sm font-semibold text-ok-700">
@@ -99,7 +99,7 @@ export default async function RoadmapPage() {
                 </p>
               )}
               <p className="mt-2 text-center text-xs text-slate-500">
-                Opens Google Maps for a scooter, through every stop left, from where you are now.
+                Just to look at the day. For directions, use Navigate here on the next stop.
               </p>
             </div>
           </section>
@@ -188,10 +188,10 @@ export default async function RoadmapPage() {
                           href={googleRoute([pin])}
                           target="_blank"
                           rel="noreferrer"
-                          className="flex items-center justify-center gap-2 border-t border-slate-900/[0.06] bg-brand-50 py-3 text-sm font-bold text-brand-900 active:bg-brand-100"
+                          className="tap-lg flex items-center justify-center gap-2 bg-brand-900 text-base font-bold text-white active:bg-brand-950"
                         >
-                          <Glyph small d="m3 11 18-8-8 18-2-8-8-2Z" />
-                          Navigate to this stop
+                          <Glyph d="m3 11 18-8-8 18-2-8-8-2Z" />
+                          Navigate here
                         </a>
                       ) : null}
                     </div>
