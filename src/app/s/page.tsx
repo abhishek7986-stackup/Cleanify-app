@@ -7,6 +7,10 @@ import { TravelRefresh } from "@/components/TravelRefresh";
 import { CheckinCountdown } from "@/components/CheckinCountdown";
 import { AutoRefresh } from "@/components/AutoRefresh";
 import { TripAction } from "@/components/TripAction";
+import { JobInfoSheet, type JobInfo } from "@/components/JobInfoSheet";
+import { getJobDetail } from "@/lib/data/jobs";
+import { renderValue } from "@/components/JobDetailView";
+import { createClient } from "@/lib/supabase/server";
 import { parseEwkbPoint } from "@/lib/location-link";
 import { formatIstDate, formatIstTime } from "@/lib/domain/checkin-policy";
 import type { DayRoster, Job } from "@/lib/domain/database";
@@ -37,6 +41,10 @@ export default async function SupervisorToday() {
   const current = currentIndex >= 0 ? jobs[currentIndex] : null;
   const doneCount = jobs.filter((j) => j.status === "COMPLETED").length;
   const later = jobs.filter((_, i) => i !== currentIndex);
+
+  // The (i) details exist only for the current job, once the day is approved:
+  // later jobs' size and money stay hidden until it is their turn.
+  const info = current && approved ? await currentJobInfo(current.id) : null;
 
   const phase: Phase = !roster
     ? "none"
@@ -108,7 +116,7 @@ export default async function SupervisorToday() {
             {roster!.rejection_reason ? <p className="mt-1 text-sm text-slate-600">Office: {roster!.rejection_reason}</p> : null}
           </section>
         ) : phase === "working" && current ? (
-          <CurrentStop job={current} index={currentIndex + 1} total={jobs.length} unlocked={approved} />
+          <CurrentStop job={current} index={currentIndex + 1} total={jobs.length} unlocked={approved} info={info} />
         ) : phase === "finished" ? (
           <Empty title="All jobs done" body="Take a selfie and the scooter km photo to check out and end your day." />
         ) : (
@@ -196,7 +204,19 @@ function ShiftStrip({
 }
 
 /** The current stop: where, when, its one next step, and the two field tools. */
-function CurrentStop({ job, index, total, unlocked }: { job: DayJob; index: number; total: number; unlocked: boolean }) {
+function CurrentStop({
+  job,
+  index,
+  total,
+  unlocked,
+  info,
+}: {
+  job: DayJob;
+  index: number;
+  total: number;
+  unlocked: boolean;
+  info: JobInfo | null;
+}) {
   const pin = parseEwkbPoint(job.site_location);
   const step = nextStep(job);
   return (
@@ -204,9 +224,16 @@ function CurrentStop({ job, index, total, unlocked }: { job: DayJob; index: numb
       <p className="text-sm font-medium tabular-nums text-slate-600">
         Stop {index} of {total} · {formatIstTime(job.scheduled_start)}
       </p>
-      <h2 className="mt-1 text-[1.375rem] font-semibold leading-snug tracking-[-0.01em] text-slate-950">
-        {job.client?.name ?? "Client"}
-      </h2>
+      <div className="mt-1 flex items-start justify-between gap-2">
+        <h2 className="min-w-0 text-[1.375rem] font-semibold leading-snug tracking-[-0.01em] text-slate-950">
+          {job.client?.name ?? "Client"}
+        </h2>
+        {info ? (
+          <div className="-mr-2 -mt-1.5">
+            <JobInfoSheet info={info} title={job.client?.name ?? "Job"} />
+          </div>
+        ) : null}
+      </div>
       <p className="mt-0.5 text-[0.9375rem] text-slate-600">{job.site_address}</p>
       <p className="mt-1 text-sm text-slate-500">
         {job.travel_minutes != null ? `~${job.travel_minutes} min ride` : null}
@@ -423,4 +450,29 @@ function Glyph({ d, small }: { d: string; small?: boolean }) {
       <path d={d} />
     </svg>
   );
+}
+
+/** The current job's size and money, for the (i) sheet. */
+async function currentJobInfo(jobId: string): Promise<JobInfo | null> {
+  const [detail, sumRes] = await Promise.all([
+    getJobDetail(jobId),
+    createClient().then((sb) => sb.rpc("my_pay_summary")),
+  ]);
+  if (!detail) return null;
+  const { job, service, lineItems, lineItemFields, jobFields } = detail;
+  const value = (raw: unknown, f: (typeof lineItemFields)[number]) => renderValue(f, raw);
+  return {
+    service: service?.name ?? null,
+    total: job.quoted_amount != null ? Number(job.quoted_amount) : null,
+    sharePercent: sumRes.data?.[0] ? Number(sumRes.data[0].percent_now) : null,
+    unitsLabel:
+      lineItems.length === 1 ? (service?.line_item_singular ?? "item").toLowerCase() : (service?.line_item_plural ?? "items").toLowerCase(),
+    units: lineItems.map((li) => ({
+      label: li.label ?? `${service?.line_item_singular ?? "Item"} ${li.position}`,
+      facts: lineItemFields.map((f) => value(li.details?.[f.key], f)).filter((v) => v !== "—"),
+    })),
+    facts: jobFields
+      .map((f) => ({ label: f.label, value: renderValue(f, job.service_details?.[f.key]) }))
+      .filter((f) => f.value !== "—"),
+  };
 }

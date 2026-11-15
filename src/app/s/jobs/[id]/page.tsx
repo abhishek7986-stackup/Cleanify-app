@@ -130,7 +130,8 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
           when={`${formatIstDate(job.scheduled_start)} · ${formatIstTime(job.scheduled_start)}`}
           address={job.site_address}
           landmark={job.site_landmark}
-          quoted={job.quoted_amount != null ? Number(job.quoted_amount) : null}
+          // A later job's amount stays hidden until it is this job's turn.
+          quoted={job.quoted_amount != null && !waitFor ? Number(job.quoted_amount) : null}
           // The location is the reward for an approved depot check-in.
           // Directions only once the trip has started (Start trip opens them).
           mapsHref={unlocked && !waitFor && job.status === "EN_ROUTE" ? siteMaps : null}
@@ -188,7 +189,16 @@ export default async function SupervisorJobPage(props: PageProps<"/s/jobs/[id]">
             workers={workers ?? []}
           />
         ) : null}
-        <JobDetailView detail={detail} hideSummary />
+        {waitFor ? (
+          <p className="flex items-center gap-2 px-1 text-sm text-slate-600">
+            <svg viewBox="0 0 24 24" className="size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M7 11V8a5 5 0 0 1 10 0v3M5.5 11h13v9.5h-13z" />
+            </svg>
+            The job size and amount show once {waitFor.client} is finished.
+          </p>
+        ) : (
+          <JobDetailView detail={detail} hideSummary />
+        )}
       </div>
     </AppShell>
   );
