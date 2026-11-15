@@ -267,14 +267,14 @@ export function JobFlow({
       {preArrival && depot === "APPROVED" && !waitFor ? (
         status === "EN_ROUTE" ? (
           <>
-            <StepStatus tone="go">On the way. Tap I&apos;ve reached when you get there.</StepStatus>
+            <StepStatus tone="go">On the way. Tap I&apos;ve reached when you arrive</StepStatus>
             <BigButton busy={busy} onClick={() => void reached()} icon="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11ZM12 12.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z">
               I&apos;ve reached the site
             </BigButton>
           </>
         ) : (
           <>
-            <StepStatus tone="go">Leave for the site when you are ready.</StepStatus>
+            <StepStatus tone="go">Start the trip when you leave for the site</StepStatus>
             <BigButton
               busy={busy}
               onClick={() => void advance(status === "ASSIGNED" ? ["CHECKED_IN", "EN_ROUTE"] : ["EN_ROUTE"], "Starting trip…")}
@@ -293,7 +293,7 @@ export function JobFlow({
 
       {status === "ON_SITE" && beforeStatus === "APPROVED" ? (
         <div className="space-y-2">
-          <StepStatus tone="ok">Before photos approved. Start cleaning.</StepStatus>
+          <StepStatus tone="ok">Before photos approved: start cleaning</StepStatus>
           <BigButton busy={busy} onClick={() => void advance(["IN_PROGRESS"], "Starting…")} icon="M8 5.5v13l10.5-6.5L8 5.5Z">
             Start cleaning
           </BigButton>

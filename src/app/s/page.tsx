@@ -309,8 +309,11 @@ function ActionBar({ phase, current }: { phase: Phase; current: DayJob | null })
       if (!current) return null;
       const label = actionLabel(current);
       return (
-        <Link href={`/s/jobs/${current.id}`} className={label.waiting ? quiet : primary}>
-          {label.text}
+        <Link href={`/s/jobs/${current.id}`} className={label.waiting ? quiet : `${primary} justify-between px-5`}>
+          <span className="text-left leading-tight">
+            <span className={`block text-xs font-medium ${label.waiting ? "text-slate-500" : "text-white/70"}`}>Open job</span>
+            <span className="block">Next: {label.text}</span>
+          </span>
           {label.waiting ? null : <Glyph d="M5 12h14M13 6l6 6-6 6" />}
         </Link>
       );
@@ -351,7 +354,7 @@ function nextStep(job: Job, unlocked: boolean): { text: string; tone: "go" | "wa
   switch (job.status) {
     case "ASSIGNED":
     case "CHECKED_IN":
-      return unlocked ? { text: "Start the trip when you leave", tone: "go" } : null;
+      return unlocked ? { text: "Start the trip when you leave for the site", tone: "go" } : null;
     case "EN_ROUTE":
       return { text: "On the way. Tap I've reached when you arrive", tone: "go" };
     case "ON_SITE":

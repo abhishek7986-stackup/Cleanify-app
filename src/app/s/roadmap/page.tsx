@@ -158,7 +158,6 @@ export default async function RoadmapPage() {
                       <div className="min-w-0 flex-1">
                         <p className={`truncate font-semibold ${done ? "text-slate-500" : "text-slate-900"}`}>
                           {job.client?.name ?? "Client"}
-                          {isNext ? <span className="font-medium text-brand-950"> · next</span> : null}
                         </p>
                         <p className="truncate text-sm text-slate-600">{job.site_address}</p>
                         <p className="text-sm tabular-nums text-slate-600">
