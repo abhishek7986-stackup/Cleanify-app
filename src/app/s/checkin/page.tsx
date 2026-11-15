@@ -61,6 +61,11 @@ export default async function CheckinPage() {
           retake={retake}
           rejectionReason={r.rejection_reason}
           alreadyHave={alreadyHave}
+          odometerPhotoId={
+            day.checkinPhotos
+              .filter((p) => p.kind === "ODOMETER" && new Date(p.captured_at_server).getTime() > since)
+              .at(-1)?.id ?? null
+          }
         />
       )}
     </AppShell>

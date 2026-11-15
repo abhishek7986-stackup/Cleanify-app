@@ -22,11 +22,14 @@ const KIND_LABEL: Partial<Record<PhotoKind, string>> = {
 export function ApprovalCard({
   roster,
   supervisorName,
+  photoKm = null,
   submittedLabel,
   photos,
 }: {
   roster: DayRoster;
   supervisorName: string;
+  /** What the app read off the odometer photo, if it could. */
+  photoKm?: number | null;
   submittedLabel: string;
   photos: PhotoView[];
 }) {
@@ -63,10 +66,7 @@ export function ApprovalCard({
       </div>
 
       {roster.start_odometer_km != null ? (
-        <p className="mt-2 text-sm text-slate-700">
-          Km reading typed: <b className="tabular-nums">{Number(roster.start_odometer_km)} km</b>
-          <span className="text-slate-400"> (check it against the photo)</span>
-        </p>
+        <OdometerCheck typed={Number(roster.start_odometer_km)} photo={photoKm} />
       ) : null}
 
       {/* Anything the system found odd. Flags inform the human decision; they
@@ -178,6 +178,32 @@ function StatusBadge({ status, lateness }: { status: string; lateness: string | 
           late
         </span>
       ) : null}
+    </div>
+  );
+}
+
+/** Typed km beside what the photo said; a mismatch is called out, never blocked. */
+function OdometerCheck({ typed, photo }: { typed: number; photo: number | null }) {
+  const fmt = (n: number) => n.toLocaleString("en-IN");
+  const differs = photo != null && photo !== typed;
+  return (
+    <div
+      className={`mt-3 grid grid-cols-2 gap-px overflow-hidden rounded-2xl text-sm ${
+        differs ? "bg-warn-100 ring-1 ring-warn-100" : "bg-slate-900/[0.06] ring-1 ring-slate-900/[0.06]"
+      }`}
+    >
+      <div className="bg-white p-3">
+        <p className="text-xs text-slate-500">Typed</p>
+        <p className="font-bold tabular-nums text-slate-900">{fmt(typed)} km</p>
+      </div>
+      <div className={differs ? "bg-warn-50 p-3" : "bg-white p-3"}>
+        <p className={`text-xs ${differs ? "font-semibold text-warn-700" : "text-slate-500"}`}>
+          {differs ? "Photo reads, differs" : "Photo reads"}
+        </p>
+        <p className={`font-bold tabular-nums ${differs ? "text-warn-700" : "text-slate-900"}`}>
+          {photo != null ? `${fmt(photo)} km` : "Not read"}
+        </p>
+      </div>
     </div>
   );
 }

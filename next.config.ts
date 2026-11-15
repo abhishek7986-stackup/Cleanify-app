@@ -6,6 +6,14 @@ const nextConfig: NextConfig = {
   output: "standalone",
   poweredByHeader: false,
 
+  // The free odometer reader starts its engine from files on disk, so it must
+  // run from node_modules rather than be bundled, and those files must ship
+  // with the standalone server.
+  serverExternalPackages: ["tesseract.js", "tesseract.js-core"],
+  outputFileTracingIncludes: {
+    "/api/odometer": ["./node_modules/tesseract.js/**/*", "./node_modules/tesseract.js-core/**/*"],
+  },
+
   // Lets a phone on the same Wi-Fi load the dev server's JS. Without this the
   // page renders but never hydrates, so no button does anything. 127.0.0.1 is
   // for testing as a second user on the Mac. Development only.

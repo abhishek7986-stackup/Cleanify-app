@@ -49,6 +49,7 @@ export default async function CheckoutPage() {
           startKm={startKm}
           openJobs={openJobs}
           alreadyHave={[...new Set(day.checkinPhotos.map((p) => p.kind as PhotoKind))]}
+          odometerPhotoId={day.checkinPhotos.filter((p) => p.kind === "CHECKOUT_ODOMETER").at(-1)?.id ?? null}
         />
       )}
     </AppShell>

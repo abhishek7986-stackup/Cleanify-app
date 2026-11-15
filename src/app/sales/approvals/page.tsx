@@ -83,7 +83,18 @@ export default async function ApprovalsPage() {
   ]);
   const photos = (photoRes.data ?? []) as Photo[];
   const fields = (fieldRes.data ?? []) as ServiceField[];
-  const signed = await getSignedPhotoUrls(photos.map((p) => p.storage_path));
+  const odometerIds = photos.filter((p) => p.kind === "ODOMETER").map((p) => p.id);
+  const [signed, readingRes] = await Promise.all([
+    getSignedPhotoUrls(photos.map((p) => p.storage_path)),
+    odometerIds.length
+      ? supabase.from("odometer_readings").select("photo_id, read_km").in("photo_id", odometerIds)
+      : Promise.resolve({ data: [] as { photo_id: string; read_km: number | null }[] }),
+  ]);
+  const photoKmOf = (rosterId: string): number | null => {
+    const odo = photos.find((p) => p.roster_id === rosterId && p.kind === "ODOMETER");
+    const r = (readingRes.data ?? []).find((x) => x.photo_id === odo?.id);
+    return r?.read_km != null ? Number(r.read_km) : null;
+  };
 
   const reviews = siteJobs.flatMap((j) =>
     (["before", "after"] as const)
@@ -99,6 +110,7 @@ export default async function ApprovalsPage() {
       key={r.id}
       roster={r}
       supervisorName={nameOf(r.supervisor_id)}
+      photoKm={photoKmOf(r.id)}
       submittedLabel={`${formatIstDate(r.roster_date)} · checked in ${formatIstTime(r.submitted_at)}`}
       photos={photos
         .filter((p) => p.roster_id === r.id && CHECKIN_KINDS.includes(p.kind))

@@ -255,6 +255,7 @@ export type Photo = {
   distance_from_expected_m: string | null;
   flagged: boolean;
   flag_reason: string | null;
+  uploaded_by: string | null;
 };
 
 export type CaptureToken = {
@@ -481,6 +482,15 @@ export type StaffDirectoryRow = {
   is_active: boolean;
 };
 
+/** What the app read off an odometer photo (server-written, never edited). */
+export type OdometerReading = {
+  photo_id: string;
+  read_km: number | null;
+  raw_text: string | null;
+  engine: string;
+  created_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -496,6 +506,7 @@ export type Database = {
       job_line_items: Tbl<JobLineItem>;
       day_rosters: Tbl<DayRoster>;
       photos: Tbl<Photo>;
+      odometer_readings: Tbl<OdometerReading>;
       capture_tokens: Tbl<CaptureToken>;
       payments: Tbl<Payment>;
       pay_staff: Tbl<PayStaff>;

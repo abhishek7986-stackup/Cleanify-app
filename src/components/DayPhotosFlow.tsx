@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { PhotoKind } from "@/lib/domain/database";
 import { LiveCameraCapture } from "@/components/LiveCameraCapture";
@@ -50,6 +50,7 @@ export function DayPhotosFlow({
   retake = false,
   rejectionReason = null,
   alreadyHave,
+  odometerPhotoId = null,
   startKm = null,
   openJobs = 0,
 }: {
@@ -63,6 +64,8 @@ export function DayPhotosFlow({
   rejectionReason?: string | null;
   /** Photo kinds already on the server that still count. */
   alreadyHave: PhotoKind[];
+  /** An odometer photo already taken (e.g. before a reload), to read on open. */
+  odometerPhotoId?: string | null;
   /** Check-out only: this morning's reading, to show km driven. */
   startKm?: number | null;
   /** Check-out only: jobs today that are not finished. */
@@ -77,6 +80,41 @@ export function DayPhotosFlow({
   const [submitting, setSubmitting] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<{ at: string; late?: boolean; kmToday?: number | null } | null>(null);
+  // What the app read off the odometer photo. It pre-fills the km box; the
+  // supervisor confirms or corrects, and the office sees both if they differ.
+  const [reading, setReading] = useState<{ state: "reading" | "read" | "unread" | "offline"; km?: number } | null>(null);
+
+  async function readOdometer(photoId: string) {
+    // A retake replaces the number only if the supervisor never changed it.
+    const previousRead = reading?.km != null ? String(reading.km) : null;
+    setReading({ state: "reading" });
+    try {
+      const res = await fetch("/api/odometer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ photoId }),
+      });
+      const json = (await res.json()) as { km?: number | null };
+      if (res.ok && typeof json.km === "number") {
+        setReading({ state: "read", km: json.km });
+        setKm((cur) => (cur.trim() === "" || cur.trim() === previousRead ? String(json.km) : cur));
+      } else {
+        setReading({ state: "unread" });
+      }
+    } catch {
+      setReading({ state: "unread" });
+    }
+  }
+
+  // A km photo taken before this screen was reopened: read it straight away.
+  const readOnOpen = useRef(false);
+  useEffect(() => {
+    if (!odometerPhotoId || readOnOpen.current) return;
+    readOnOpen.current = true;
+    void readOdometer(odometerPhotoId);
+    // readOdometer is stable enough for a one-off read on open.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [odometerPhotoId]);
 
   const kmValue = km.trim() === "" ? null : Number(km);
   const kmValid = kmValue !== null && Number.isFinite(kmValue) && kmValue >= 0;
@@ -299,6 +337,7 @@ export function DayPhotosFlow({
             />
             <span className="text-lg font-semibold text-slate-400">km</span>
           </span>
+          <OdometerHint reading={reading} typed={kmValid ? kmValue : null} />
           {mode === "checkout" && startKm != null && kmValid && kmValue! >= startKm ? (
             <span className="mt-2 block text-sm font-semibold text-brand-700">
               {Math.round((kmValue! - startKm) * 10) / 10} km today
@@ -331,12 +370,59 @@ export function DayPhotosFlow({
           title={camera.title}
           hint={camera.hint}
           onCancel={() => setCamera(null)}
-          onCaptured={({ queued }) => {
+          onCaptured={({ queued, photoId }) => {
             setShots((s) => ({ ...s, [camera.kind]: queued ? "queued" : "uploaded" }));
+            if (camera.kind === "ODOMETER" || camera.kind === "CHECKOUT_ODOMETER") {
+              if (photoId) void readOdometer(photoId);
+              else setReading({ state: "offline" });
+            }
             setCamera(null);
           }}
         />
       ) : null}
     </div>
+  );
+}
+
+/** Under the km box: what the photo said, and whether the typed number matches. */
+function OdometerHint({
+  reading,
+  typed,
+}: {
+  reading: { state: "reading" | "read" | "unread" | "offline"; km?: number } | null;
+  typed: number | null;
+}) {
+  if (!reading) {
+    return <span className="mt-2 block text-sm text-slate-500">Take the km photo and the number fills in by itself.</span>;
+  }
+  if (reading.state === "reading") {
+    return (
+      <span className="mt-2 flex items-center gap-2 text-sm font-medium text-brand-800">
+        <span className="size-3.5 animate-spin rounded-full border-2 border-brand-600 border-t-transparent" aria-hidden />
+        Reading the km from your photo…
+      </span>
+    );
+  }
+  if (reading.state === "offline") {
+    return <span className="mt-2 block text-sm text-slate-500">No signal to read the photo. Type the number shown.</span>;
+  }
+  if (reading.state === "unread" || reading.km == null) {
+    return <span className="mt-2 block text-sm text-warn-700">Couldn&apos;t read the number. Type it from the scooter.</span>;
+  }
+  const fmt = reading.km.toLocaleString("en-IN");
+  if (typed != null && typed !== reading.km) {
+    return (
+      <span className="mt-2 block text-sm font-medium text-warn-700">
+        The photo reads {fmt} km. You typed a different number; the office will see both.
+      </span>
+    );
+  }
+  return (
+    <span className="mt-2 flex items-center gap-1.5 text-sm font-medium text-ok-700">
+      <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="m5 12.5 4.5 4.5L19 7.5" />
+      </svg>
+      Read from your photo. Check it matches the scooter.
+    </span>
   );
 }
