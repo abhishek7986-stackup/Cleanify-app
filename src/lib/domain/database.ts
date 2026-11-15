@@ -482,6 +482,15 @@ export type StaffDirectoryRow = {
   is_active: boolean;
 };
 
+/** One step of the admin's pay ladder: this percentage from this much earned. */
+export type PayTier = {
+  kind: "supervisor" | "worker";
+  from_earned: number;
+  percent: number;
+  updated_by: string | null;
+  updated_at: string;
+};
+
 /** What the app read off an odometer photo (server-written, never edited). */
 export type OdometerReading = {
   photo_id: string;
@@ -507,6 +516,7 @@ export type Database = {
       day_rosters: Tbl<DayRoster>;
       photos: Tbl<Photo>;
       odometer_readings: Tbl<OdometerReading>;
+      pay_tiers: Tbl<PayTier>;
       capture_tokens: Tbl<CaptureToken>;
       payments: Tbl<Payment>;
       pay_staff: Tbl<PayStaff>;
@@ -524,6 +534,38 @@ export type Database = {
     };
     Functions: {
       create_job: { Args: { p_payload: unknown }; Returns: Job };
+      set_pay_tiers: {
+        Args: { p_kind: "supervisor" | "worker"; p_tiers: { from_earned: number; percent: number }[] };
+        Returns: undefined;
+      };
+      my_pay_summary: {
+        Args: Record<string, never>;
+        Returns: {
+          staff_id: string;
+          percent_now: number;
+          lifetime_earned: number;
+          next_from_earned: number | null;
+          next_percent: number | null;
+          today_earned: number;
+          today_jobs_paid: number;
+          today_expected: number;
+          today_jobs_left: number;
+          week_start: string;
+          payout_day: string;
+          week_earned: number;
+          week_jobs: number;
+          week_cash_collected: number;
+          brought_forward: number;
+          week_net: number;
+          week_settled: number;
+          last7_earned: number;
+          month_earned: number;
+          last_month_earned: number;
+          cash_collected_month: number;
+          cash_returned_total: number;
+          paid_to_me_total: number;
+        }[];
+      };
       report_location: {
         Args: { p_lat: number; p_lng: number; p_accuracy_m?: number | null };
         Returns: boolean;

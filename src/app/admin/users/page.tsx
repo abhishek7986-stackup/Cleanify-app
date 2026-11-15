@@ -66,6 +66,9 @@ export default async function UsersPage() {
         <Link href="/admin/services" className="tap flex items-center justify-between card px-4 text-sm font-medium text-slate-700">
           Services and their questions <span aria-hidden>→</span>
         </Link>
+        <Link href="/admin/pay-rates" className="tap flex items-center justify-between card px-4 text-sm font-medium text-slate-700">
+          Pay rates: percentage and raises <span aria-hidden>→</span>
+        </Link>
 
         <section className="space-y-3">
           <h2 className="px-1 font-semibold text-slate-900">

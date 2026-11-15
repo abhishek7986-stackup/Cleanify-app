@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/AppShell";
 import { istDate, formatIstDate, formatIstTime } from "@/lib/domain/checkin-policy";
 
-export const metadata = { title: "History" };
+export const metadata = { title: "Past jobs" };
 export const dynamic = "force-dynamic";
 
 export default async function HistoryPage() {
@@ -37,11 +37,11 @@ export default async function HistoryPage() {
   return (
     <AppShell
       profile={profile}
-      title="History"
+      title="Past jobs"
+      back="/s/payments"
       nav={[
         { href: "/s", label: "Today" },
         { href: "/s/roadmap", label: "Roadmap" },
-        { href: "/s/history", label: "History" },
         { href: "/s/payments", label: "Payments" },
       ]}
     >

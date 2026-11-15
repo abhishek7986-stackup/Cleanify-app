@@ -58,7 +58,6 @@ export default async function SupervisorToday() {
       nav={[
         { href: "/s", label: "Today" },
         { href: "/s/roadmap", label: "Roadmap" },
-        { href: "/s/history", label: "History" },
         { href: "/s/payments", label: "Payments" },
       ]}
       status={<ShiftStrip date={day.date} roster={roster} phase={phase} done={doneCount} total={jobs.length} />}
