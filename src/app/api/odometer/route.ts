@@ -59,13 +59,25 @@ export async function POST(request: NextRequest) {
 
   const lastKm = await lastKnownKm(admin, auth.user.id, photo.kind, photo.roster_id);
 
+  // Google first when a key is set; if Google refuses (billing off, quota, an
+  // outage) the free reader takes over, so a photo is never left unread.
   const visionKey = process.env.GOOGLE_VISION_API_KEY;
-  const engine = visionKey ? "google_vision" : "tesseract";
+  let engine: "google_vision" | "tesseract" = "tesseract";
   let text = "";
-  try {
-    text = visionKey ? await readWithVision(image, visionKey) : await readWithTesseract(image);
-  } catch (e) {
-    console.error("odometer read failed", e);
+  if (visionKey) {
+    try {
+      text = await readWithVision(image, visionKey);
+      engine = "google_vision";
+    } catch (e) {
+      console.error("Google Vision failed, using the free reader", e);
+    }
+  }
+  if (engine === "tesseract") {
+    try {
+      text = await readWithTesseract(image);
+    } catch (e) {
+      console.error("odometer read failed", e);
+    }
   }
   const km = text ? pickOdometerKm(text, lastKm) : null;
 
@@ -113,8 +125,12 @@ async function readWithVision(image: Buffer, key: string): Promise<string> {
     }),
   });
   if (!res.ok) throw new Error(`Vision ${res.status}`);
-  const json = (await res.json()) as { responses?: { fullTextAnnotation?: { text?: string } }[] };
-  return json.responses?.[0]?.fullTextAnnotation?.text ?? "";
+  const json = (await res.json()) as {
+    responses?: { fullTextAnnotation?: { text?: string }; error?: { message?: string } }[];
+  };
+  const r = json.responses?.[0];
+  if (r?.error) throw new Error(`Vision: ${r.error.message ?? "error"}`);
+  return r?.fullTextAnnotation?.text ?? "";
 }
 
 // One reader kept warm between requests: starting it takes a few seconds.
