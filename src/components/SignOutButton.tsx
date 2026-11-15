@@ -12,7 +12,7 @@ export function SignOutButton() {
         // from the last one. See goHome() in LoginForm.
         window.location.replace("/login");
       }}
-      className="tap rounded-xl px-3 text-sm font-medium text-slate-600"
+      className="tap rounded-full px-3 text-sm font-semibold text-slate-600 active:bg-slate-100"
     >
       Sign out
     </button>

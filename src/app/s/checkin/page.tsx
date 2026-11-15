@@ -30,7 +30,8 @@ export default async function CheckinPage() {
   return (
     <AppShell
       profile={profile}
-      title="Depot check-in"
+      title="Check in"
+      back="/s"
       nav={[
         { href: "/s", label: "Today" },
         { href: "/s/roadmap", label: "Roadmap" },
@@ -70,13 +71,13 @@ function Notice({ title, body, ok, waiting }: { title: string; body: string; ok?
   return (
     <div className="space-y-4">
       {waiting ? <AutoRefresh seconds={8} /> : null}
-      <div className={`rounded-2xl border p-5 ${ok ? "border-ok-100 bg-ok-50" : "border-slate-200 bg-white"}`}>
+      <div className={`rounded-3xl p-5 ring-1 ${ok ? "bg-ok-50 ring-ok-100" : "bg-white shadow-sm ring-slate-200"}`}>
         <p className={`text-lg font-semibold ${ok ? "text-ok-700" : "text-slate-900"}`}>{title}</p>
         <p className={`mt-1 ${ok ? "text-ok-700" : "text-slate-600"}`}>{body}</p>
       </div>
       <a
         href="/s"
-        className="tap-lg flex items-center justify-center rounded-2xl border-2 border-slate-300 font-semibold"
+        className="tap-lg flex items-center justify-center rounded-2xl bg-brand-700 font-bold text-white active:scale-[0.98]"
       >
         Back to today
       </a>

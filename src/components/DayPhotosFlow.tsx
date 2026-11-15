@@ -156,31 +156,32 @@ export function DayPhotosFlow({
   /* ---------------------------------------------------------------- done */
   if (done) {
     return (
-      <div className="space-y-4">
-        <div className="rounded-2xl border border-ok-100 bg-ok-50 p-5">
-          {mode === "checkin" ? (
-            <>
-              <p className="text-lg font-semibold text-ok-700">
-                {retake ? "New photos sent" : "Photos sent for approval"}
-              </p>
-              <p className="mt-1 text-ok-700">
-                {retake ? "" : `Checked in at ${formatIstTime(done.at)}${done.late ? " (late)" : ""}. `}
-                Your jobs unlock as soon as the photos are approved.
-              </p>
-            </>
-          ) : (
-            <>
-              <p className="text-lg font-semibold text-ok-700">Checked out. Have a good evening.</p>
-              <p className="mt-1 text-ok-700">
-                {formatIstTime(done.at)}
-                {done.kmToday != null ? ` · ${done.kmToday} km today` : ""}
-              </p>
-            </>
-          )}
-        </div>
+      <div className="flex min-h-[60vh] flex-col items-center justify-center px-2 text-center">
+        <span className="flex size-20 items-center justify-center rounded-full bg-ok-600 text-white shadow-lg shadow-ok-600/30">
+          <svg viewBox="0 0 24 24" className="size-10" fill="none" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="m5 12.5 4.5 4.5L19 7.5" />
+          </svg>
+        </span>
+        {mode === "checkin" ? (
+          <>
+            <p className="mt-5 text-2xl font-bold text-slate-900">{retake ? "New photos sent" : "You're checked in"}</p>
+            <p className="mt-2 max-w-xs text-slate-600">
+              {retake ? "" : `At ${formatIstTime(done.at)}${done.late ? " (late)" : ""}. `}
+              Your jobs unlock as soon as the office approves the photos.
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="mt-5 text-2xl font-bold text-slate-900">Checked out</p>
+            <p className="mt-2 text-slate-600">
+              {formatIstTime(done.at)}
+              {done.kmToday != null ? ` · ${done.kmToday} km today` : ""}. Have a good evening.
+            </p>
+          </>
+        )}
         <a
           href="/s"
-          className="tap-lg flex items-center justify-center rounded-2xl bg-brand-700 font-semibold text-white"
+          className="tap-lg mt-8 flex w-full items-center justify-center rounded-2xl bg-brand-700 text-base font-bold text-white active:scale-[0.98]"
         >
           {mode === "checkin" ? "See today's jobs" : "Back to today"}
         </a>
@@ -188,113 +189,139 @@ export function DayPhotosFlow({
     );
   }
 
+  const doneCount = steps.filter((p) => shots[p.kind] !== "none").length + (kmNeeded && kmValid ? 1 : 0);
+  const totalCount = steps.length + (kmNeeded ? 1 : 0);
+
   /* ---------------------------------------------------------------- form */
   return (
-    <div className="space-y-4">
+    <div className="space-y-5 pb-28">
       {mode === "checkin" ? (
         retake ? (
-          <div className="rounded-2xl bg-danger-50 p-4 text-sm text-danger-700">
-            <p className="font-semibold">Your check-in photos were rejected</p>
-            {rejectionReason ? <p className="mt-1">{rejectionReason}</p> : null}
+          <div className="rounded-3xl bg-danger-50 p-4 text-sm text-danger-700 ring-1 ring-danger-100">
+            <p className="font-bold">Your check-in photos were rejected</p>
+            {rejectionReason ? <p className="mt-1">&ldquo;{rejectionReason}&rdquo;</p> : null}
             <p className="mt-1">Take both photos again and send them.</p>
           </div>
         ) : (
-          <section className="rounded-2xl border border-slate-200 bg-white p-4">
-            <CheckinCountdown deadline={deadline} submittedAt={null} />
+          <section className="rounded-3xl bg-gradient-to-br from-brand-600 to-brand-900 p-5 text-white shadow-lg shadow-brand-900/20">
+            <CheckinCountdown tone="hero" deadline={deadline} submittedAt={null} />
           </section>
         )
       ) : openJobs > 0 ? (
-        <div className="rounded-2xl bg-warn-50 p-4 text-sm text-warn-700">
-          <p className="font-semibold">
+        <div className="rounded-3xl bg-warn-50 p-4 text-sm text-warn-700 ring-1 ring-warn-100">
+          <p className="font-bold">
             {openJobs} job{openJobs === 1 ? " is" : "s are"} not finished yet
           </p>
           <p className="mt-1">You can still check out. The office will see that it was left open.</p>
         </div>
       ) : (
-        <p className="rounded-2xl bg-ok-50 p-4 text-sm font-medium text-ok-700">
+        <p className="rounded-3xl bg-ok-50 p-4 text-sm font-semibold text-ok-700 ring-1 ring-ok-100">
           All of today&apos;s jobs are done. Check out to finish your day.
         </p>
       )}
 
-      <ol className="space-y-3">
-        {steps.map((p, i) => {
-          const state = shots[p.kind];
-          return (
-            <li key={p.kind} className="flex items-center gap-3 rounded-2xl border-2 border-slate-200 bg-white p-4">
-              <span
-                className={`flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                  state === "none" ? "bg-slate-100 text-slate-500" : "bg-ok-600 text-white"
-                }`}
-                aria-hidden
-              >
-                {state === "none" ? i + 1 : "✓"}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="font-semibold text-slate-900">{p.title}</p>
-                <p className="text-sm text-slate-500">
-                  {state === "uploaded"
-                    ? "Photo saved"
-                    : state === "queued"
-                      ? "Saved on this phone, will upload when there is signal"
-                      : p.hint}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setCamera(p)}
-                className={`tap shrink-0 rounded-xl px-4 text-sm font-semibold ${
-                  state === "none" ? "bg-brand-700 text-white" : "border-2 border-slate-200 text-slate-600"
-                }`}
-              >
-                {state === "none" ? "Take photo" : "Retake"}
-              </button>
-            </li>
-          );
-        })}
-      </ol>
+      <div>
+        <div className="mb-2.5 flex items-baseline justify-between px-1">
+          <h2 className="text-lg font-bold text-slate-900">Steps</h2>
+          <span className="text-sm font-medium text-slate-500">
+            {doneCount} of {totalCount} done
+          </span>
+        </div>
+        <ol className="grid grid-cols-2 gap-3">
+          {steps.map((p, i) => {
+            const state = shots[p.kind];
+            const taken = state !== "none";
+            return (
+              <li key={p.kind}>
+                <button
+                  type="button"
+                  onClick={() => setCamera(p)}
+                  className={`relative flex aspect-[4/5] w-full flex-col items-center justify-center gap-2 rounded-3xl p-3 text-center active:scale-[0.98] ${
+                    taken
+                      ? "bg-ok-50 ring-2 ring-ok-600"
+                      : "border-2 border-dashed border-brand-600/50 bg-white"
+                  }`}
+                >
+                  <span className="absolute left-3 top-3 text-xs font-bold text-slate-400">{i + 1}</span>
+                  <span
+                    className={`flex size-14 items-center justify-center rounded-full ${
+                      taken ? "bg-ok-600 text-white" : "bg-brand-50 text-brand-700"
+                    }`}
+                  >
+                    <svg viewBox="0 0 24 24" className="size-7" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      {taken ? (
+                        <path d="m5 12.5 4.5 4.5L19 7.5" />
+                      ) : p.facing === "user" ? (
+                        <>
+                          <circle cx="12" cy="9" r="3.5" />
+                          <path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5" />
+                        </>
+                      ) : (
+                        <>
+                          <path d="M4 15a8 8 0 1 1 16 0" />
+                          <path d="m12 15 3.5-4.5" />
+                          <path d="M4 19h16" />
+                        </>
+                      )}
+                    </svg>
+                  </span>
+                  <span className="text-sm font-bold leading-tight text-slate-900">{p.title}</span>
+                  <span className="text-xs leading-snug text-slate-500">
+                    {state === "uploaded" ? "Saved · tap to retake" : state === "queued" ? "Saved, uploads with signal" : p.hint}
+                  </span>
+                  {!taken ? (
+                    <span className="mt-1 rounded-full bg-brand-700 px-3 py-1 text-xs font-bold text-white">Open camera</span>
+                  ) : null}
+                </button>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
 
       {kmNeeded ? (
-        <label className="block rounded-2xl border-2 border-slate-200 bg-white p-4">
-          <span className="mb-1.5 block font-semibold text-slate-900">
-            Km reading <span className="text-danger-600">*</span>
+        <label className="block rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+          <span className="block text-lg font-bold text-slate-900">Km reading</span>
+          <span className="mt-0.5 block text-sm text-slate-500">
+            The number on the scooter
+            {mode === "checkout" && startKm != null ? ` (this morning: ${startKm} km)` : ""}
           </span>
-          <span className="mb-2 block text-sm text-slate-500">
-            Type the number shown on the scooter
-            {mode === "checkout" && startKm != null ? ` (this morning: ${startKm} km)` : ""}.
+          <span className="mt-3 flex items-center gap-2 rounded-2xl bg-slate-50 px-4 ring-2 ring-slate-200 focus-within:ring-brand-600">
+            <input
+              type="number"
+              inputMode="decimal"
+              min={0}
+              step="0.1"
+              placeholder="12450"
+              value={km}
+              onChange={(e) => setKm(e.target.value)}
+              className="h-16 min-w-0 flex-1 bg-transparent text-3xl font-bold tabular-nums tracking-tight text-slate-900 outline-none placeholder:text-slate-300"
+            />
+            <span className="text-lg font-semibold text-slate-400">km</span>
           </span>
-          <input
-            type="number"
-            inputMode="decimal"
-            min={0}
-            step="0.1"
-            placeholder="e.g. 12450"
-            value={km}
-            onChange={(e) => setKm(e.target.value)}
-            className="tap w-full rounded-xl border-2 border-slate-200 bg-white px-3 text-lg tabular-nums outline-none focus:border-brand-600"
-          />
           {mode === "checkout" && startKm != null && kmValid && kmValue! >= startKm ? (
-            <span className="mt-1.5 block text-sm font-medium text-brand-700">
+            <span className="mt-2 block text-sm font-semibold text-brand-700">
               {Math.round((kmValue! - startKm) * 10) / 10} km today
             </span>
           ) : null}
         </label>
       ) : null}
 
-      {error ? <p className="rounded-xl bg-danger-50 p-3 text-sm text-danger-700">{error}</p> : null}
+      {error ? <p className="rounded-2xl bg-danger-50 p-3 text-sm font-medium text-danger-700">{error}</p> : null}
 
-      <button
-        type="button"
-        onClick={() => void submit()}
-        disabled={!ready || submitting !== null}
-        className="tap-lg w-full rounded-2xl bg-brand-700 font-semibold text-white disabled:opacity-40"
-      >
-        {submitting ?? (retake ? "Send new photos" : verb)}
-      </button>
-      {!ready ? (
-        <p className="text-center text-sm text-slate-500">
-          {!photosReady ? "Take both photos" : "Type the km reading"} to {verb.toLowerCase()}.
-        </p>
-      ) : null}
+      {/* The one action, always under the thumb. */}
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 px-4 pb-[calc(var(--safe-bottom)+0.75rem)] pt-3 backdrop-blur">
+        <div className="mx-auto w-full max-w-3xl">
+          <button
+            type="button"
+            onClick={() => void submit()}
+            disabled={!ready || submitting !== null}
+            className="tap-lg w-full rounded-2xl bg-brand-700 text-base font-bold text-white shadow-sm active:scale-[0.98] disabled:bg-slate-200 disabled:text-slate-500 disabled:shadow-none"
+          >
+            {submitting ?? (ready ? (retake ? "Send new photos" : verb) : !photosReady ? "Take both photos first" : "Type the km reading")}
+          </button>
+        </div>
+      </div>
 
       {camera ? (
         <LiveCameraCapture

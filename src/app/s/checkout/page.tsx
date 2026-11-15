@@ -21,6 +21,7 @@ export default async function CheckoutPage() {
     <AppShell
       profile={profile}
       title="Check out"
+      back="/s"
       nav={[
         { href: "/s", label: "Today" },
         { href: "/s/roadmap", label: "Roadmap" },
