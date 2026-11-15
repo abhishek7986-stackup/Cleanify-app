@@ -53,7 +53,7 @@ export function ApprovalCard({
   const decided = roster.approval_status !== "PENDING";
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-4">
+    <section className="card p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="font-semibold text-slate-900">{supervisorName}</p>
@@ -152,7 +152,7 @@ export function ApprovalCard({
             <button type="button" onClick={() => setRejecting(true)} className="tap flex-1 rounded-xl border-2 border-danger-500 font-semibold text-danger-600">
               Reject
             </button>
-            <button type="button" disabled={busy} onClick={() => review(true)} className="tap flex-[2] rounded-xl bg-brand-700 font-semibold text-white disabled:opacity-50">
+            <button type="button" disabled={busy} onClick={() => review(true)} className="tap flex-[2] rounded-xl bg-brand-900 font-semibold text-white disabled:opacity-50">
               {busy ? "…" : "Approve"}
             </button>
           </div>

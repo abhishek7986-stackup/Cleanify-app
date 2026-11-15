@@ -74,7 +74,7 @@ export function StaffForm({
   const input = "tap mt-1 w-full rounded-xl border-2 border-slate-200 bg-white px-3 text-base font-normal outline-none focus:border-brand-600";
 
   return (
-    <div className={`space-y-3 ${staff ? "mt-3 border-t border-slate-100 pt-3" : "rounded-2xl border border-slate-200 bg-white p-4"}`}>
+    <div className={`space-y-3 ${staff ? "mt-3 border-t border-slate-100 pt-3" : "card p-4"}`}>
       {!staff ? <h2 className="font-semibold text-slate-900">New worker</h2> : null}
       {isWorker ? (
         <>
@@ -136,7 +136,7 @@ export function StaffForm({
         <button type="button" onClick={() => setOpen(false)} className="tap flex-1 rounded-xl border-2 border-slate-200 font-semibold text-slate-600">
           Cancel
         </button>
-        <button type="button" disabled={busy} onClick={() => void save()} className="tap flex-1 rounded-xl bg-brand-700 font-semibold text-white disabled:opacity-40">
+        <button type="button" disabled={busy} onClick={() => void save()} className="tap flex-1 rounded-xl bg-brand-900 font-semibold text-white disabled:opacity-40">
           {busy ? "Saving…" : "Save"}
         </button>
       </div>

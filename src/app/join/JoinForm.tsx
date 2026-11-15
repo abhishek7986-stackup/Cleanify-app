@@ -222,7 +222,7 @@ export function JoinForm() {
       <button
         type="submit"
         disabled={busy !== null}
-        className="tap-lg w-full rounded-xl bg-brand-700 text-base font-semibold text-white disabled:opacity-50"
+        className="tap-lg w-full rounded-xl bg-brand-900 text-base font-semibold text-white disabled:opacity-50"
       >
         {busy ?? "Create my account"}
       </button>
@@ -285,7 +285,7 @@ function DocPicker({
       <label
         htmlFor={id}
         className={`tap flex shrink-0 cursor-pointer items-center rounded-xl px-3 text-sm font-semibold ${
-          doc ? "border-2 border-slate-200 text-slate-600" : "bg-brand-700 text-white"
+          doc ? "border-2 border-slate-200 text-slate-600" : "bg-brand-900 text-white"
         }`}
       >
         {doc ? "Change" : "Add photo"}

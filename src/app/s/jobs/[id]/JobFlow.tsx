@@ -219,7 +219,7 @@ export function JobFlow({
   }
 
   return (
-    <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+    <section className="space-y-4 card p-5">
       <Stepper status={status} before={beforeStatus} after={afterStatus} />
 
       {/* -------------------------------------------- before arriving */}
@@ -238,7 +238,7 @@ export function JobFlow({
             </p>
             <a
               href="/s/checkin"
-              className="tap-lg flex items-center justify-center rounded-2xl bg-brand-700 text-base font-bold text-white active:scale-[0.98]"
+              className="tap-lg flex items-center justify-center rounded-2xl bg-brand-900 text-base font-bold text-white active:scale-[0.98]"
             >
               {depot === "REJECTED" ? "Retake depot photos" : "Go to depot check-in"}
             </a>
@@ -481,7 +481,7 @@ function UnitPhotoRow({ unit, which, onShoot }: { unit: FlowUnit; which: "before
         </span>
       </span>
       {!taken ? (
-        <span className="shrink-0 rounded-full bg-brand-700 px-3 py-1.5 text-xs font-bold text-white">Camera</span>
+        <span className="shrink-0 rounded-full bg-brand-900 px-3 py-1.5 text-xs font-bold text-white">Camera</span>
       ) : null}
     </button>
   );
@@ -535,7 +535,7 @@ function BigButton({
       type="button"
       onClick={onClick}
       disabled={disabled || busy !== null}
-      className="tap-lg flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-700 text-base font-bold text-white shadow-sm active:scale-[0.98] disabled:bg-slate-200 disabled:text-slate-500 disabled:shadow-none"
+      className="tap-lg flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-900 text-base font-bold text-white active:scale-[0.98] disabled:bg-slate-200 disabled:text-slate-500 disabled:shadow-none"
     >
       {busy ? null : icon ? <Glyph d={icon} /> : null}
       {busy ?? children}
@@ -547,7 +547,7 @@ function Panel({ tone, title, children }: { tone: "ok" | "plain"; title: string;
   return (
     <div
       className={`flex items-center gap-3 rounded-3xl p-5 ring-1 ${
-        tone === "ok" ? "bg-ok-50 ring-ok-100" : "bg-white shadow-sm ring-slate-200"
+        tone === "ok" ? "bg-ok-50 ring-ok-100" : "card"
       }`}
     >
       {tone === "ok" ? (

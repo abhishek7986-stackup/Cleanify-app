@@ -65,7 +65,7 @@ export default async function SalesToday(props: PageProps<"/sales">) {
               <li key={j.id}>
                 <Link
                   href={`/sales/jobs/${j.id}`}
-                  className="block rounded-2xl border border-slate-200 bg-white p-4"
+                  className="block card p-4"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">

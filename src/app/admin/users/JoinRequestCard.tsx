@@ -188,7 +188,7 @@ export function JoinRequestCard({
               type="button"
               disabled={busy}
               onClick={() => void decide(true)}
-              className="tap flex-[2] rounded-xl bg-brand-700 font-semibold text-white disabled:opacity-50"
+              className="tap flex-[2] rounded-xl bg-brand-900 font-semibold text-white disabled:opacity-50"
             >
               {busy ? "…" : "Approve"}
             </button>

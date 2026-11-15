@@ -63,7 +63,7 @@ export default async function JoinStatusPage() {
             <p className="mt-2 text-sm text-danger-700">Please contact the Cleanify office.</p>
           </div>
         ) : (
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="card p-5">
             <p className="font-semibold text-slate-900">Your account is switched off</p>
             <p className="mt-1 text-sm text-slate-600">Please contact the Cleanify office.</p>
           </div>

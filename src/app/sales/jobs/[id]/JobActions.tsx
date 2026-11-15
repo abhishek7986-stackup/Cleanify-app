@@ -37,7 +37,7 @@ export function JobActions({
         <button
           type="button"
           onClick={() => setOpen("reschedule")}
-          className="tap-lg flex-1 rounded-2xl bg-brand-700 font-semibold text-white"
+          className="tap-lg flex-1 rounded-2xl bg-brand-900 font-semibold text-white"
         >
           Reschedule
         </button>
@@ -183,7 +183,7 @@ function RescheduleModal({
         type="button"
         disabled={busy || !reasonId}
         onClick={submit}
-        className="tap-lg w-full rounded-2xl bg-brand-700 font-semibold text-white disabled:opacity-50"
+        className="tap-lg w-full rounded-2xl bg-brand-900 font-semibold text-white disabled:opacity-50"
       >
         {busy ? "Rescheduling…" : "Confirm reschedule"}
       </button>

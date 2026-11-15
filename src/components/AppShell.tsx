@@ -27,7 +27,7 @@ export function AppShell({
 }) {
   return (
     <div className="flex min-h-full flex-col">
-      <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/95 backdrop-blur">
+      <header className="sticky top-0 z-30 bg-canvas/90 backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-3xl items-center gap-2 px-4 pb-2.5 pt-[calc(var(--safe-top)+0.625rem)]">
           {back ? (
             <Link
@@ -41,10 +41,10 @@ export function AppShell({
             </Link>
           ) : null}
           <div className="min-w-0 flex-1">
-            <h1 className="truncate text-xl font-bold tracking-tight text-slate-900">{title}</h1>
+            <h1 className="truncate text-[1.375rem] font-bold tracking-tight text-slate-950">{title}</h1>
             <p className="mt-0.5 flex min-w-0 items-center gap-1.5 text-xs text-slate-500">
               <span
-                className="flex size-[18px] shrink-0 items-center justify-center rounded-full bg-brand-700 text-[9px] font-bold text-white"
+                className="flex size-[18px] shrink-0 items-center justify-center rounded-full bg-brand-900 text-[9px] font-bold text-white"
                 aria-hidden
               >
                 {initials(profile.full_name)}

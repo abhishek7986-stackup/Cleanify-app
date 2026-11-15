@@ -14,6 +14,11 @@
   --color-brand-700: #0f766e;
   --color-brand-800: #115e59;
   --color-brand-900: #134e4a;
+  --color-brand-950: #0b3532;
+
+  /* The page behind the cards: a soft, slightly warm grey, so white cards read
+     as raised without needing heavy shadows. */
+  --color-canvas: #f4f5f3;
 
   --color-danger-50:  #fef2f2;
   --color-danger-100: #fee2e2;
@@ -48,12 +53,22 @@ body {
 }
 
 body {
-  background: #f8fafc;
+  background: var(--color-canvas);
   color: #0f172a;
   font-family: var(--font-sans);
   /* Stop iOS zooming the whole page when a supervisor double-taps a button. */
   touch-action: manipulation;
   -webkit-text-size-adjust: 100%;
+}
+
+/* The one card surface used everywhere: white, a hairline edge and the
+   faintest lift. Minimal, but still clearly a thing you can tap. */
+@utility card {
+  border-radius: 1.5rem;
+  background: #fff;
+  box-shadow:
+    0 0 0 1px rgb(15 23 42 / 0.06),
+    0 1px 2px rgb(15 23 42 / 0.04);
 }
 
 /* Never let a field control be small enough to miss with a gloved thumb. */

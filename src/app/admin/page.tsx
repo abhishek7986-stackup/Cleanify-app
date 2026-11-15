@@ -104,7 +104,7 @@ export default async function AdminDashboard() {
 
         {/* Each supervisor's day: in, out, and the scooter km in between. */}
         {rosters.length ? (
-          <section className="rounded-2xl border border-slate-200 bg-white p-4">
+          <section className="card p-4">
             <h2 className="mb-2 font-semibold text-slate-900">Supervisors today</h2>
             <ul className="divide-y divide-slate-100 text-sm">
               {rosters.map((r) => {

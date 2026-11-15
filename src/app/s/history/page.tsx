@@ -59,7 +59,7 @@ export default async function HistoryPage() {
               <ul className="space-y-2">
                 {rows.map((j) => (
                   <li key={j.id}>
-                    <Link href={`/s/jobs/${j.id}`} className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+                    <Link href={`/s/jobs/${j.id}`} className="flex items-center justify-between gap-3 card p-4">
                       <div className="min-w-0">
                         <p className="truncate font-semibold text-slate-900">{j.client?.name ?? j.job_number}</p>
                         <p className="truncate text-sm text-slate-500">

@@ -108,7 +108,7 @@ export function LoginForm() {
     "w-full tap rounded-xl border-2 border-slate-200 bg-white px-4 text-base " +
     "outline-none focus:border-brand-600";
   const button =
-    "w-full tap-lg rounded-xl bg-brand-700 text-base font-semibold text-white " +
+    "w-full tap-lg rounded-xl bg-brand-900 text-base font-semibold text-white " +
     "disabled:opacity-50";
 
   if (AUTH_MODE === "otp") {

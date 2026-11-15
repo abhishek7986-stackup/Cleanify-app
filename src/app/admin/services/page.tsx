@@ -21,7 +21,7 @@ export default async function ServicesPage() {
         </p>
 
         {services.map((s) => (
-          <section key={s.id} className="rounded-2xl border border-slate-200 bg-white p-4">
+          <section key={s.id} className="card p-4">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="font-semibold text-slate-900">{s.name}</p>

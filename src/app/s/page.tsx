@@ -36,21 +36,19 @@ export default async function SupervisorToday() {
 
         {/* The hero: one card, one next action. */}
         {!day.roster ? (
-          <section className="rounded-3xl bg-white p-5 text-center shadow-sm ring-1 ring-slate-200">
+          <section className="card p-5 text-center">
             <p className="text-lg font-bold text-slate-900">No check-in today</p>
             <p className="mt-1 text-sm text-slate-500">You have no jobs booked for {formatIstDate(day.date)}.</p>
           </section>
         ) : needsCheckin ? (
-          <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-600 to-brand-900 p-5 text-white shadow-lg shadow-brand-900/20">
-            <div className="pointer-events-none absolute -right-10 -top-12 size-44 rounded-full bg-white/10" aria-hidden />
-            <div className="pointer-events-none absolute -bottom-16 right-10 size-32 rounded-full bg-white/5" aria-hidden />
+          <section className="rounded-3xl bg-brand-950 p-6 text-white">
             <div className="relative">
               <div className="mb-4 flex items-center justify-between">
                 <span className="flex items-center gap-2 text-sm font-semibold">
                   <Icon d="M4 20V9l8-5 8 5v11M9 20v-6h6v6" />
                   Depot check-in
                 </span>
-                <span className="rounded-full bg-white/15 px-2.5 py-1 text-xs font-semibold">
+                <span className="rounded-full bg-white/10 px-2.5 py-1 text-xs font-semibold">
                   {formatIstDate(day.date)}
                 </span>
               </div>
@@ -67,7 +65,7 @@ export default async function SupervisorToday() {
 
               <a
                 href="/s/checkin"
-                className="tap-lg mt-5 flex items-center justify-center gap-2 rounded-2xl bg-white text-base font-bold text-brand-800 shadow-sm active:scale-[0.98]"
+                className="tap-lg mt-5 flex items-center justify-center gap-2 rounded-2xl bg-white text-base font-bold text-brand-800 active:scale-[0.98]"
               >
                 <Icon d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.7l1.3-2h5l1.3 2h1.7A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5v-8ZM12 16a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z" />
                 Start check-in
@@ -91,7 +89,7 @@ export default async function SupervisorToday() {
             </a>
           </section>
         ) : day.roster.approval_status === "PENDING" ? (
-          <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+          <section className="card p-5">
             <AutoRefresh seconds={8} />
             <div className="flex items-center gap-3">
               <span className="relative flex size-11 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-700">
@@ -170,7 +168,7 @@ function CheckoutCard({ roster, jobs }: { roster: DayRoster; jobs: Job[] }) {
   }
   const open = jobs.filter((j) => !["COMPLETED", "CANCELLED", "NO_SHOW", "DRAFT"].includes(j.status)).length;
   return (
-    <section className="space-y-2 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+    <section className="space-y-2 card p-5">
       <p className="text-lg font-bold text-slate-900">End of the day</p>
       <p className="text-sm text-slate-600">
         {open === 0
@@ -180,7 +178,7 @@ function CheckoutCard({ roster, jobs }: { roster: DayRoster; jobs: Job[] }) {
       <a
         href="/s/checkout"
         className={`tap-lg flex items-center justify-center rounded-2xl font-semibold ${
-          open === 0 ? "bg-brand-700 text-white" : "border-2 border-slate-300 text-slate-700"
+          open === 0 ? "bg-brand-900 text-white" : "border-2 border-slate-300 text-slate-700"
         }`}
       >
         Check out
@@ -209,12 +207,12 @@ function JobCard({
   return (
     <a
       href={`/s/jobs/${job.id}`}
-      className={`block overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-slate-200 active:scale-[0.99] ${
+      className={`block card overflow-hidden active:scale-[0.99] ${
         done ? "opacity-70" : ""
       }`}
     >
       <div className="flex gap-3 p-4">
-        <div className="flex w-14 shrink-0 flex-col items-center justify-center rounded-2xl bg-slate-50 py-2 ring-1 ring-slate-100">
+        <div className="flex w-14 shrink-0 flex-col items-center justify-center rounded-2xl bg-canvas py-2">
           <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Job {index}</span>
           <span className="text-sm font-bold tabular-nums text-slate-900">{clock}</span>
           <span className="text-[10px] font-semibold uppercase text-slate-500">{meridiem}</span>
@@ -255,7 +253,7 @@ function JobCard({
       {next ? (
         <p
           className={`flex items-center justify-between gap-2 px-4 py-2.5 text-sm font-bold ${
-            next.waiting ? "bg-brand-50 text-brand-800" : "bg-brand-700 text-white"
+            next.waiting ? "bg-brand-50 text-brand-800" : "bg-brand-900 text-white"
           }`}
         >
           <span>{next.text}</span>

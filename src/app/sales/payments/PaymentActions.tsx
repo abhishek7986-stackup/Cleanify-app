@@ -170,7 +170,7 @@ export function CorrectPaymentButton({ jobId, upi, cash }: { jobId: string; upi:
           type="button"
           disabled={busy || !reason.trim() || total <= 0}
           onClick={() => void save()}
-          className="tap flex-1 rounded-xl bg-brand-700 text-sm font-semibold text-white disabled:opacity-40"
+          className="tap flex-1 rounded-xl bg-brand-900 text-sm font-semibold text-white disabled:opacity-40"
         >
           {busy ? "Saving…" : "Save correct amount"}
         </button>
@@ -199,7 +199,7 @@ export function UpiSettings({ upi }: { upi: { id: string; name: string } | null 
 
   if (!open) {
     return (
-      <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-3 text-sm">
+      <div className="flex items-center justify-between gap-3 card p-3 text-sm">
         <span className="min-w-0 break-words text-slate-600">
           Customers pay <b className="text-slate-900">{upi?.name}</b> ({upi?.id})
         </span>
@@ -239,7 +239,7 @@ export function UpiSettings({ upi }: { upi: { id: string; name: string } | null 
         type="button"
         disabled={busy}
         onClick={() => void save()}
-        className="tap w-full rounded-xl bg-brand-700 font-semibold text-white disabled:opacity-40"
+        className="tap w-full rounded-xl bg-brand-900 font-semibold text-white disabled:opacity-40"
       >
         {busy ? "Saving…" : "Save"}
       </button>

@@ -44,10 +44,10 @@ export default async function RoadmapPage() {
           <ol className="relative space-y-3 border-l-2 border-slate-200 pl-5">
             {day.jobs.map((job, i) => (
               <li key={job.id} className="relative">
-                <span className="absolute -left-[27px] top-3 flex size-6 items-center justify-center rounded-full bg-brand-700 text-xs font-bold text-white">
+                <span className="absolute -left-[27px] top-3 flex size-6 items-center justify-center rounded-full bg-brand-900 text-xs font-bold text-white">
                   {i + 1}
                 </span>
-                <Link href={`/s/jobs/${job.id}`} className="block rounded-2xl border border-slate-200 bg-white p-4">
+                <Link href={`/s/jobs/${job.id}`} className="block card p-4">
                   <p className="text-sm font-medium text-slate-500">
                     {formatIstTime(job.scheduled_start)}
                     {job.travel_minutes != null ? ` · ~${job.travel_minutes} min to get here` : ""}

@@ -171,13 +171,13 @@ function JobHeader({
   mapNote: string;
 }) {
   return (
-    <section className="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-slate-200">
-      <div className="bg-gradient-to-br from-brand-600 to-brand-900 p-5 text-white">
+    <section className="card overflow-hidden">
+      <div className="bg-brand-950 p-6 text-white">
         <p className="text-xs font-semibold uppercase tracking-wider text-white/75">{service ?? "Job"}</p>
         <p className="mt-1 text-2xl font-bold leading-tight tracking-tight">{client}</p>
         <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold">
-          <span className="rounded-full bg-white/15 px-2.5 py-1">{when}</span>
-          {quoted != null ? <span className="rounded-full bg-white/15 px-2.5 py-1">{rupees(quoted)}</span> : null}
+          <span className="rounded-full bg-white/10 px-2.5 py-1">{when}</span>
+          {quoted != null ? <span className="rounded-full bg-white/10 px-2.5 py-1">{rupees(quoted)}</span> : null}
         </div>
       </div>
       <div className="space-y-4 p-5">
@@ -196,7 +196,7 @@ function JobHeader({
               href={mapsHref}
               target="_blank"
               rel="noreferrer"
-              className="tap flex items-center justify-center gap-2 rounded-2xl bg-brand-700 text-sm font-bold text-white active:scale-[0.98]"
+              className="tap flex items-center justify-center gap-2 rounded-2xl bg-brand-900 text-sm font-bold text-white active:scale-[0.98]"
             >
               <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                 <path d="m3 11 18-8-8 18-2-8-8-2Z" />

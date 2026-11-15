@@ -42,7 +42,7 @@ export default async function TeamPage() {
           {staff.map((s) => {
             const { percent, nextRise } = previewPercent(s, today);
             return (
-              <li key={s.id} className={`rounded-2xl border border-slate-200 bg-white p-4 ${s.is_active ? "" : "opacity-60"}`}>
+              <li key={s.id} className={`card p-4 ${s.is_active ? "" : "opacity-60"}`}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="truncate font-semibold text-slate-900">{s.full_name}</p>

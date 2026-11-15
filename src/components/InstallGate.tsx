@@ -148,7 +148,7 @@ export function InstallGate({ audience = "supervisor" }: { audience?: "superviso
         type="button"
         onClick={() => void enableAlerts()}
         disabled={busy}
-        className="tap mt-3 rounded-xl bg-brand-700 px-5 font-semibold text-white disabled:opacity-50"
+        className="tap mt-3 rounded-xl bg-brand-900 px-5 font-semibold text-white disabled:opacity-50"
       >
         {busy ? "Enabling…" : "Enable alerts"}
       </button>
@@ -165,25 +165,24 @@ function Banner({
   children: React.ReactNode;
   onDismiss?: () => void;
 }) {
-  const tones = {
-    brand: "bg-brand-50 border-brand-200 text-brand-900",
-    warn: "bg-warn-50 border-warn-100 text-warn-700",
-    danger: "bg-danger-50 border-danger-100 text-danger-700",
-  } as const;
+  // Quiet by design: a white card with a coloured marker, so a reminder never
+  // shouts louder than the day's actual work.
+  const dot = { brand: "bg-brand-600", warn: "bg-warn-500", danger: "bg-danger-500" } as const;
 
   return (
-    <div className={`relative rounded-2xl border p-4 ${tones[tone]}`}>
+    <div className="card relative flex gap-3 p-4 pr-10 text-slate-600 [&_.font-semibold]:text-slate-900 [&_p.text-sm]:text-slate-600">
+      <span className={`mt-1.5 size-2 shrink-0 rounded-full ${dot[tone]}`} aria-hidden />
+      <div className="min-w-0">{children}</div>
       {onDismiss ? (
         <button
           type="button"
           onClick={onDismiss}
           aria-label="Dismiss"
-          className="absolute right-2 top-2 size-9 rounded-full text-lg leading-none opacity-60"
+          className="absolute right-1.5 top-1.5 flex size-9 items-center justify-center rounded-full text-lg leading-none text-slate-400 active:bg-slate-100"
         >
           ×
         </button>
       ) : null}
-      {children}
     </div>
   );
 }

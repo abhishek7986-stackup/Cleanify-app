@@ -157,7 +157,7 @@ export function DayPhotosFlow({
   if (done) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center px-2 text-center">
-        <span className="flex size-20 items-center justify-center rounded-full bg-ok-600 text-white shadow-lg shadow-ok-600/30">
+        <span className="flex size-20 items-center justify-center rounded-full bg-ok-600 text-white">
           <svg viewBox="0 0 24 24" className="size-10" fill="none" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             <path d="m5 12.5 4.5 4.5L19 7.5" />
           </svg>
@@ -181,7 +181,7 @@ export function DayPhotosFlow({
         )}
         <a
           href="/s"
-          className="tap-lg mt-8 flex w-full items-center justify-center rounded-2xl bg-brand-700 text-base font-bold text-white active:scale-[0.98]"
+          className="tap-lg mt-8 flex w-full items-center justify-center rounded-2xl bg-brand-900 text-base font-bold text-white active:scale-[0.98]"
         >
           {mode === "checkin" ? "See today's jobs" : "Back to today"}
         </a>
@@ -203,7 +203,7 @@ export function DayPhotosFlow({
             <p className="mt-1">Take both photos again and send them.</p>
           </div>
         ) : (
-          <section className="rounded-3xl bg-gradient-to-br from-brand-600 to-brand-900 p-5 text-white shadow-lg shadow-brand-900/20">
+          <section className="rounded-3xl bg-brand-950 p-6 text-white">
             <CheckinCountdown tone="hero" deadline={deadline} submittedAt={null} />
           </section>
         )
@@ -270,7 +270,7 @@ export function DayPhotosFlow({
                     {state === "uploaded" ? "Saved · tap to retake" : state === "queued" ? "Saved, uploads with signal" : p.hint}
                   </span>
                   {!taken ? (
-                    <span className="mt-1 rounded-full bg-brand-700 px-3 py-1 text-xs font-bold text-white">Open camera</span>
+                    <span className="mt-1 rounded-full bg-brand-900 px-3 py-1 text-xs font-bold text-white">Open camera</span>
                   ) : null}
                 </button>
               </li>
@@ -280,7 +280,7 @@ export function DayPhotosFlow({
       </div>
 
       {kmNeeded ? (
-        <label className="block rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+        <label className="block card p-5">
           <span className="block text-lg font-bold text-slate-900">Km reading</span>
           <span className="mt-0.5 block text-sm text-slate-500">
             The number on the scooter
@@ -316,7 +316,7 @@ export function DayPhotosFlow({
             type="button"
             onClick={() => void submit()}
             disabled={!ready || submitting !== null}
-            className="tap-lg w-full rounded-2xl bg-brand-700 text-base font-bold text-white shadow-sm active:scale-[0.98] disabled:bg-slate-200 disabled:text-slate-500 disabled:shadow-none"
+            className="tap-lg w-full rounded-2xl bg-brand-900 text-base font-bold text-white active:scale-[0.98] disabled:bg-slate-200 disabled:text-slate-500 disabled:shadow-none"
           >
             {submitting ?? (ready ? (retake ? "Send new photos" : verb) : !photosReady ? "Take both photos first" : "Type the km reading")}
           </button>

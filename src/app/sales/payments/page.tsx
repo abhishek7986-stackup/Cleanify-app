@@ -127,12 +127,12 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
               To
               <input type="date" name="to" defaultValue={to} className="tap mt-1 block w-full rounded-xl border-2 border-slate-200 bg-white px-2 text-sm" />
             </label>
-            <button className="tap rounded-xl bg-brand-700 px-4 text-sm font-semibold text-white">Show</button>
+            <button className="tap rounded-xl bg-brand-900 px-4 text-sm font-semibold text-white">Show</button>
           </form>
         ) : null}
 
         {/* The one thing everyone looks for: how much, and how it came in. */}
-        <section className="rounded-2xl border border-slate-200 bg-white p-4">
+        <section className="card p-4">
           <p className="text-sm text-slate-500">
             Total received, {from === to ? shortDate(from) : `${shortDate(from)} to ${shortDate(to)}`}
           </p>
@@ -187,7 +187,7 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
         ) : null}
 
         {totals.length > 0 ? (
-          <section className="rounded-2xl border border-slate-200 bg-white p-4">
+          <section className="card p-4">
             <h2 className="mb-2 font-semibold text-slate-900">By supervisor</h2>
             <table className="w-full text-sm tabular-nums">
               <thead>
@@ -225,7 +225,7 @@ export default async function PaymentsPage(props: PageProps<"/sales/payments">) 
               const job = rows[0].job;
               const total = rows.reduce((n, r) => n + Number(r.amount), 0);
               return (
-                <article key={jobId} className="rounded-2xl border border-slate-200 bg-white p-4">
+                <article key={jobId} className="card p-4">
                   <div className="flex items-start justify-between gap-3">
                     <Link href={`/sales/jobs/${jobId}`} className="min-w-0">
                       <p className="truncate font-semibold text-slate-900">{job?.client?.name ?? job?.job_number}</p>

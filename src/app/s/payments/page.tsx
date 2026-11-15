@@ -84,7 +84,7 @@ export default async function MyPaymentsPage() {
         ) : null}
 
         {earningsRes.data?.length ? (
-          <section className="rounded-2xl border border-slate-200 bg-white p-4">
+          <section className="card p-4">
             <h2 className="mb-1 font-semibold text-slate-900">My salary per job</h2>
             <ul className="divide-y divide-slate-100 text-sm">
               {earningsRes.data.map((e) => (
@@ -124,7 +124,7 @@ function Statement({
   const settled = Number(row.settled_amount ?? 0);
   const left = Number(row.carry_forward ?? 0);
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-4">
+    <section className="card p-4">
       <h2 className="font-semibold text-slate-900">{title}</h2>
       <p className="text-xs text-slate-500">
         {weekLabel(week)} · you are at {Number(row.percent_now)}%

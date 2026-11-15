@@ -18,7 +18,7 @@ export function ContinueButton() {
         await createClient().auth.refreshSession();
         window.location.replace("/");
       }}
-      className="tap-lg w-full rounded-xl bg-brand-700 font-semibold text-white disabled:opacity-50"
+      className="tap-lg w-full rounded-xl bg-brand-900 font-semibold text-white disabled:opacity-50"
     >
       {busy ? "Opening…" : "Open the app"}
     </button>

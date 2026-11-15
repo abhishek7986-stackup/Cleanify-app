@@ -323,7 +323,7 @@ export function NewJobWizard({
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="tap-lg flex-1 rounded-2xl bg-brand-700 font-semibold text-white"
+            className="tap-lg flex-1 rounded-2xl bg-brand-900 font-semibold text-white"
           >
             Book another
           </button>
@@ -625,7 +625,7 @@ export function NewJobWizard({
 
       {/* ------------------------------------------------------ 5. review */}
       {step === 5 && service ? (
-        <section className="space-y-2 rounded-2xl border border-slate-200 bg-white p-4 text-sm">
+        <section className="space-y-2 card p-4 text-sm">
           <Row k="Client" v={client?.name ?? draft.name} />
           <Row k="Service" v={service.name} />
           <Row k="Where" v={siteAddress} />
@@ -652,11 +652,11 @@ export function NewJobWizard({
           </button>
         ) : null}
         {step < STEPS.length - 1 ? (
-          <button type="button" onClick={next} className="tap-lg flex-[2] rounded-2xl bg-brand-700 font-semibold text-white">
+          <button type="button" onClick={next} className="tap-lg flex-[2] rounded-2xl bg-brand-900 font-semibold text-white">
             Continue
           </button>
         ) : (
-          <button type="button" onClick={submit} disabled={submitting} className="tap-lg flex-[2] rounded-2xl bg-brand-700 font-semibold text-white disabled:opacity-50">
+          <button type="button" onClick={submit} disabled={submitting} className="tap-lg flex-[2] rounded-2xl bg-brand-900 font-semibold text-white disabled:opacity-50">
             {submitting ? "Creating…" : "Create job"}
           </button>
         )}

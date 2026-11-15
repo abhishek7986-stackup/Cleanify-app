@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0f766e",
+  themeColor: "#f4f5f3",
   width: "device-width",
   initialScale: 1,
   // Field staff need to pinch-zoom a client's address or a photo, so zoom is

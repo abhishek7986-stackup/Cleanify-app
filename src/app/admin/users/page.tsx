@@ -63,7 +63,7 @@ export default async function UsersPage() {
     <AppShell profile={profile} title="Staff" nav={officeNav(profile)}>
       <div className="space-y-4">
         {pending.length ? <AutoRefresh seconds={30} /> : null}
-        <Link href="/admin/services" className="tap flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700">
+        <Link href="/admin/services" className="tap flex items-center justify-between card px-4 text-sm font-medium text-slate-700">
           Services and their questions <span aria-hidden>→</span>
         </Link>
 
@@ -104,7 +104,7 @@ export default async function UsersPage() {
             {staff
               .filter((s) => !pendingIds.has(s.id))
               .map((s) => (
-                <li key={s.id} className="rounded-2xl border border-slate-200 bg-white p-4">
+                <li key={s.id} className="card p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="font-semibold text-slate-900">{s.full_name}</p>

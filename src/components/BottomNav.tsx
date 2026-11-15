@@ -15,7 +15,7 @@ export function BottomNav({ items }: { items: { href: string; label: string }[] 
     .sort((a, b) => b.href.length - a.href.length)[0]?.href;
 
   return (
-    <nav className="sticky bottom-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur">
+    <nav className="sticky bottom-0 z-30 border-t border-slate-900/[0.06] bg-white/90 backdrop-blur-md">
       <ul className="mx-auto flex w-full max-w-3xl pb-[var(--safe-bottom)]">
         {items.map((item) => {
           const on = item.href === active;

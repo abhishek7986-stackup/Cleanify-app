@@ -142,7 +142,7 @@ export default async function PayoutsPage(props: PageProps<"/sales/payouts">) {
               const quiet = net === 0 && Number(r.job_count) === 0 && !r.payout_id;
               const left = leftToSettle(r);
               return (
-                <li key={r.staff_id} className="rounded-2xl border border-slate-200 bg-white p-4">
+                <li key={r.staff_id} className="card p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="truncate font-semibold text-slate-900">{r.full_name}</p>
