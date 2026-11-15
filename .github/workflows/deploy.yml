@@ -71,8 +71,10 @@ jobs:
             set -e
             cd /sites/CLEANIFY
 
-            # Install dependencies on the server (from the package files just copied)
-            npm i
+            # Install dependencies on the server (from the package files just copied).
+            # No install scripts: the project's own (copying the map worker) needs
+            # scripts/, which is not copied here, and its output already ships in public/.
+            npm i --ignore-scripts
 
             # Restart the application using PM2
             pm2 restart cleanify
