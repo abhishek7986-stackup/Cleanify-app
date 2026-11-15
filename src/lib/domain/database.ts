@@ -579,6 +579,23 @@ export type Database = {
     };
     Functions: {
       create_job: { Args: { p_payload: unknown }; Returns: Job };
+      my_team_pay: {
+        Args: Record<string, never>;
+        Returns: {
+          staff_id: string;
+          full_name: string;
+          percent: number;
+          in_training: boolean;
+          today_earned: number;
+          week_earned: number;
+          week_jobs: number;
+          month_earned: number;
+          last_week_due: number;
+          last_week_paid: number | null;
+          last_week_paid_at: string | null;
+          payout_day: string;
+        }[];
+      };
       my_team_rates: {
         Args: Record<string, never>;
         Returns: { staff_id: string; full_name: string; percent: number; in_training: boolean }[];

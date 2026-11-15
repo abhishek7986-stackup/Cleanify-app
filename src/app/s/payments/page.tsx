@@ -22,11 +22,13 @@ export default async function MyPaymentsPage() {
   if (profile.role !== "supervisor") redirect("/sales/payments");
 
   const supabase = await createClient();
-  const [staffRes, dueRes] = await Promise.all([
+  const [staffRes, dueRes, teamRes] = await Promise.all([
     supabase.from("pay_staff").select("id").eq("profile_id", profile.id).maybeSingle(),
     supabase.rpc("jobs_awaiting_payment"),
+    supabase.rpc("my_team_pay"),
   ]);
   const due = dueRes.data ?? [];
+  const team = teamRes.data ?? [];
 
   return (
     <AppShell profile={profile} title="Payments" nav={NAV}>
@@ -38,6 +40,48 @@ export default async function MyPaymentsPage() {
           <p className="mt-1 text-sm text-slate-600">Ask the office to add you under Team %, then your pay shows here.</p>
         </section>
       )}
+
+      {team.length ? (
+        <div className="-mx-4">
+          <p className="section-label px-4 pb-2 pt-6">Your team&apos;s pay</p>
+          <ul className="sheet divide-y divide-brand-950/[0.07]">
+            {team.map((w) => {
+              const paid = w.last_week_paid != null;
+              const due = Number(w.last_week_due);
+              return (
+                <li key={w.staff_id} className="px-4 py-3">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <p className="min-w-0 truncate font-semibold text-slate-900">
+                      {w.full_name}
+                      <span className="font-normal text-slate-500"> · {w.in_training ? "in training" : `${Number(w.percent)}%`}</span>
+                    </p>
+                    <p className="shrink-0 text-right">
+                      <span className="block font-semibold tabular-nums text-slate-950">{rupees(w.week_earned)}</span>
+                    </p>
+                  </div>
+                  <p className="text-sm tabular-nums text-slate-600">
+                    This week · {w.week_jobs} {Number(w.week_jobs) === 1 ? "job" : "jobs"} · today {rupees(w.today_earned)} · this month{" "}
+                    {rupees(w.month_earned)}
+                  </p>
+                  <p className="mt-1 flex items-center gap-2 text-sm">
+                    <span className={`size-2 shrink-0 rounded-full ${paid ? "bg-ok-600" : due > 0 ? "bg-amber-500" : "bg-slate-300"}`} aria-hidden />
+                    <span className="text-slate-700">
+                      {paid
+                        ? `Last week: paid ${rupees(Math.abs(Number(w.last_week_paid)))}`
+                        : due > 0
+                          ? `Last week: ${rupees(due)} to be paid by the office`
+                          : "Last week: nothing due"}
+                    </span>
+                  </p>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="px-4 pt-2 text-xs text-slate-500">
+            Workers have no login, so their pay shows here. The office pays them on Monday.
+          </p>
+        </div>
+      ) : null}
 
       {due.length ? (
         <div className="-mx-4">

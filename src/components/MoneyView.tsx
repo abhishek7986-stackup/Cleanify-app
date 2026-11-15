@@ -43,6 +43,16 @@ export async function MoneyView({ staffId, self }: { staffId: string; self: bool
   }
 
   const today = days[0];
+  // This week's approved expenses, split by whose money paid for them.
+  const { data: weekExp } = await supabase
+    .from("expenses")
+    .select("amount, paid_from")
+    .eq("staff_id", staffId)
+    .eq("week_start", s.week_start)
+    .eq("status", "APPROVED")
+    .is("voided_at", null);
+  const expFromCash = (weekExp ?? []).filter((x) => x.paid_from === "customer_cash").reduce((n, x) => n + Number(x.amount), 0);
+  const expFromOwn = (weekExp ?? []).filter((x) => x.paid_from === "own_money").reduce((n, x) => n + Number(x.amount), 0);
   const net = Number(s.week_net);
   const inHand = Math.max(0, -net);
   const you = self ? "you" : "they";
@@ -115,7 +125,9 @@ export async function MoneyView({ staffId, self }: { staffId: string; self: bool
             />
           ) : null}
           <Row k="Customers' cash collected this week" v={`− ${rupees(s.week_cash_collected)}`} />
-          {Number(s.week_handed_back) > 0 ? <Row k="Given to the office or spent on work (approved)" v={`+ ${rupees(s.week_handed_back)}`} /> : null}
+          {Number(s.week_handed_back) > 0 ? <Row k="Given to the office (confirmed)" v={`+ ${rupees(s.week_handed_back)}`} /> : null}
+          {expFromCash > 0 ? <Row k="Expenses paid from customers' cash" v={`+ ${rupees(expFromCash)}`} /> : null}
+          {expFromOwn > 0 ? <Row k={`Expenses paid from ${your} own money (repaid)`} v={`+ ${rupees(expFromOwn)}`} /> : null}
         </dl>
         <p className={`mt-3 flex items-baseline justify-between rounded-lg px-3 py-3 ${net < 0 ? "bg-danger-50" : "bg-ok-50"}`}>
           <span className={`font-semibold ${net < 0 ? "text-danger-700" : "text-ok-700"}`}>
